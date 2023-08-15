@@ -80,6 +80,10 @@ This exists because in default helix, even if you have no statusline elements in
 This option is designed to be disabled in your config, but you can set it on runtime as well (surprisingly). \
 It will look wonky if you do, so it makes the most sense to make a hotkey to toggle the statusline when / if you suddenly realize you want to see information in it (while not caring about it in the general case).
 
+### Implemented PRs from upstream
+
+* [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
+
 ### Command expansions
 
 When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.
