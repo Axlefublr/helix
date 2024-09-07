@@ -33,14 +33,13 @@ There's no need to handle the runtime directory again anymore, because the symli
 
 ## This fork's changes
 
-> [!NOTE]
-> One paragraph explains one change
-
 Things like hover docs, pickers, and possibly other various popups have <kbd>ctrl+d</kbd> and <kbd>ctrl+u</kbd> hardcoded to mean "scroll by half a page down / up" \
 It's really hard to press for me, and in the case of pickers, it overrides <kbd>ctrl+u</kbd> to delete until the start of the line, which I use *really* frequently elsewhere, \
 So I change <kbd>ctrl+d</kbd> to be <kbd>alt+l</kbd> and <kbd>ctrl+u</kbd> to be <kbd>alt+h</kbd>.
 
 Hotkey to toggle preview in a picker changed from <kbd>ctrl+t</kbd> to <kbd>alt+;</kbd> because the former might as well be impossible to press.
+
+---
 
 <div align="center">
 
