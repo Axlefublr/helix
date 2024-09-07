@@ -1,3 +1,45 @@
+# This is a fork...
+
+...with various changes that I prefer.
+
+To use it, you would have to build this repository from source.
+
+I recommend to [read the docs](https://docs.helix-editor.com/master/building-from-source.html) as they're likely to be more up to date than this readme (lol), but as a shortcut, here you go:
+
+> [!TIP]
+> Move into some directory where you would want to store this repo \
+> So that you could easily update and such
+
+```sh
+git clone --depth 1 https://github.com/Axlefublr/helix
+cd helix
+cargo install --path helix-term --locked
+mkdir -p ~/.cargo/bin/
+rm -fr ~/.cargo/bin/runtime
+ln -sf $PWD/runtime ~/.cargo/bin/
+```
+
+> [!WARNING]
+> If any of these commands are unfamiliar to you, you should definitely read the docs rather than trust me.
+
+In the future, when you want to update, you would:
+
+```sh
+git pull
+cargo install --path helix-term --locked
+```
+
+There's no need to handle the runtime directory again anymore, because the symlink takes care of that automatically.
+
+## This fork's changes
+
+> [!NOTE]
+> One paragraph explains one change
+
+Things like hover docs, pickers, and possibly other various popups have <kbd>ctrl+d</kbd> and <kbd>ctrl+u</kbd> hardcoded to mean "scroll by half a page down / up" \
+It's really hard to press for me, and in the case of pickers, it overrides <kbd>ctrl+u</kbd> to delete until the start of the line, which I use *really* frequently elsewhere, \
+So I change <kbd>ctrl+d</kbd> to be <kbd>alt+l</kbd> and <kbd>ctrl+u</kbd> to be <kbd>alt+h</kbd>.
+
 <div align="center">
 
 <h1>
