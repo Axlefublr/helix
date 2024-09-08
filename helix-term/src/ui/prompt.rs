@@ -635,7 +635,7 @@ impl Component for Prompt {
                     self.change_history(cx, register, CompletionDirection::Forward);
                 }
             }
-            key!(Tab) => {
+            key!(Tab) | alt!(';') => {
                 self.change_completion_selection(CompletionDirection::Forward);
                 // if single completion candidate is a directory list content in completion
                 if self.completion.len() == 1 && self.line.ends_with(std::path::MAIN_SEPARATOR) {
