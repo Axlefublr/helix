@@ -1071,7 +1071,7 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
                 }
                 return close_fn(self);
             }
-            alt!(';') => {
+            ctrl!('t') | alt!(';') => {
                 self.toggle_preview();
             }
             _ => {
