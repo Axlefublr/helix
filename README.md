@@ -1,14 +1,10 @@
-# This is a fork...
-
-...with various changes that I prefer.
+# This is my helix fork
 
 To use it, you would have to build this repository from source.
 
-I recommend to [read the docs](https://docs.helix-editor.com/master/building-from-source.html) as they're likely to be more up to date than this readme (lol), but as a shortcut, here you go:
-
-> [!TIP]
-> Move into some directory where you would want to store this repo \
-> So that you could easily update and such
+First, `cd` into some place where you would like to keep this repository, so that you can easily update in the future. \
+I recommend to also [read the docs](https://docs.helix-editor.com/master/building-from-source.html) on compiling helix from source, to make sure everything goes smoothly. \
+Then, execute this in your (linux) shell:
 
 ```sh
 git clone --depth 1 https://github.com/Axlefublr/helix
@@ -19,8 +15,10 @@ rm -fr ~/.cargo/bin/runtime
 ln -sf $PWD/runtime ~/.cargo/bin/
 ```
 
-> [!WARNING]
-> If any of these commands are unfamiliar to you, you should definitely read the docs rather than trust me.
+Because I make a symlink, the runtime directory that helix requires gets updated automatically. \
+When files in the `runtime/` directory of this repository (your locally stored copy) change, they change in the place where helix expects them, too.
+
+To make sure the locations match up, execute `helix --health`.
 
 In the future, when you want to update, you would:
 
@@ -29,15 +27,16 @@ git pull
 cargo install --path helix-term --locked
 ```
 
-There's no need to handle the runtime directory again anymore, because the symlink takes care of that automatically.
-
 ## This fork's changes
 
 Things like hover docs, pickers, and possibly other various popups have <kbd>ctrl+d</kbd> and <kbd>ctrl+u</kbd> hardcoded to mean "scroll by half a page down / up" \
-It's really hard to press for me, and in the case of pickers, it overrides <kbd>ctrl+u</kbd> to delete until the start of the line, which I use *really* frequently elsewhere, \
-So I change <kbd>ctrl+d</kbd> to be <kbd>alt+l</kbd> and <kbd>ctrl+u</kbd> to be <kbd>alt+h</kbd>.
+I change <kbd>ctrl+d</kbd> to be <kbd>alt+l</kbd> and <kbd>ctrl+u</kbd> to be <kbd>alt+h</kbd>. \
+I *replace* them specifically, because by default, <kbd>ctrl+u</kbd> overrides the very useful "delete until the start of the line" mapping. \
+So this change effectively also adds that mapping to pickers.
 
-Hotkey to toggle preview in a picker changed from <kbd>ctrl+t</kbd> to <kbd>alt+;</kbd> because the former might as well be impossible to press.
+Adds hotkey to toggle preview in a picker: <kbd>alt+;</kbd> (default is <kbd>ctrl+t</kbd>).
+
+In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the same as <kbd>Tab</kbd>.
 
 ---
 
