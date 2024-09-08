@@ -549,8 +549,8 @@ impl Component for Prompt {
             alt!('f') | ctrl!(Right) => self.move_cursor(Movement::ForwardWord(1)),
             ctrl!('b') | key!(Left) => self.move_cursor(Movement::BackwardChar(1)),
             ctrl!('f') | key!(Right) => self.move_cursor(Movement::ForwardChar(1)),
-            ctrl!('e') | key!(End) => self.move_end(),
-            ctrl!('a') | key!(Home) => self.move_start(),
+            ctrl!('e') | key!(End) | alt!('.') => self.move_end(),
+            ctrl!('a') | key!(Home) | alt!(',') => self.move_start(),
             ctrl!('w') | alt!(Backspace) | ctrl!(Backspace) => {
                 self.delete_word_backwards(cx.editor);
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);

@@ -38,6 +38,8 @@ Adds hotkey to toggle preview in a picker: <kbd>alt+;</kbd> (default is <kbd>ctr
 
 In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the same as <kbd>Tab</kbd>.
 
+In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start of the line and <kbd>alt+.</kbd> to the end, like <kbd>ctrl+a</kbd> and <kbd>ctrl+e</kbd> also do.
+
 ---
 
 <div align="center">
