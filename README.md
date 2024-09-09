@@ -40,6 +40,8 @@ In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the s
 
 In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start of the line and <kbd>alt+.</kbd> to the end, like <kbd>ctrl+a</kbd> and <kbd>ctrl+e</kbd> also do.
 
+Wherever <kbd>ctrl+n</kbd> & <kbd>ctrl+p</kbd> work, <kbd>alt+j</kbd> & <kbd>alt+k</kbd> do too.
+
 ---
 
 <div align="center">
