@@ -20,6 +20,9 @@ When files in the `runtime/` directory of this repository (your locally stored c
 
 To make sure the locations match up, execute `helix --health`.
 
+The full path to the binary you'll get is `~/.cargo/bin/hx`, so you will be able to use `hx` in your shell if `~/.cargo/bin` is in your $PATH (it likely already is). \
+The `helix` package on arch actually gives you the executable `helix`, rather than `hx`. Here you will get `hx` even if you are on arch.
+
 In the future, when you want to update, you would:
 
 ```sh
@@ -39,8 +42,6 @@ Adds hotkey to toggle preview in a picker: <kbd>alt+;</kbd> (default is <kbd>ctr
 In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the same as <kbd>Tab</kbd>.
 
 In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start of the line and <kbd>alt+.</kbd> to the end, like <kbd>ctrl+a</kbd> and <kbd>ctrl+e</kbd> also do.
-
-Wherever <kbd>ctrl+n</kbd> & <kbd>ctrl+p</kbd> work, <kbd>alt+j</kbd> & <kbd>alt+k</kbd> do too.
 
 ---
 
