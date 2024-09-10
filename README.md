@@ -45,6 +45,23 @@ In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start
 
 `shell_replace_with_output` mappable action, that acts like `shell_pipe`, but doesn't pipe the selections into the command. So, just execute a command and replace selections with the output.
 
+### Command expansions
+
+When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.
+
+Consider that our current working directory is `~/prog/dotfiles` and the currently open buffer is `~/prog/dotfiles/helix/config.toml`. \
+`:sh echo %p` will output `/home/username/prog/dotfiles/helix/config.toml` (full path) \
+`:sh echo %h` -> `/home/username/prog/dotfiles/helix` ("head" of the current buffer) \
+`:sh echo %w` -> `/home/username/prog/dotfiles` (helix's working directory)
+
+If you want to insert `%p` literally, escape it like: `%%p`. \
+`:sh echo %%p` -> `%p`.
+
+If any other character, aside from the ones supported, comes after the `%`, you don't need to escape it, and can use it normally. \
+`:sh echo %m` -> `%m`.
+
+This behavior may change in the future, not sure if it's the nicest solution.
+
 ---
 
 <div align="center">

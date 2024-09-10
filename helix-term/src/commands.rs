@@ -5866,6 +5866,64 @@ async fn shell_impl_async(
     Ok(Tendril::from(output))
 }
 
+fn expand_expansions(cmd: &str, doc: &Document) -> String {
+    let maybe_path = doc.path.as_ref();
+    let mut result = String::new();
+    let mut chars = cmd.chars().peekable();
+
+    while let Some(chr) = chars.next() {
+        if chr != '%' {
+            result.push(chr);
+            continue;
+        }
+
+        let Some(&next_chr) = chars.peek() else {
+            // % as last character in string
+            result.push(chr);
+            continue;
+        };
+
+        let mut maybe_expand = |next_chr: char, replacement: &str| {
+            // if previous char was % too
+            if result.ends_with('%') {
+                result.push(next_chr);
+            } else {
+                result.push_str(replacement);
+            }
+            chars.next();
+        };
+
+        if next_chr == 'p' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| buf.display().to_string())
+                    .unwrap_or_default(),
+            )
+        } else if next_chr == 'h' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| {
+                        let mut buf = buf.clone();
+                        buf.pop();
+                        buf.display().to_string()
+                    })
+                    .unwrap_or_default(),
+            )
+        } else if next_chr == 'w' {
+            maybe_expand(
+                next_chr,
+                &helix_stdx::env::current_working_dir().display().to_string(),
+            )
+        } else {
+            result.push(chr);
+        }
+    }
+
+    result
+}
+
 fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let pipe = match behavior {
         ShellBehavior::Replace | ShellBehavior::Ignore => true,
@@ -5876,6 +5934,8 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let shell = &config.shell;
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id);
+
+    let cmd = expand_expansions(cmd, doc);
 
     let mut changes = Vec::with_capacity(selection.len());
     let mut ranges = SmallVec::with_capacity(selection.len());
@@ -5888,7 +5948,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             output.clone()
         } else {
             let input = range.slice(text);
-            match shell_impl(shell, cmd, pipe.then(|| input.into())) {
+            match shell_impl(shell, &cmd, pipe.then(|| input.into())) {
                 Ok(mut output) => {
                     if !input.ends_with("\n") && !output.is_empty() && output.ends_with('\n') {
                         output.pop();

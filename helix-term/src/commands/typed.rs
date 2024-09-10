@@ -2292,7 +2292,9 @@ fn run_shell_command(
     }
 
     let shell = cx.editor.config().shell.clone();
+    let (_, doc) = current!(cx.editor);
     let args = args.join(" ");
+    let args = expand_expansions(&args, doc);
 
     let callback = async move {
         let output = shell_impl_async(&shell, &args, None).await?;
