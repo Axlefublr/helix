@@ -557,6 +557,7 @@ impl MappableCommand {
         shell_pipe_to, "Pipe selections into shell command ignoring output",
         shell_insert_output, "Insert shell command output before selections",
         shell_append_output, "Append shell command output after selections",
+        shell_replace_with_output, "Replace selections with the output of a shell command",
         shell_keep_pipe, "Filter selections with shell predicate",
         suspend, "Suspend and return to shell",
         rename_symbol, "Rename symbol",
@@ -5722,6 +5723,7 @@ enum ShellBehavior {
     Ignore,
     Insert,
     Append,
+    JustReplace,
 }
 
 fn shell_pipe(cx: &mut Context) {
@@ -5738,6 +5740,14 @@ fn shell_insert_output(cx: &mut Context) {
 
 fn shell_append_output(cx: &mut Context) {
     shell_prompt(cx, "append-output:".into(), ShellBehavior::Append);
+}
+
+fn shell_replace_with_output(cx: &mut Context) {
+    shell_prompt(
+        cx,
+        "replace-with-output:".into(),
+        ShellBehavior::JustReplace,
+    );
 }
 
 fn shell_keep_pipe(cx: &mut Context) {
@@ -5859,7 +5869,7 @@ async fn shell_impl_async(
 fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let pipe = match behavior {
         ShellBehavior::Replace | ShellBehavior::Ignore => true,
-        ShellBehavior::Insert | ShellBehavior::Append => false,
+        ShellBehavior::Insert | ShellBehavior::Append | ShellBehavior::JustReplace => false,
     };
 
     let config = cx.editor.config();
@@ -5902,7 +5912,9 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
         let output_len = output.chars().count();
 
         let (from, to, deleted_len) = match behavior {
-            ShellBehavior::Replace => (range.from(), range.to(), range.len()),
+            ShellBehavior::Replace | ShellBehavior::JustReplace => {
+                (range.from(), range.to(), range.len())
+            }
             ShellBehavior::Insert => (range.from(), range.from(), 0),
             ShellBehavior::Append => (range.to(), range.to(), 0),
             _ => (range.from(), range.from(), 0),

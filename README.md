@@ -43,6 +43,8 @@ In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the s
 
 In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start of the line and <kbd>alt+.</kbd> to the end, like <kbd>ctrl+a</kbd> and <kbd>ctrl+e</kbd> also do.
 
+`shell_replace_with_output` mappable action, that acts like `shell_pipe`, but doesn't pipe the selections into the command. So, just execute a command and replace selections with the output.
+
 ---
 
 <div align="center">
