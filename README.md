@@ -1,6 +1,30 @@
 # This is my helix fork
 
-To use it, you would have to build this repository from source.
+And it is, first and foremost, a personal fork. \
+I am one person, and will only implement features that *I* need, to minimize the cost of maintenance.
+
+There is a small chance I'll add your requested feature, but that chance is very small; You will have more luck adding it yourself, to your own fork.
+
+Ah yes, the wonderful plugin ecosystem of helix: just making a fork and modifying the source 💀
+
+I will arbitrarily add breaking changes, either to the changes already made by this fork, or to core.
+Autoupdating this fork is a bad idea, consequently. It would save your mental sanity to check the commits from time to time to see what changed, and decide to recompile again once there are features you want here, rather than trusting things to just continue working in the same way indefinitely.
+
+There is one single place where all of the fork's changes are going to be listed — this readme! In the "This fork's changes" section you'll see below. Once you read it once, you'll be able to skim through it from time to time to see what changed; completely new features will appear at the bottom, sometimes in new sections.
+
+This fork is based on helix master, not stable. \
+I will be rebasing on upstream master every time I see a feature I want from there. \
+Considering just how awfully slow helix development is in upstream, this might not happen often, but I *am* keeping a look at the new commits in master.
+
+If there's a feature from master that you want to get and I haven't yet rebased on it, you can ask me in an issue, describing why you want that feature. I'm sorry for making that requirement, but I really want to minimize my effort maintaining this, so will only rebase when *I* don't need to, if it noticeably improves someone else's experience.
+
+To conclude: this fork can be useful to you, if you want the features it implements, but I wouldn't say it's a fork you can *rely* on, like you would be able on upstream stable. One thing I can promise you though, is that I'm obscenely obsessed with configuring my editor, and so I will maintain this for as long as I use helix and as long as it doesn't have every single feature I want, lol. So the situation of the latest commit being 5 months ago, that I saw with another helix fork, is most likely not going to happen.
+
+You can join my [discord server](https://discord.gg/bgVSg362dK) if you want to hear me glaze helix (and talk about features I'm currently implementing).
+
+## Installation
+
+To use this fork, you would have to build this repository from source.
 
 First, `cd` into some place where you would like to keep this repository, so that you can easily update in the future. \
 I recommend to also [read the docs](https://docs.helix-editor.com/master/building-from-source.html) on compiling helix from source, to make sure everything goes smoothly. \
