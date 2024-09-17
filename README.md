@@ -85,6 +85,85 @@ Here's what all command expansions would evaluate to:
 |`%m`     |`%m`                                            |not an expansion, taken literally       |
 |`%%p`    |`%p`                                            |escaped using `%%` to be taken literally|
 
+### Harp
+
+My favorite feature I had in nvim! \
+Inspired by [`harp-nvim`](https://github.com/Axlefublr/harp-nvim), implemented using the [`harp`](https://github.com/Axlefublr/harp) library. \
+I will be using concepts from `harp` in my explanation, I expect you to have read the readme of that project. \You don't have to be familiar with `harp-nvim`, but if you are, you'll get what I'm going to be talking about easier.
+
+You can think of "harps" as storage units. You can store some information related to the editor in a harp, to then use it later. \
+Harps are *persistent*. Once you set a harp, it stays forever, until overwritten in the future (by you, again) and gets retained across helix sessions. \
+Even if you have multiple helix sessions open at a time, if you set a harp in one session, it will *immediately* become available in another session.
+
+To organize harps, there are harp "sections". \
+Sections exist to organize all the different types of harps, to allow you to use one harp name across multiple different harp *types*.
+Each individual harp is given its name by *you*, interactively. \
+So, you can store some file in a "file harp" called `a`, and then store your latest search in a "search harp" (not yet implemented) called also `a`; these will not conflict, and let you consistently use short names for maximum efficiency (if that is your preference). \
+You can either *get* a harp (take the information stored in a harp and use it somehow) or *set* a harp (take some information from the environment and store it in a harp).
+
+#### Why are harps helpful?
+
+Typing things in takes a long time, while being done so often.
+
+Let's take `:open` for example. \
+If you want to open a path with a really long path, you will ideally want to type in the minimum amount of characters possible, to then press <kbd>Tab</kbd> to autocomplete, on *each* path component. \
+This consistently gets annoying when the string you need to type in to tab complete is long too. \
+If you want to complete `~/downgrade/test.lua`, you need to type in `downg` to tab complete, because `Downloads` also exists in that directory. \
+Then maybe in `downgrade`, there is also `test.py`. Now you have to type in `test.l` and at that point, it's not even worth completing.
+
+Fuzzy searching is better but has a different issue. \
+First of all, it's dependent on your current working directory: `file_picker` of helix, or `telescope` of nvim will usually open from your cwd. \
+If you need to open a file from somewhere else, you're fucked.
+
+In the case with helix, you can `:open` a directory to fuzzy search it, but at that point you're just mixing in two non-perfect methods.
+
+The second issue with the fuzzy file picker, is the min-maxed fuzzy strings you end up creating and memorizing to get to the file you want the most efficiently (similar to the min-maxed tab complete strings in `:open`). \
+Those can get pretty arbitrary; to get to `helix/generator.py` I have in my dotfiles, the fuzzy search for it is `raty`. \
+Worse yet, it might change in the future, if I create a new file that matches `raty` more closely. \
+Well, I don't have to deal with that anymore! Now it's literally just `c` and I can get to it from *anywhere* **instantly** with a file harp.
+
+Simple, direct, fast.
+
+Harps don't magically remove your usage of `:open` or the fuzzy search picker, they *minimize* it. \
+First you get to some file using one of the two, and store it in a harp. \
+Now you get a "bookmark" of the file, that lets you completely circumvent having to dance around with `:open`/fzf ever again with that file. \
+The different harp types (only one exists, I intend to add more) allow you to express *what* you're storing and relative to *where* you're storing it, giving you a lot of flexibility *and* speed.
+
+Stop thinking about *how* to get to your file, let your muscle memory move you there.
+
+#### Structure
+
+Throughout the explanation of each upcoming harp type, I will also be giving you the section names. \
+They do not come up in usage, but if you ever look at the data file (`~/.local/share/harp.yml` on linux), you will know what refers to what. \
+This may also help you understand if things aren't working the way you expected them to, if you know how sections are named and made. \
+Each harp type will start with the `get` mappable action and the `set` mappable action, that you can make mappings for. \
+The name `set` may possibly be confused to mean "this can only be set once". \
+This is not the case, `set` creates a new harp if it didn't exist before, or *updates* a harp if it already exists, so if you realize you don't need the old value of some harp, you can *override* it with a new one using the `set` action. \
+After an explanation for what the harp *does*, I will explain the usecase and thought process behind creating it.
+
+#### File harps
+
+```
+harp_file_get
+harp_file_set
+```
+
+`set` to store the full path of the current buffer into a harp in the `harp_files` section. \
+When you `get` it, `:open` the file stored in the harp.
+
+This is really useful for files that you know you want to open from *anywhere*. \
+Perfect usecase is for dotfiles. \
+Say you were just editing some code and opened lazygit. \
+Now you realize that you want to change some setting in your lazygit config. \
+But oh no! You were working on some project, and really can't be bothered to go locate the lazygit config file, so you just think "meh, I'll do that later" and forget about it. \
+I always found that really annoying!
+
+Well, if you previously stored that config file in a *file harp*, you don't need to be in this situation anymore. \
+Just `harp_file_get`, change the setting you wanted, and go back to the file you were just editing in the project, continuing to use your (now reconfigured) lazygit. \
+I've been using this for a while in nvim, and from personal experience, I noticed that you get to retain the "flow" state, which is *really* helpful when programming.
+
+Currently this is the only harp that's implemented, but I intend to add quite a few more, to finally make me miss nothing from nvim 🔥.
+
 ---
 
 <div align="center">
