@@ -73,18 +73,17 @@ In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start
 
 When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.
 
+Example usage: `:sh echo %p`.
+
 Consider that our current working directory is `~/prog/dotfiles` and the currently open buffer is `~/prog/dotfiles/helix/config.toml`. \
-`:sh echo %p` will output `/home/username/prog/dotfiles/helix/config.toml` (full path) \
-`:sh echo %h` -> `/home/username/prog/dotfiles/helix` ("head" of the current buffer) \
-`:sh echo %w` -> `/home/username/prog/dotfiles` (helix's working directory)
-
-If you want to insert `%p` literally, escape it like: `%%p`. \
-`:sh echo %%p` -> `%p`.
-
-If any other character, aside from the ones supported, comes after the `%`, you don't need to escape it, and can use it normally. \
-`:sh echo %m` -> `%m`.
-
-This behavior may change in the future, not sure if it's the nicest solution.
+Here's what all command expansions would evaluate to:
+|Expansion|Output                                          |Explanation                             |
+|-------- |------------------------------------------------|----------------------------------------|
+|`%p`     |`/home/username/prog/dotfiles/helix/config.toml`|full path                               |
+|`%h`     |`/home/username/prog/dotfiles/helix`            |"head" of the current buffer            |
+|`%w`     |`/home/username/prog/dotfiles`                  |helix's working directory               |
+|`%m`     |`%m`                                            |not an expansion, taken literally       |
+|`%%p`    |`%p`                                            |escaped using `%%` to be taken literally|
 
 ---
 
