@@ -89,7 +89,8 @@ Here's what all command expansions would evaluate to:
 
 My favorite feature I had in nvim! \
 Inspired by [`harp-nvim`](https://github.com/Axlefublr/harp-nvim), implemented using the [`harp`](https://github.com/Axlefublr/harp) library. \
-I will be using concepts from `harp` in my explanation, I expect you to have read the readme of that project. \You don't have to be familiar with `harp-nvim`, but if you are, you'll get what I'm going to be talking about easier.
+I will be using concepts from `harp` in my explanation, I expect you to have read the readme of that project. \
+You don't have to be familiar with `harp-nvim`, but if you are, you'll get what I'm going to be talking about easier.
 
 You can think of "harps" as storage units. You can store some information related to the editor in a harp, to then use it later. \
 Harps are *persistent*. Once you set a harp, it stays forever, until overwritten in the future (by you, again) and gets retained across helix sessions. \

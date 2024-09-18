@@ -558,7 +558,6 @@ impl MappableCommand {
         shell_pipe_to, "Pipe selections into shell command ignoring output",
         shell_insert_output, "Insert shell command output before selections",
         shell_append_output, "Append shell command output after selections",
-        shell_replace_with_output, "Replace selections with the output of a shell command",
         shell_keep_pipe, "Filter selections with shell predicate",
         suspend, "Suspend and return to shell",
         rename_symbol, "Rename symbol",
@@ -569,8 +568,10 @@ impl MappableCommand {
         command_palette, "Open command palette",
         goto_word, "Jump to a two-character label",
         extend_to_word, "Extend to a two-character label",
+        //-----------------------------------------------fork-----------------------------------------------
         harp_file_get, "Open a file harp",
         harp_file_set, "Set a file harp",
+        shell_replace_with_output, "Replace selections with the output of a shell command",
     );
 }
 
@@ -672,6 +673,116 @@ impl PartialEq for MappableCommand {
         }
     }
 }
+
+//---------------------------------------------------fork---------------------------------------------------
+fn harp_file_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp file get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let harp = HarpReady::build().unwrap();
+
+            let maybe_entry = harp.get("harp_files", input, true, false, false, false);
+
+            let entry = match maybe_entry {
+                Ok(entry) => entry,
+                Err(_) => {
+                    log::error!(
+                        "harp: register `{}` doesn't exist in section `harp_files`",
+                        input
+                    );
+                    return;
+                }
+            };
+
+            let maybe_set = match &entry.path {
+                Some(path) => path,
+                None => {
+                    log::error!(
+                        "harp: path of register `{}` in section `harp_files` is empty",
+                        input
+                    );
+                    return;
+                }
+            };
+
+            let path = match PathBuf::try_from(maybe_set) {
+                Ok(path) => path,
+                Err(_) => {
+                    log::error!(
+                        "harp: path of register `{}` in section `harp_files` is not a path",
+                        input
+                    );
+                    return;
+                }
+            };
+
+            // taken from :open impl
+            let _ = cx.editor.open(&path, Action::Replace).unwrap();
+            // let (view, doc) = current!(cx.editor);
+            // let pos = Selection::point(pos_at_coords(doc.text().slice(..), pos, true));
+            // doc.set_selection(view.id, pos);
+            // does not affect opening a buffer without pos
+            // align_view(doc, view, Align::Center);
+        },
+    )
+}
+
+fn harp_file_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp file set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let mut harp = HarpReady::build().unwrap();
+
+            let (_, doc) = current!(cx.editor);
+            let Some(path) = &doc.path else {
+                log::error!("harp: current buffer doesn't have a path");
+                return;
+            };
+
+            let maybe_entry = harp.update(
+                "harp_files".into(),
+                input.into(),
+                Some(path.display().to_string()),
+                None,
+                None,
+                None,
+            );
+
+            if maybe_entry.is_err() {
+                log::error!("harp: couldn't save current path");
+            }
+        },
+    )
+}
+
+fn shell_replace_with_output(cx: &mut Context) {
+    shell_prompt(
+        cx,
+        "replace-with-output:".into(),
+        ShellBehavior::JustReplace,
+    );
+}
+//---------------------------------------------------fork---------------------------------------------------
 
 fn no_op(_cx: &mut Context) {}
 
@@ -5720,113 +5831,13 @@ fn surround_delete(cx: &mut Context) {
     })
 }
 
-fn harp_file_get(cx: &mut Context) {
-    ui::prompt(
-        cx,
-        "harp file get:".into(),
-        None,
-        ui::completers::none,
-        move |cx, input: &str, event: PromptEvent| {
-            if event != PromptEvent::Validate {
-                return;
-            }
-            if input.is_empty() {
-                return;
-            }
-
-            let harp = HarpReady::build().unwrap();
-
-            let maybe_entry = harp.get("harp_files", input, true, false, false, false);
-
-            let entry = match maybe_entry {
-                Ok(entry) => entry,
-                Err(_) => {
-                    log::error!(
-                        "harp: register `{}` doesn't exist in section `harp_files`",
-                        input
-                    );
-                    return;
-                }
-            };
-
-            let maybe_set = match &entry.path {
-                Some(path) => path,
-                None => {
-                    log::error!(
-                        "harp: path of register `{}` in section `harp_files` is empty",
-                        input
-                    );
-                    return;
-                }
-            };
-
-            let path = match PathBuf::try_from(maybe_set) {
-                Ok(path) => path,
-                Err(_) => {
-                    log::error!(
-                        "harp: path of register `{}` in section `harp_files` is not a path",
-                        input
-                    );
-                    return;
-                }
-            };
-
-            // taken from :open impl
-            let _ = cx.editor.open(&path, Action::Replace).unwrap();
-            // let (view, doc) = current!(cx.editor);
-            // let pos = Selection::point(pos_at_coords(doc.text().slice(..), pos, true));
-            // doc.set_selection(view.id, pos);
-            // does not affect opening a buffer without pos
-            // align_view(doc, view, Align::Center);
-        },
-    )
-}
-
-fn harp_file_set(cx: &mut Context) {
-    ui::prompt(
-        cx,
-        "harp file set:".into(),
-        None,
-        ui::completers::none,
-        move |cx, input: &str, event: PromptEvent| {
-            if event != PromptEvent::Validate {
-                return;
-            }
-            if input.is_empty() {
-                return;
-            }
-
-            let mut harp = HarpReady::build().unwrap();
-
-            let (_, doc) = current!(cx.editor);
-            let Some(path) = &doc.path else {
-                log::error!("harp: current buffer doesn't have a path");
-                return;
-            };
-
-            let maybe_entry = harp.update(
-                "harp_files".into(),
-                input.into(),
-                Some(path.display().to_string()),
-                None,
-                None,
-                None,
-            );
-
-            if maybe_entry.is_err() {
-                log::error!("harp: couldn't save current path");
-            }
-        },
-    )
-}
-
 #[derive(Eq, PartialEq)]
 enum ShellBehavior {
     Replace,
     Ignore,
     Insert,
     Append,
-    JustReplace,
+    JustReplace, // fork
 }
 
 fn shell_pipe(cx: &mut Context) {
@@ -5843,14 +5854,6 @@ fn shell_insert_output(cx: &mut Context) {
 
 fn shell_append_output(cx: &mut Context) {
     shell_prompt(cx, "append-output:".into(), ShellBehavior::Append);
-}
-
-fn shell_replace_with_output(cx: &mut Context) {
-    shell_prompt(
-        cx,
-        "replace-with-output:".into(),
-        ShellBehavior::JustReplace,
-    );
 }
 
 fn shell_keep_pipe(cx: &mut Context) {
