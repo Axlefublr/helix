@@ -69,6 +69,8 @@ In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start
 
 `shell_replace_with_output` mappable action, that acts like `shell_pipe`, but doesn't pipe the selections into the command. So, just execute a command and replace selections with the output.
 
+`:random` command with aliases `:rnd`, `:rng` that randomizes your selections.
+
 ### Command expansions
 
 When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.
