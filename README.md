@@ -71,6 +71,10 @@ In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start
 
 `:random` command with aliases `:rnd`, `:rng` that randomizes your selections.
 
+`whichkey` option in the `[editor]` section can be set to `true` (default) or `false`. \
+If set to `false`, the infoboxes for *mappings* will not show up. \
+This is different from just disabling the `auto-info` option in that you will still get the popup for `select_register`.
+
 ### Command expansions
 
 When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.

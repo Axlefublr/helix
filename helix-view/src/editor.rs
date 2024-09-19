@@ -298,6 +298,8 @@ pub struct Config {
     pub completion_replace: bool,
     /// Whether to display infoboxes. Defaults to true.
     pub auto_info: bool,
+    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
+    pub whichkey: bool,
     pub file_picker: FilePickerConfig,
     /// Configuration of the statusline elements
     pub statusline: StatusLineConfig,
@@ -954,6 +956,7 @@ impl Default for Config {
             preview_completion_insert: true,
             completion_trigger_len: 2,
             auto_info: true,
+            whichkey: true,
             file_picker: FilePickerConfig::default(),
             statusline: StatusLineConfig::default(),
             cursor_shape: CursorShapeConfig::default(),

@@ -5696,7 +5696,9 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
         (" ", "... or any character acting as a pair"),
     ];
 
-    cx.editor.autoinfo = Some(Info::new(title, &help_text));
+    if cx.editor.config.load().whichkey {
+        cx.editor.autoinfo = Some(Info::new(title, &help_text));
+    }
 }
 
 fn surround_add(cx: &mut Context) {
