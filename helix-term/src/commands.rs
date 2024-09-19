@@ -2,7 +2,6 @@ pub(crate) mod dap;
 pub(crate) mod lsp;
 pub(crate) mod typed;
 
-use axleharp::HarpReady;
 pub use dap::*;
 use futures_util::FutureExt;
 use helix_event::status;
@@ -570,7 +569,9 @@ impl MappableCommand {
         extend_to_word, "Extend to a two-character label",
         //-----------------------------------------------fork-----------------------------------------------
         harp_file_get, "Open a file harp",
-        harp_file_set, "Set a file harp",
+        harp_file_set, "Set a file harp to the current buffer",
+        harp_search_get, "Search for a stored search harp",
+        harp_search_set, "Set a search harp to the contents of your `/` register",
         shell_replace_with_output, "Replace selections with the output of a shell command",
     );
 }
@@ -675,6 +676,130 @@ impl PartialEq for MappableCommand {
 }
 
 //---------------------------------------------------fork---------------------------------------------------
+use axleharp::HarpReady;
+
+#[derive(Default)]
+struct HarpOutput {
+    path: Option<PathBuf>,
+    // line: Option<i32>,
+    // column: Option<i32>,
+    extra: Option<String>,
+}
+
+#[derive(Default)]
+struct HarpInput {
+    path: Option<String>,
+    line: Option<i32>,
+    column: Option<i32>,
+    extra: Option<String>,
+}
+
+#[derive(Default)]
+struct HarpContract {
+    path: bool,
+    line: bool,
+    column: bool,
+    extra: bool,
+}
+
+impl HarpContract {
+    fn path() -> Self {
+        HarpContract {
+            path: true,
+            ..Default::default()
+        }
+    }
+
+    fn extra() -> Self {
+        HarpContract {
+            extra: true,
+            ..Default::default()
+        }
+    }
+}
+
+impl HarpOutput {
+    fn build(section: &str, register: &str, contract: HarpContract) -> Result<Self, String> {
+        let harp = HarpReady::build().unwrap();
+
+        let entry = harp
+            .get(
+                section,
+                register,
+                contract.path,
+                contract.line,
+                contract.column,
+                contract.extra,
+            )
+            .map_err(|_| {
+                format!(
+                    "harp: register `{}` doesn't exist in section `{}`",
+                    register, section,
+                )
+            })?;
+
+        let path: Option<PathBuf> = if contract.path {
+            Some(
+                entry
+                    .path
+                    .clone()
+                    .ok_or(format!(
+                        "harp: path of register `{}` in section `{}` is empty",
+                        register, section
+                    ))?
+                    .try_into()
+                    .map_err(|_| {
+                        format!(
+                            "harp: path of register `{}` in section `{}` is not a path",
+                            register, section
+                        )
+                    })?,
+            )
+        } else {
+            None
+        };
+
+        let extra: Option<String> = if contract.extra {
+            Some(entry.extra.clone().ok_or(format!(
+                "harp: extra of register `{}` in section `{}` is empty",
+                register, section
+            ))?)
+        } else {
+            None
+        };
+
+        Ok(Self {
+            path,
+            // line: None,
+            // column: None,
+            extra,
+        })
+    }
+}
+
+fn harp_update(section: &str, register: &str, values: HarpInput) -> Result<(), String> {
+    let mut harp = HarpReady::build().unwrap();
+
+    if harp
+        .update(
+            section.into(),
+            register.into(),
+            values.path,
+            values.line,
+            values.column,
+            values.extra,
+        )
+        .is_err()
+    {
+        Err(format!(
+            "harp: couldn't update register {} in section {}",
+            register, section
+        ))
+    } else {
+        Ok(())
+    }
+}
+
 fn harp_file_get(cx: &mut Context) {
     ui::prompt(
         cx,
@@ -689,50 +814,17 @@ fn harp_file_get(cx: &mut Context) {
                 return;
             }
 
-            let harp = HarpReady::build().unwrap();
-
-            let maybe_entry = harp.get("harp_files", input, true, false, false, false);
-
-            let entry = match maybe_entry {
-                Ok(entry) => entry,
-                Err(_) => {
-                    log::error!(
-                        "harp: register `{}` doesn't exist in section `harp_files`",
-                        input
-                    );
+            let values = match HarpOutput::build("harp_files", input, HarpContract::path()) {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
                     return;
                 }
             };
 
-            let maybe_set = match &entry.path {
-                Some(path) => path,
-                None => {
-                    log::error!(
-                        "harp: path of register `{}` in section `harp_files` is empty",
-                        input
-                    );
-                    return;
-                }
-            };
-
-            let path = match PathBuf::try_from(maybe_set) {
-                Ok(path) => path,
-                Err(_) => {
-                    log::error!(
-                        "harp: path of register `{}` in section `harp_files` is not a path",
-                        input
-                    );
-                    return;
-                }
-            };
-
-            // taken from :open impl
-            let _ = cx.editor.open(&path, Action::Replace).unwrap();
-            // let (view, doc) = current!(cx.editor);
-            // let pos = Selection::point(pos_at_coords(doc.text().slice(..), pos, true));
-            // doc.set_selection(view.id, pos);
-            // does not affect opening a buffer without pos
-            // align_view(doc, view, Align::Center);
+            cx.editor
+                .open(&values.path.unwrap(), Action::Replace)
+                .unwrap();
         },
     )
 }
@@ -751,26 +843,106 @@ fn harp_file_set(cx: &mut Context) {
                 return;
             }
 
-            let mut harp = HarpReady::build().unwrap();
-
             let (_, doc) = current!(cx.editor);
             let Some(path) = &doc.path else {
-                log::error!("harp: current buffer doesn't have a path");
+                cx.editor
+                    .set_error("harp: current buffer doesn't have a path");
                 return;
             };
 
-            let maybe_entry = harp.update(
-                "harp_files".into(),
-                input.into(),
-                Some(path.display().to_string()),
-                None,
-                None,
-                None,
-            );
+            if let Err(msg) = harp_update(
+                "harp_files",
+                input,
+                HarpInput {
+                    path: Some(path.display().to_string()),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
+        },
+    )
+}
 
-            if maybe_entry.is_err() {
-                log::error!("harp: couldn't save current path");
+fn harp_search_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp search get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
             }
+            if input.is_empty() {
+                return;
+            }
+
+            let values = match HarpOutput::build("harp_searches", input, HarpContract::extra()) {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
+                    return;
+                }
+            };
+
+            match cx
+                .editor
+                .registers
+                .write('/', vec![values.extra.clone().unwrap()])
+            {
+                Ok(_) => cx
+                    .editor
+                    .set_status(format!("harp: set search to `{}`", values.extra.unwrap())),
+                Err(err) => cx.editor.set_error(err.to_string()),
+            }
+        },
+    )
+}
+
+fn harp_search_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp search set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let search: String = {
+                let Some(mut search) = cx.editor.registers.read('/', cx.editor) else {
+                    cx.editor.set_error("harp: register / is empty");
+                    return;
+                };
+                match search.next() {
+                    Some(search) => search.to_string(),
+                    None => {
+                        drop(search);
+                        cx.editor.set_error("harp: register / is empty");
+                        return;
+                    }
+                }
+            };
+
+            if let Err(msg) = harp_update(
+                "harp_searches",
+                input,
+                HarpInput {
+                    extra: Some(search),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
         },
     )
 }

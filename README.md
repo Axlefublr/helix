@@ -42,7 +42,7 @@ ln -sf $PWD/runtime ~/.cargo/bin/
 Because I make a symlink, the runtime directory that helix requires gets updated automatically. \
 When files in the `runtime/` directory of this repository (your locally stored copy) change, they change in the place where helix expects them, too.
 
-To make sure the locations match up, execute `helix --health`.
+To make sure the locations match up, see the output of `helix --health`.
 
 The full path to the binary you'll get is `~/.cargo/bin/hx`, so you will be able to use `hx` in your shell if `~/.cargo/bin` is in your $PATH (it likely already is). \
 The `helix` package on arch actually gives you the executable `helix`, rather than `hx`. Here you will get `hx` even if you are on arch.
@@ -105,7 +105,7 @@ Even if you have multiple helix sessions open at a time, if you set a harp in on
 To organize harps, there are harp "sections". \
 Sections exist to organize all the different types of harps, to allow you to use one harp name across multiple different harp *types*.
 Each individual harp is given its name by *you*, interactively. \
-So, you can store some file in a "file harp" called `a`, and then store your latest search in a "search harp" (not yet implemented) called also `a`; these will not conflict, and let you consistently use short names for maximum efficiency (if that is your preference). \
+So, you can store some file in a "file harp" called `a`, and then store your latest search in a "search harp" called also `a`; these will not conflict, and let you consistently use short names for maximum efficiency (if that is your preference). \
 You can either *get* a harp (take the information stored in a harp and use it somehow) or *set* a harp (take some information from the environment and store it in a harp).
 
 #### Why are harps helpful?
@@ -134,7 +134,7 @@ Simple, direct, fast.
 Harps don't magically remove your usage of `:open` or the fuzzy search picker, they *minimize* it. \
 First you get to some file using one of the two, and store it in a harp. \
 Now you get a "bookmark" of the file, that lets you completely circumvent having to dance around with `:open`/fzf ever again with that file. \
-The different harp types (only one exists, I intend to add more) allow you to express *what* you're storing and relative to *where* you're storing it, giving you a lot of flexibility *and* speed.
+The different harp types (only one file-structure-related harp type exists, I intend to add more) allow you to express *what* you're storing and relative to *where* you're storing it, giving you a lot of flexibility *and* speed.
 
 Stop thinking about *how* to get to your file, let your muscle memory move you there.
 
@@ -156,7 +156,7 @@ harp_file_set
 ```
 
 `set` to store the full path of the current buffer into a harp in the `harp_files` section. \
-When you `get` it, `:open` the file stored in the harp.
+`get` to `:open` the file stored in the harp.
 
 This is really useful for files that you know you want to open from *anywhere*. \
 Perfect usecase is for dotfiles. \
@@ -169,7 +169,43 @@ Well, if you previously stored that config file in a *file harp*, you don't need
 Just `harp_file_get`, change the setting you wanted, and go back to the file you were just editing in the project, continuing to use your (now reconfigured) lazygit. \
 I've been using this for a while in nvim, and from personal experience, I noticed that you get to retain the "flow" state, which is *really* helpful when programming.
 
-Currently this is the only harp that's implemented, but I intend to add quite a few more, to finally make me miss nothing from nvim 🔥.
+### Search harps
+
+```
+harp_search_get
+harp_search_set
+```
+
+`set` gets your latest search (stored in the `/` register) and stores it in a harp in the `harp_searches` section. \
+`get` puts the stored search into your `/` register, effectively "making a search".
+
+A really obvious thing to want to do in an editor is to trim trailing whitespace. \
+In helix it's a bit of a hassle: `%s[ \t]+$<CR>d`, where `<CR>` means <kbd>Enter</kbd>. \
+Focusing on the pattern: `[ \t]+$` is just slightly too much to type in for me. \
+`\s` won't work there because the final newline in the file gets matched. \
+I could I guess rely on helix to append it, but that seems a bit wack to do anyway. \
+`[ \t]` is too much to type in, so I might opt for just matching spaces. \
+But then I might miss some rogue tab!
+
+With search harps, I can store this search in a harp. `t`, for example. \
+Now instead of having to type in `[ \t]+$`, I can press my mapping for search harps, do `t<CR>`, \
+and then when I `%s`, I'll see the pattern I want as an autosuggestion. \
+I can press <kbd>Enter</kbd> twice, and bob's my uncle.
+
+You might argue that this is a pretty small binding optimization, and you might be right about that. \
+For some reason though, grabbing a pattern like this still *feels* better to me than typing it in, even though it's not *that* long.
+
+A better example would be some more complex / long pattern, that is simply unreasonable to type in, kinda ever. \
+Or maybe a pattern that you will forget, but could remember the harp name of.
+
+Because search harps just put the output into your `/` register, the searches end up as autosuggestions in a lot of places. \
+For example, you can search for `.gitignore` and save it in the `g` search harp. \
+When you get that `g` search harp in the future, you can open the file picker to see `.gitignore` autosuggested. \
+Relative file harps (will be implemented) work better for this usecase, though.
+
+Probably the most useful example: \
+Search for `(TODO|FIXME|HACK):` and store it in a search harp. \
+Now you have a very convenient way to look through TODOs of any project: just `get` the search harp for it, open `global_search`, press enter, and see all of your results.
 
 ---
 
