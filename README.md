@@ -75,6 +75,11 @@ In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start
 If set to `false`, the infoboxes for *mappings* will not show up. \
 This is different from just disabling the `auto-info` option in that you will still get the popup for `select_register`.
 
+`should-statusline` option in the `[editor]` section can be set to `false` to disable the statusline completely. \
+This exists because in default helix, even if you have no statusline elements in your statusline configuration, a default set of elements is drawn, rather than removing the statusline. \
+This option is designed to be disabled in your config, but you can set it on runtime as well (surprisingly). \
+It will look wonky if you do, so it makes the most sense to make a hotkey to toggle the statusline when / if you suddenly realize you want to see information in it (while not caring about it in the general case).
+
 ### Command expansions
 
 When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.

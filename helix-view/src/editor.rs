@@ -243,6 +243,12 @@ where
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
 pub struct Config {
+    //--------------------------------------------------fork--------------------------------------------------
+    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
+    pub whichkey: bool,
+    /// Whether to display the statusline at all.
+    pub should_statusline: bool,
+    //--------------------------------------------------fork--------------------------------------------------
     /// Padding to keep between the edge of the screen and the cursor when scrolling. Defaults to 5.
     pub scrolloff: usize,
     /// Number of lines to scroll at once. Defaults to 3
@@ -298,8 +304,6 @@ pub struct Config {
     pub completion_replace: bool,
     /// Whether to display infoboxes. Defaults to true.
     pub auto_info: bool,
-    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
-    pub whichkey: bool,
     pub file_picker: FilePickerConfig,
     /// Configuration of the statusline elements
     pub statusline: StatusLineConfig,
@@ -934,6 +938,10 @@ pub enum PopupBorderConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            //----------------------------------------------fork----------------------------------------------
+            should_statusline: true,
+            whichkey: true,
+            //----------------------------------------------fork----------------------------------------------
             scrolloff: 5,
             scroll_lines: 3,
             mouse: true,
@@ -956,7 +964,6 @@ impl Default for Config {
             preview_completion_insert: true,
             completion_trigger_len: 2,
             auto_info: true,
-            whichkey: true,
             file_picker: FilePickerConfig::default(),
             statusline: StatusLineConfig::default(),
             cursor_shape: CursorShapeConfig::default(),
