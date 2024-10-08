@@ -22,6 +22,8 @@ To conclude: this fork can be useful to you, if you want the features it impleme
 
 You can join my [discord server](https://discord.gg/bgVSg362dK) if you want to hear me glaze helix (and talk about features I'm currently implementing).
 
+If you want to contact me on discord without joining a server, my username is `axlefublr`.
+
 ## Installation
 
 To use this fork, you would have to build this repository from source.
