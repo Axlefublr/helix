@@ -571,6 +571,8 @@ impl MappableCommand {
         //-----------------------------------------------fork-----------------------------------------------
         harp_file_get, "Open a file harp",
         harp_file_set, "Set a file harp to the current buffer",
+        harp_cwd_get, ":cd into a cwd harp",
+        harp_cwd_set, "Update cwd harp to be the current working directory",
         harp_search_get, "Search for a stored search harp",
         harp_search_set, "Set a search harp to the contents of your `/` register",
         shell_replace_with_output, "Replace selections with the output of a shell command",
@@ -856,6 +858,69 @@ fn harp_file_set(cx: &mut Context) {
                 input,
                 HarpInput {
                     path: Some(path.display().to_string()),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
+        },
+    )
+}
+
+fn harp_cwd_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp cwd get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let values = match HarpOutput::build("harp_dirs", input, HarpContract::path()) {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
+                    return;
+                }
+            };
+
+            helix_stdx::env::set_current_working_dir(values.path.clone().unwrap()).unwrap();
+            cx.editor.set_status(format!(
+                "harp: cwd is now {}",
+                values.path.unwrap().display()
+            ));
+        },
+    )
+}
+
+fn harp_cwd_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp cwd set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let cwd = helix_stdx::env::current_working_dir();
+
+            if let Err(msg) = harp_update(
+                "harp_dirs",
+                input,
+                HarpInput {
+                    path: Some(cwd.display().to_string()),
                     ..Default::default()
                 },
             ) {

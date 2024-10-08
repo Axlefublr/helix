@@ -161,7 +161,7 @@ The name `set` may possibly be confused to mean "this can only be set once". \
 This is not the case, `set` creates a new harp if it didn't exist before, or *updates* a harp if it already exists, so if you realize you don't need the old value of some harp, you can *override* it with a new one using the `set` action. \
 After an explanation for what the harp *does*, I will explain the usecase and thought process behind creating it.
 
-#### File harps
+### File harps
 
 ```
 harp_file_get
@@ -219,6 +219,45 @@ Relative file harps (will be implemented) work better for this usecase, though.
 Probably the most useful example: \
 Search for `(TODO|FIXME|HACK):` and store it in a search harp. \
 Now you have a very convenient way to look through TODOs of any project: just `get` the search harp for it, open `global_search`, press enter, and see all of your results.
+
+### Cwd harps
+
+```
+harp_cwd_get
+harp_cwd_set
+```
+
+`set` takes your current working directory (like from `:pwd`), and stores it in a harp in the `harp_dirs` section. \
+`get` takes the stored directory, and `:cd`s into it.
+
+Development is really projectual, and jumping around a lot of commonly visited directories can be a chore. Closing and reopening helix just to fuzzy search some file somewhere is a bit too much effort.
+
+I have a very specific example:
+
+I use `lazygit`, and have a config for it stored in `~/prog/dotfiles/lazygit.yml`. \
+I change things in it every so often, and to make myself not have to google the default config every time, I store it as a file in `~/prog/backup/default/lazygit.yml`.
+
+This one time, let's `:cd ~/prog/backup` and use `harp_cwd_set` to store that working directory as a cwd harp named `b`. \
+Next time, when I want to access that file while being in `~/prog/dotfiles`, everything gets easier!
+
+Instead of:
+* close helix
+* travel to `~/prog/backup`
+* open helix
+* fuzzy search for `lazygit`
+
+I just do
+* `get_cwd_harp` -> `b`
+* fuzzy search for `lazygit`
+
+Quite a bit nicer! Even better than that, is that assuming we set `dotfiles` too, we can easily come *back* as well!
+
+You might point out that a normal file harp would suffice. You would be correct! In a vaccuum, using a file harp to get to a file is optimal. \
+However, that `backup` directory of mine contains a lot of useful files, and it's simply more *cost effective* (in terms of my brain memory) to just mark the directory, rather than coming up with appropriate names for each individual file. \
+If I figure out that the default lazygit config, in specific, I visit often enough to warrant a file harp, I *still* benefit from the cwd harp I set, \
+because *getting* to the file to then set the file harp for it still gets easier!
+
+The more obvious usecase for this feature, of course, is if you work on a bunch of projects at the same time, you can switch between them more easily. But, like, duh.
 
 ---
 
