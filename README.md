@@ -83,6 +83,7 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
+* [9143](https://github.com/helix-editor/helix/pull/9143) by @intarga
 
 ### Command expansions
 

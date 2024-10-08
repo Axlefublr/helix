@@ -91,3 +91,4 @@
 | `:yank-diagnostic` | Yank diagnostic(s) under primary cursor to register, or clipboard by default |
 | `:read`, `:r` | Load a file into buffer |
 | `:random`, `:rng`, `:rnd` | Randomize your selections |
+| `:reload-history` | Reload history files for persistent state |
