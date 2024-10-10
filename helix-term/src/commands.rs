@@ -571,6 +571,8 @@ impl MappableCommand {
         //-----------------------------------------------fork-----------------------------------------------
         harp_file_get, "Open a file harp",
         harp_file_set, "Set a file harp to the current buffer",
+        harp_project_file_get, "Open a relative to cwd file harp",
+        harp_project_file_set, "Set a relative to cwd file harp to the current buffer",
         harp_cwd_get, ":cd into a cwd harp",
         harp_cwd_set, "Update cwd harp to be the current working directory",
         harp_search_get, "Search for a stored search harp",
@@ -855,6 +857,82 @@ fn harp_file_set(cx: &mut Context) {
 
             if let Err(msg) = harp_update(
                 "harp_files",
+                input,
+                HarpInput {
+                    path: Some(path.display().to_string()),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
+        },
+    )
+}
+
+fn harp_project_file_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp project file get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let values = match HarpOutput::build(
+                &format!(
+                    "harp_files_{}",
+                    helix_stdx::env::current_working_dir().display()
+                ),
+                input,
+                HarpContract::path(),
+            ) {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
+                    return;
+                }
+            };
+
+            cx.editor
+                .open(&values.path.unwrap(), Action::Replace)
+                .unwrap();
+        },
+    )
+}
+
+fn harp_project_file_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp project file set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let (_, doc) = current!(cx.editor);
+            let Some(path) = &doc.path else {
+                cx.editor
+                    .set_error("harp: current buffer doesn't have a path");
+                return;
+            };
+
+            if let Err(msg) = harp_update(
+                &format!(
+                    "harp_files_{}",
+                    helix_stdx::env::current_working_dir().display()
+                ),
                 input,
                 HarpInput {
                     path: Some(path.display().to_string()),

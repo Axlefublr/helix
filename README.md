@@ -126,7 +126,7 @@ You can either *get* a harp (take the information stored in a harp and use it so
 Typing things in takes a long time, while being done so often.
 
 Let's take `:open` for example. \
-If you want to open a path with a really long path, you will ideally want to type in the minimum amount of characters possible, to then press <kbd>Tab</kbd> to autocomplete, on *each* path component. \
+If you want to open a file with a really long path, you will ideally want to type in the minimum amount of characters possible, to then press <kbd>Tab</kbd> to autocomplete, on *each* path component. \
 This consistently gets annoying when the string you need to type in to tab complete is long too. \
 If you want to complete `~/downgrade/test.lua`, you need to type in `downg` to tab complete, because `Downloads` also exists in that directory. \
 Then maybe in `downgrade`, there is also `test.py`. Now you have to type in `test.l` and at that point, it's not even worth completing.
@@ -140,36 +140,26 @@ In the case with helix, you can `:open` a directory to fuzzy search it, but at t
 The second issue with the fuzzy file picker, is the min-maxed fuzzy strings you end up creating and memorizing to get to the file you want the most efficiently (similar to the min-maxed tab complete strings in `:open`). \
 Those can get pretty arbitrary; to get to `helix/generator.py` I have in my dotfiles, the fuzzy search for it is `raty`. \
 Worse yet, it might change in the future, if I create a new file that matches `raty` more closely. \
-Well, I don't have to deal with that anymore! Now it's literally just `c` and I can get to it from *anywhere* **instantly** with a file harp.
+Well, I don't have to deal with that anymore! Now it's literally just `c` and I can get to it from *anywhere* **instantly** using a file harp.
 
 Simple, direct, fast.
 
 Harps don't magically remove your usage of `:open` or the fuzzy search picker, they *minimize* it. \
 First you get to some file using one of the two, and store it in a harp. \
 Now you get a "bookmark" of the file, that lets you completely circumvent having to dance around with `:open`/fzf ever again with that file. \
-The different harp types (only one file-structure-related harp type exists, I intend to add more) allow you to express *what* you're storing and relative to *where* you're storing it, giving you a lot of flexibility *and* speed.
+The different harp types allow you to express *what* you're storing and relative to *where* you're storing it, giving you a lot of flexibility *and* speed.
 
 Stop thinking about *how* to get to your file, let your muscle memory move you there.
-
-#### Structure
-
-Throughout the explanation of each upcoming harp type, I will also be giving you the section names. \
-They do not come up in usage, but if you ever look at the data file (`~/.local/share/harp.yml` on linux), you will know what refers to what. \
-This may also help you understand if things aren't working the way you expected them to, if you know how sections are named and made. \
-Each harp type will start with the `get` mappable action and the `set` mappable action, that you can make mappings for. \
-The name `set` may possibly be confused to mean "this can only be set once". \
-This is not the case, `set` creates a new harp if it didn't exist before, or *updates* a harp if it already exists, so if you realize you don't need the old value of some harp, you can *override* it with a new one using the `set` action. \
-After an explanation for what the harp *does*, I will explain the usecase and thought process behind creating it.
 
 ### File harps
 
 ```
-harp_file_get
 harp_file_set
+harp_file_get
 ```
 
-`set` to store the full path of the current buffer into a harp in the `harp_files` section. \
-`get` to `:open` the file stored in the harp.
+`harp_file_set` to store the full path of the current buffer into a harp in the `harp_files` section. \
+`harp_file_get` to `:open` the file stored in the harp.
 
 This is really useful for files that you know you want to open from *anywhere*. \
 Perfect usecase is for dotfiles. \
@@ -182,11 +172,77 @@ Well, if you previously stored that config file in a *file harp*, you don't need
 Just `harp_file_get`, change the setting you wanted, and go back to the file you were just editing in the project, continuing to use your (now reconfigured) lazygit. \
 I've been using this for a while in nvim, and from personal experience, I noticed that you get to retain the "flow" state, which is *really* helpful when programming.
 
+### Project file harps
+
+```
+harp_project_file_set
+harp_project_file_get
+```
+
+`harp_project_file_set` to store the full path of the current buffer into a harp in a section\*. \
+`harp_project_file_get` to `:open` the file stored in the harp.
+
+\*The section used is built like this: it will always start with `harp_files_`, and after that string, your current working directory will be appended.
+
+So if your current working directory is `~/prog/dotfiles` and your current buffer is `~/prog/dotfiles/colors.css`, when using a project file harp to save that buffer, you will be storing into a section named `harp_files_/home/username/prog/dotfiles`.
+
+You can think of project file harps as file harps that are *relative to the project*.
+
+This is pretty powerful! Normal file harps are mostly meant for files that are important to be accessible from *anywhere*. Things like config files that you may want to edit while in the middle of doing something else.
+
+In this project, I visit `helix-term/src/commands.rs` pretty frequently. It is only ever relevant when my current working directory *is* this project, and yet with a normal file harp, I can't express that. \
+I'd want to express it for this reason: I use the register name `c` for another (more commonly visited) harp already. \
+I'd love to use `c` for `helix-term/src/commands.rs` too, but it's already taken, so I take the compromise of naming it `com` instead. \
+This is not too bad when considered in a vacuum, but as my amount of file harps increases, the need to name them in increasingly complex ways does too.
+
+With a project file harp, I can use `c` again! Matter of fact, I can use `c` in literally every different project I have, if I want to. There will be no conflicts, as they're stored in different sections.
+
+When deciding between a file harp and a project file harp, ask yourself this question: "when I want to access this file, what will my current working directory generally be?".
+
+### Cwd harps
+
+```
+harp_cwd_set
+harp_cwd_get
+```
+
+`set` takes your current working directory (like from `:pwd`), and stores it in a harp in the `harp_dirs` section. \
+`get` takes the stored directory, and `:cd`s into it.
+
+Development is pretty projectual, and jumping through a bunch of commonly visited directories can be a chore. Closing and reopening helix just to fuzzy search some file somewhere is a bit too much effort.
+
+I have a very specific example:
+
+I use `lazygit`, and have a config for it stored in `~/prog/dotfiles/lazygit.yml`. \
+I change things in it every so often, and to make myself not have to google the default config every time, I store it as a file in `~/prog/backup/default/lazygit.yml`.
+
+This one time, let's `:cd ~/prog/backup` and use `harp_cwd_set` to store that working directory as a cwd harp named `b`. \
+Next time, when I want to access that file while being in `~/prog/dotfiles`, everything gets easier!
+
+Instead of:
+* close helix
+* travel to `~/prog/backup`
+* open helix
+* fuzzy search for `lazygit`
+
+I just do
+* `harp_cwd_get` -> `b`
+* fuzzy search for `lazygit`
+
+Quite a bit nicer! Even better than that, is that assuming we set `dotfiles` too, we can easily come *back* as well!
+
+You might point out that a normal file harp would suffice. You would be correct! In a vaccuum, using a file harp to get to a file is optimal. \
+However, that `backup` directory of mine contains a lot of useful files, and it's simply more *cost effective* (in terms of my brain memory) to just mark the directory, rather than coming up with appropriate names for each individual file. \
+If I figure out that the default lazygit config, in specific, I visit often enough to warrant a file harp, I *still* benefit from the cwd harp I set, \
+because *getting* to the file to then set the file harp for it still gets easier!
+
+The more obvious usecase for this feature, of course, is if you work on a bunch of projects at the same time, you can switch between them more easily. But, like, duh.
+
 ### Search harps
 
 ```
-harp_search_get
 harp_search_set
+harp_search_get
 ```
 
 `set` gets your latest search (stored in the `/` register) and stores it in a harp in the `harp_searches` section. \
@@ -212,52 +268,14 @@ A better example would be some more complex / long pattern, that is simply unrea
 Or maybe a pattern that you will forget, but could remember the harp name of.
 
 Because search harps just put the output into your `/` register, the searches end up as autosuggestions in a lot of places. \
-For example, you can search for `.gitignore` and save it in the `g` search harp. \
-When you get that `g` search harp in the future, you can open the file picker to see `.gitignore` autosuggested. \
-Relative file harps (will be implemented) work better for this usecase, though.
+For example, you can search for `struct HarpOutput` to match the definition of a struct you have *somewhere* in the codebase, and then save it in the `hout` search harp. \
+When you get that `hout` search harp in the future, you can open the global_search picker to see `struct HarpOutput` autosuggested. \
+Press <kbd>Enter</kbd> twice and blammo. \
+This way, you can get to the definition of the struct in a faster way, than relying on your lsp. Especially true with rust, but generally raw text matching will happen faster than your lsp responding.
 
 Probably the most useful example: \
 Search for `(TODO|FIXME|HACK):` and store it in a search harp. \
 Now you have a very convenient way to look through TODOs of any project: just `get` the search harp for it, open `global_search`, press enter, and see all of your results.
-
-### Cwd harps
-
-```
-harp_cwd_get
-harp_cwd_set
-```
-
-`set` takes your current working directory (like from `:pwd`), and stores it in a harp in the `harp_dirs` section. \
-`get` takes the stored directory, and `:cd`s into it.
-
-Development is really projectual, and jumping around a lot of commonly visited directories can be a chore. Closing and reopening helix just to fuzzy search some file somewhere is a bit too much effort.
-
-I have a very specific example:
-
-I use `lazygit`, and have a config for it stored in `~/prog/dotfiles/lazygit.yml`. \
-I change things in it every so often, and to make myself not have to google the default config every time, I store it as a file in `~/prog/backup/default/lazygit.yml`.
-
-This one time, let's `:cd ~/prog/backup` and use `harp_cwd_set` to store that working directory as a cwd harp named `b`. \
-Next time, when I want to access that file while being in `~/prog/dotfiles`, everything gets easier!
-
-Instead of:
-* close helix
-* travel to `~/prog/backup`
-* open helix
-* fuzzy search for `lazygit`
-
-I just do
-* `get_cwd_harp` -> `b`
-* fuzzy search for `lazygit`
-
-Quite a bit nicer! Even better than that, is that assuming we set `dotfiles` too, we can easily come *back* as well!
-
-You might point out that a normal file harp would suffice. You would be correct! In a vaccuum, using a file harp to get to a file is optimal. \
-However, that `backup` directory of mine contains a lot of useful files, and it's simply more *cost effective* (in terms of my brain memory) to just mark the directory, rather than coming up with appropriate names for each individual file. \
-If I figure out that the default lazygit config, in specific, I visit often enough to warrant a file harp, I *still* benefit from the cwd harp I set, \
-because *getting* to the file to then set the file harp for it still gets easier!
-
-The more obvious usecase for this feature, of course, is if you work on a bunch of projects at the same time, you can switch between them more easily. But, like, duh.
 
 ---
 
