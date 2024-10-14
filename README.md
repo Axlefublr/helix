@@ -82,6 +82,8 @@ This exists because in default helix, even if you have no statusline elements in
 This option is designed to be disabled in your config, but you can set it on runtime as well (surprisingly). \
 It will look wonky if you do, so it makes the most sense to make a hotkey to toggle the statusline when / if you suddenly realize you want to see information in it (while not caring about it in the general case).
 
+`ephemeral-messages` option in the `[editor]` section can now be set to `true` to make status / error messages at the bottom of the UI *not* take up an entire line. Instead, they will be printed over the editor view directly.
+
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2

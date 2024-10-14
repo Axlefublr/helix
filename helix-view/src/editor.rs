@@ -251,8 +251,10 @@ pub struct Config {
     //--------------------------------------------------fork--------------------------------------------------
     /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
     pub whichkey: bool,
-    /// Whether to display the statusline at all.
+    /// Whether to display the statusline at all. Defaults to true.
     pub should_statusline: bool,
+    /// Whether to make messages take up an entire line in the UI, or appear over editor text. Defaults to the latter (false).
+    pub ephemeral_messages: bool,
     //--------------------------------------------------fork--------------------------------------------------
     /// Padding to keep between the edge of the screen and the cursor when scrolling. Defaults to 5.
     pub scrolloff: usize,
@@ -984,6 +986,7 @@ impl Default for Config {
             //----------------------------------------------fork----------------------------------------------
             should_statusline: true,
             whichkey: true,
+            ephemeral_messages: false,
             //----------------------------------------------fork----------------------------------------------
             scrolloff: 5,
             scroll_lines: 3,
