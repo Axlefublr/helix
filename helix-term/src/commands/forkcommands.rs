@@ -459,6 +459,46 @@ pub fn expand_expansions(cmd: &str, doc: &Document) -> String {
                     .map(|buf| buf.display().to_string())
                     .unwrap_or_default(),
             )
+        } else if next_chr == 'r' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| {
+                        buf.strip_prefix(helix_stdx::env::current_working_dir())
+                            .unwrap_or_else(|_| buf)
+                            .display()
+                            .to_string()
+                    })
+                    .unwrap_or_default(),
+            )
+        } else if next_chr == 'e' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| buf.extension().unwrap_or_default().to_string_lossy())
+                    .unwrap_or_default(),
+            )
+        } else if next_chr == 'n' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| buf.file_name().unwrap_or_default().to_string_lossy())
+                    .unwrap_or_default(),
+            )
+        } else if next_chr == 'g' {
+            maybe_expand(next_chr, &{
+                let output = std::process::Command::new("git")
+                    .arg("rev-parse")
+                    .arg("--show-toplevel")
+                    .output()
+                    .expect("how the fuck do you not have git installed");
+                if output.status.success() {
+                    let stdout = String::from_utf8(output.stdout).unwrap();
+                    stdout.trim().to_owned()
+                } else {
+                    "".into()
+                }
+            })
         } else if next_chr == 'h' {
             maybe_expand(
                 next_chr,

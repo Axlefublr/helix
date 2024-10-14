@@ -96,15 +96,27 @@ Supported in: `shell_pipe`, `shell_pipe_to`, `shell_insert_output`, `shell_appen
 
 Example usage: `:sh echo %p`.
 
-Consider that our current working directory is `~/prog/dotfiles` and the currently open buffer is `~/prog/dotfiles/helix/config.toml`. \
-Here's what all command expansions would evaluate to:
-|Expansion|Output                                          |Explanation                             |
-|-------- |------------------------------------------------|----------------------------------------|
-|`%p`     |`/home/username/prog/dotfiles/helix/config.toml`|full path                               |
-|`%h`     |`/home/username/prog/dotfiles/helix`            |"head" of the current buffer            |
-|`%w`     |`/home/username/prog/dotfiles`                  |helix's working directory               |
-|`%m`     |`%m`                                            |not an expansion, taken literally       |
-|`%%p`    |`%p`                                            |escaped using `%%` to be taken literally|
+Considering our example context...
+
+|Thing                    |Value                                            |
+|-------------------------|-------------------------------------------------|
+|current buffer           |`~/prog/dotfiles/fish/abbreviations/percent.fish`|
+|current working directory|`~/prog/dotfiles/fish`                           |
+|git repo root            |`~/prog/dotfiles`                                |
+
+...here's what all command expansions would evaluate to:
+
+|Expansion|Output                                                        |Explanation                             |
+|---------|--------------------------------------------------------------|----------------------------------------|
+|`%p`     |`/home/username/prog/dotfiles/fish/abbreviations/percent.fish`|full path                               |
+|`%h`     |`/home/username/prog/dotfiles/fish/abbreviations`             |"head" of the current buffer            |
+|`%w`     |`/home/username/prog/dotfiles/fish`                           |helix's working directory (can be different from the directory you started helix in)|
+|`%g`     |`/home/username/prog/dotfiles`                                |git repo root                           |
+|`%r`     |`abbreviations/percent.fish`                                  |filepath, relative to cwd (full path, if can't be relative to cwd)|
+|`%n`     |`percent.fish`                                                |basename of the current buffer          |
+|`%e`     |`fish`                                                        |extension                               |
+|`%m`     |`%m`                                                          |not an expansion, taken literally       |
+|`%%p`    |`%p`                                                          |escaped using `%%` to be taken literally|
 
 > [!CAUTION]
 > The resulting path is not escaped in any way.
