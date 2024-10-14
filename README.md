@@ -92,7 +92,7 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 
 ### Command expansions
 
-When using actions and commands that let you execute a shell command (`:sh`, `shell_insert_output`, `shell_append_output`, `shell_pipe`, etc), you can now use command expansions.
+Supported in: `shell_pipe`, `shell_pipe_to`, `shell_insert_output`, `shell_append_output`, `shell_replace_with_output` and **all** `:command`s. I'm not yet sure if the latter is a good idea, but feel free to `:cd %p` if you wish /j.
 
 Example usage: `:sh echo %p`.
 
@@ -105,6 +105,11 @@ Here's what all command expansions would evaluate to:
 |`%w`     |`/home/username/prog/dotfiles`                  |helix's working directory               |
 |`%m`     |`%m`                                            |not an expansion, taken literally       |
 |`%%p`    |`%p`                                            |escaped using `%%` to be taken literally|
+
+> [!CAUTION]
+> The resulting path is not escaped in any way.
+> If it contains spaces, that *may* be a problem, depending on what command you're using the expansion in.
+> You may want to quote expansions, in that case.
 
 ### Harp
 

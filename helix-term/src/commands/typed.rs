@@ -2380,9 +2380,7 @@ fn run_shell_command(
     }
 
     let shell = cx.editor.config().shell.clone();
-    let (_, doc) = current!(cx.editor);
     let args = args.join(" ");
-    let args = expand_expansions(&args, doc);
 
     let callback = async move {
         let output = shell_impl_async(&shell, &args, None).await?;
@@ -3399,6 +3397,11 @@ pub(super) fn command_mode(cx: &mut Context) {
             if let Some(cmd) = typed::TYPABLE_COMMAND_MAP.get(parts[0]) {
                 let shellwords = Shellwords::from(input);
                 let args = shellwords.words();
+                let (_, doc) = current!(cx.editor);
+                let args: Vec<Cow<str>> = args
+                    .iter()
+                    .map(|word| Cow::Owned(expand_expansions(word, doc)))
+                    .collect();
 
                 if let Err(e) = (cmd.fun)(cx, &args[1..], event) {
                     cx.editor.set_error(format!("{}", e));

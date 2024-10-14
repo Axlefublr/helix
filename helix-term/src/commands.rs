@@ -235,6 +235,11 @@ impl MappableCommand {
                         jobs: cx.jobs,
                         scroll: None,
                     };
+                    let (_, doc) = current!(cx.editor);
+                    let args: Vec<Cow<str>> = args
+                        .iter()
+                        .map(|word| Cow::Owned(expand_expansions(word, doc)))
+                        .collect();
                     if let Err(e) = (command.fun)(&mut cx, &args[..], PromptEvent::Validate) {
                         cx.editor.set_error(format!("{}", e));
                     }
@@ -5887,8 +5892,6 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id);
 
-    let cmd = expand_expansions(cmd, doc);
-
     let mut changes = Vec::with_capacity(selection.len());
     let mut ranges = SmallVec::with_capacity(selection.len());
     let text = doc.text().slice(..);
@@ -5900,7 +5903,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             output.clone()
         } else {
             let input = range.slice(text);
-            match shell_impl(shell, &cmd, pipe.then(|| input.into())) {
+            match shell_impl(shell, cmd, pipe.then(|| input.into())) {
                 Ok(mut output) => {
                     if !input.ends_with("\n") && !output.is_empty() && output.ends_with('\n') {
                         output.pop();
@@ -5975,7 +5978,9 @@ fn shell_prompt(cx: &mut Context, prompt: Cow<'static, str>, behavior: ShellBeha
                 return;
             }
 
-            shell(cx, input, &behavior);
+            let (_, doc) = current!(cx.editor);
+            let input = expand_expansions(input, doc);
+            shell(cx, &input, &behavior);
         },
     );
 }
