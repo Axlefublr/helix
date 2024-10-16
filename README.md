@@ -112,11 +112,17 @@ Considering our example context...
 |`%h`     |`/home/username/prog/dotfiles/fish/abbreviations`             |"head" of the current buffer            |
 |`%w`     |`/home/username/prog/dotfiles/fish`                           |helix's working directory (can be different from the directory you started helix in)|
 |`%g`     |`/home/username/prog/dotfiles`                                |git repo root                           |
-|`%r`     |`abbreviations/percent.fish`                                  |filepath, relative to cwd (full path, if can't be relative to cwd)|
+|`%r`     |`abbreviations/percent.fish`                                  |filepath, relative to cwd (full path, if not inside cwd)|
+|`%q`     |`fish/abbreviations/percent.fish`                             |filepath, relative to git repo root (full path, if not inside git repo root)|
 |`%n`     |`percent.fish`                                                |basename of the current buffer          |
 |`%e`     |`fish`                                                        |extension                               |
+|`%l`     |`fish`                                                        |helix's language option (output of `:lang`)|
 |`%m`     |`%m`                                                          |not an expansion, taken literally       |
 |`%%p`    |`%p`                                                          |escaped using `%%` to be taken literally|
+
+All expansions have an uppercase variant (`%P`, `%H`, `%W`, etc) that replaces `/home/username` with `~`. \
+This only makes sense to use when you use an expansion to *see* a path, and want to avoid the usual visual bloat of seeing `/home/username`. \
+In other words, a rare thing to want, designed for a feature that I'm yet to implement.
 
 > [!CAUTION]
 > The resulting path is not escaped in any way.

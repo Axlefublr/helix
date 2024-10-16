@@ -5,7 +5,7 @@ use crate::{
 use std::path::PathBuf;
 
 use axleharp::HarpReady;
-use helix_view::{editor::Action, Document};
+use helix_view::{document::DEFAULT_LANGUAGE_NAME, editor::Action, Document};
 
 use crate::commands::Context;
 
@@ -425,6 +425,20 @@ pub fn shell_replace_with_output(cx: &mut Context) {
     );
 }
 
+pub fn get_git_repo_root() -> Option<String> {
+    let output = std::process::Command::new("git")
+        .arg("rev-parse")
+        .arg("--show-toplevel")
+        .output()
+        .expect("how the fuck do you not have git installed");
+    if output.status.success() {
+        let stdout = String::from_utf8(output.stdout).unwrap();
+        Some(stdout.trim().to_owned())
+    } else {
+        None
+    }
+}
+
 pub fn expand_expansions(cmd: &str, doc: &Document) -> String {
     let maybe_path = doc.path.as_ref();
     let mut result = String::new();
@@ -446,20 +460,30 @@ pub fn expand_expansions(cmd: &str, doc: &Document) -> String {
             // if previous char was % too
             if result.ends_with('%') {
                 result.push(next_chr);
-            } else {
+            } else if next_chr.to_ascii_lowercase() == next_chr {
                 result.push_str(replacement);
+            } else {
+                let replacement = {
+                    let home = std::env::var("HOME").ok();
+                    if let Some(home) = home {
+                        replacement.replace(&home, "~")
+                    } else {
+                        replacement.into()
+                    }
+                };
+                result.push_str(&replacement);
             }
             chars.next();
         };
 
-        if next_chr == 'p' {
+        if next_chr.to_ascii_lowercase() == 'p' {
             maybe_expand(
                 next_chr,
                 &maybe_path
                     .map(|buf| buf.display().to_string())
                     .unwrap_or_default(),
             )
-        } else if next_chr == 'r' {
+        } else if next_chr.to_ascii_lowercase() == 'r' {
             maybe_expand(
                 next_chr,
                 &maybe_path
@@ -471,35 +495,40 @@ pub fn expand_expansions(cmd: &str, doc: &Document) -> String {
                     })
                     .unwrap_or_default(),
             )
-        } else if next_chr == 'e' {
+        } else if next_chr.to_ascii_lowercase() == 'e' {
             maybe_expand(
                 next_chr,
                 &maybe_path
                     .map(|buf| buf.extension().unwrap_or_default().to_string_lossy())
                     .unwrap_or_default(),
             )
-        } else if next_chr == 'n' {
+        } else if next_chr.to_ascii_lowercase() == 'n' {
             maybe_expand(
                 next_chr,
                 &maybe_path
                     .map(|buf| buf.file_name().unwrap_or_default().to_string_lossy())
                     .unwrap_or_default(),
             )
-        } else if next_chr == 'g' {
-            maybe_expand(next_chr, &{
-                let output = std::process::Command::new("git")
-                    .arg("rev-parse")
-                    .arg("--show-toplevel")
-                    .output()
-                    .expect("how the fuck do you not have git installed");
-                if output.status.success() {
-                    let stdout = String::from_utf8(output.stdout).unwrap();
-                    stdout.trim().to_owned()
-                } else {
-                    "".into()
-                }
-            })
-        } else if next_chr == 'h' {
+        } else if next_chr.to_ascii_lowercase() == 'g' {
+            maybe_expand(next_chr, get_git_repo_root().unwrap_or_default().as_ref())
+        } else if next_chr.to_ascii_lowercase() == 'q' {
+            maybe_expand(
+                next_chr,
+                &maybe_path
+                    .map(|buf| {
+                        buf.strip_prefix(get_git_repo_root().unwrap_or_default())
+                            .unwrap_or_else(|_| buf)
+                            .display()
+                            .to_string()
+                    })
+                    .unwrap_or_default(),
+            )
+        } else if next_chr.to_ascii_lowercase() == 'l' {
+            maybe_expand(
+                next_chr,
+                doc.language_name().unwrap_or(DEFAULT_LANGUAGE_NAME),
+            )
+        } else if next_chr.to_ascii_lowercase() == 'h' {
             maybe_expand(
                 next_chr,
                 &maybe_path
@@ -510,7 +539,7 @@ pub fn expand_expansions(cmd: &str, doc: &Document) -> String {
                     })
                     .unwrap_or_default(),
             )
-        } else if next_chr == 'w' {
+        } else if next_chr.to_ascii_lowercase() == 'w' {
             maybe_expand(
                 next_chr,
                 &helix_stdx::env::current_working_dir().display().to_string(),
