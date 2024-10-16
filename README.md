@@ -84,6 +84,8 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 
 `ephemeral-messages` option in the `[editor]` section can now be set to `true` to make status / error messages at the bottom of the UI *not* take up an entire line. Instead, they will be printed over the editor view directly.
 
+`:echo` command lets you print a message to the messages line. Useful for when you want to give visual feedback to some mappings, or to use [command expansions](#command-expansions).
+
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
@@ -121,8 +123,9 @@ Considering our example context...
 |`%%p`    |`%p`                                                          |escaped using `%%` to be taken literally|
 
 All expansions have an uppercase variant (`%P`, `%H`, `%W`, etc) that replaces `/home/username` with `~`. \
-This only makes sense to use when you use an expansion to *see* a path, and want to avoid the usual visual bloat of seeing `/home/username`. \
-In other words, a rare thing to want, designed for a feature that I'm yet to implement.
+The reason they exist is because I disable the statusline, and make a bunch of mappings that use `:echo` to print a path to the statusline. \
+Seeing `/home/username` all the time would feel quite bloaty. \
+If you find another use for them, nice! But in the general case you'll want to use the lowercase variants.
 
 > [!CAUTION]
 > The resulting path is not escaped in any way.
