@@ -86,6 +86,8 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 
 `:echo` command lets you print a message to the messages line. Useful for when you want to give visual feedback to some mappings, or to use [command expansions](#command-expansions).
 
+All pickers now take up the entire screen, rather than 90%. Thanks to @satoqz for figuring out how to do this! :D
+
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
