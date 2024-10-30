@@ -88,6 +88,8 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 
 All pickers now take up the entire screen, rather than 90%. Thanks to @satoqz for figuring out how to do this! :D
 
+The `insert-final-newline` option now only inserts newline if the file is not empty.
+
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
