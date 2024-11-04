@@ -86,6 +86,8 @@ It will look wonky if you do, so it makes the most sense to make a hotkey to tog
 
 `:echo` command lets you print a message to the messages line. Useful for when you want to give visual feedback to some mappings, or to use [command expansions](#command-expansions).
 
+`:echopy` command is exactly like `:echo`, but *also* puts the result into your clipboard. For example, you can do `:echopy %p` to copy the full path to the current file to your clipboard (this is elaborated on [later](#command-expansions)).
+
 All pickers now take up the entire screen, rather than 90%. Thanks to @satoqz for figuring out how to do this! :D
 
 The `insert-final-newline` option now only inserts newline if the file is not empty.

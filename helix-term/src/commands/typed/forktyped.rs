@@ -55,3 +55,21 @@ pub fn echo(
     cx.editor.set_status(args.join(" "));
     Ok(())
 }
+
+pub fn echopy(
+    cx: &mut compositor::Context,
+    args: &[Cow<str>],
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let expansion = args.join(" ");
+    match cx.editor.registers.write('+', vec![expansion.clone()]) {
+        Ok(_) => cx.editor.set_status(expansion),
+        Err(err) => cx.editor.set_error(err.to_string()),
+    }
+
+    Ok(())
+}

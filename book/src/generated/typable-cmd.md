@@ -92,4 +92,5 @@
 | `:read`, `:r` | Load a file into buffer |
 | `:random`, `:rng`, `:rnd` | Randomize your selections |
 | `:echo`, `:c` | Print to the messages line |
+| `:echopy`, `:cc` | Put string into selected register (`+` by default) |
 | `:reload-history` | Reload history files for persistent state |

@@ -3283,6 +3283,13 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         signature: CommandSignature::none(),
     },
     TypableCommand {
+        name: "echopy",
+        aliases: &["cc"],
+        doc: "Put string into clipboard",
+        fun: echopy,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
         name: "reload-history",
         aliases: &[],
         doc: "Reload history files for persistent state",
