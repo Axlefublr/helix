@@ -197,6 +197,76 @@ pub fn harp_file_set(cx: &mut Context) {
     )
 }
 
+pub fn harp_relative_file_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp relative file get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let values = match HarpOutput::build("harp_relative_files", input, HarpContract::path())
+            {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
+                    return;
+                }
+            };
+
+            cx.editor
+                .open(&values.path.unwrap(), Action::Replace)
+                .unwrap();
+        },
+    )
+}
+
+pub fn harp_relative_file_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp relative file set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let (_, doc) = current!(cx.editor);
+            let Some(path) = &doc.path else {
+                cx.editor
+                    .set_error("harp: current buffer doesn't have a path");
+                return;
+            };
+
+            let path = path
+                .strip_prefix(helix_stdx::env::current_working_dir())
+                .unwrap_or(path);
+            if let Err(msg) = harp_update(
+                "harp_relative_files",
+                input,
+                HarpInput {
+                    path: Some(path.display().to_string()),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
+        },
+    )
+}
+
 pub fn harp_project_file_get(cx: &mut Context) {
     ui::prompt(
         cx,

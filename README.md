@@ -233,6 +233,28 @@ With a project file harp, I can use `c` again! Matter of fact, I can use `c` in 
 
 When deciding between a file harp and a project file harp, ask yourself this question: "when I want to access this file, what will my current working directory generally be?".
 
+### Relative file harps
+
+```
+harp_relative_file_set
+harp_relative_file_get
+```
+
+`harp_relative_file_set` takes current buffer's path, relative to cwd, and stores it in a harp in the `harp_relative_files` section. \
+`harp_relative_file_get` takes the stored path, and opens it (relative to cwd).
+
+Project structure tends to repeat: rust projects will have a `Cargo.toml`, `src/main.rs` or `src/lib.rs`; *every* project will have a `README.md`, maybe a `CONTRIBUTING.MD`; almost every git repo will have a `.gitignore`, and you may also use `.git/info/exclude`.
+
+As you use project file harps for these, you'll quickly notice that doing so is inefficient. \
+Project file harps make the most sense for files that are "special" to a specific project, while all of these are fairly regular.
+
+*Relative* file harps let you store just the *relative* part of a file in a harp. \
+If your current buffer is `~/prog/dotfiles/README.md`, and your current working directory is `~/prog/dotfiles`, \
+A *relative* file harp will store just `README.md`, while a normal file harp would store the *entire* path: `~/prog/dotfiles/README.md`.
+
+What this lets you do is lovely: you can store a file just once, and then continue reusing the harp for it for all of your projects. \
+Instead of having to type in `:e .gitignore` to get to it, you just use the relative file harp `g` (for example) and immediately jump to the gitignore file of *the current* project.
+
 ### Cwd harps
 
 ```
@@ -240,8 +262,8 @@ harp_cwd_set
 harp_cwd_get
 ```
 
-`set` takes your current working directory (like from `:pwd`), and stores it in a harp in the `harp_dirs` section. \
-`get` takes the stored directory, and `:cd`s into it.
+`harp_cwd_set` takes your current working directory (like from `:pwd`), and stores it in a harp in the `harp_dirs` section. \
+`harp_cwd_get` takes the stored directory, and `:cd`s into it.
 
 Development is pretty projectual, and jumping through a bunch of commonly visited directories can be a chore. Closing and reopening helix just to fuzzy search some file somewhere is a bit too much effort.
 
@@ -279,8 +301,8 @@ harp_search_set
 harp_search_get
 ```
 
-`set` gets your latest search (stored in the `/` register) and stores it in a harp in the `harp_searches` section. \
-`get` puts the stored search into your `/` register, effectively "making a search".
+`harp_search_set` gets your latest search (stored in the `/` register) and stores it in a harp in the `harp_searches` section. \
+`harp_search_get` puts the stored search into your `/` register, effectively "making a search".
 
 A really obvious thing to want to do in an editor is to trim trailing whitespace. \
 In helix it's a bit of a hassle: `%s[ \t]+$<CR>d`, where `<CR>` means <kbd>Enter</kbd>. \

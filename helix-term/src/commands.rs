@@ -578,6 +578,8 @@ impl MappableCommand {
         //-----------------------------------------------fork-----------------------------------------------
         harp_file_get, "Open a file harp",
         harp_file_set, "Set a file harp to the current buffer",
+        harp_relative_file_get, "Open a relative file harp",
+        harp_relative_file_set, "Set a relative file harp to the current buffer",
         harp_project_file_get, "Open a relative to cwd file harp",
         harp_project_file_set, "Set a relative to cwd file harp to the current buffer",
         harp_cwd_get, ":cd into a cwd harp",
