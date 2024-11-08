@@ -586,6 +586,8 @@ impl MappableCommand {
         harp_cwd_set, "Update cwd harp to be the current working directory",
         harp_search_get, "Search for a stored search harp",
         harp_search_set, "Set a search harp to the contents of your `/` register",
+        harp_register_get, "Get a register harp into default register",
+        harp_register_set, "Set a register harp from default register",
         shell_replace_with_output, "Replace selections with the output of a shell command",
     );
 }

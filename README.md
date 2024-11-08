@@ -333,6 +333,21 @@ Probably the most useful example: \
 Search for `(TODO|FIXME|HACK):` and store it in a search harp. \
 Now you have a very convenient way to look through TODOs of any project: just `get` the search harp for it, open `global_search`, press enter, and see all of your results.
 
+### Register harps
+
+```
+harp_register_set
+harp_register_get
+```
+
+`harp_register_set` puts the contents of your default register (`"`) into a harp, in section `harp_registers` \
+`harp_register_get` puts text stored in a harp into your default helix register (`"`)
+
+Have you ever been annoyed that registers don't persist across sessions? I sure have!
+
+Register harps essentially solve that, letting you store some text ✨forever✨. \
+If you make a mapping for `harp_register_set` in insert mode, you can even use that as a very basic snippets implementation.
+
 ---
 
 <div align="center">

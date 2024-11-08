@@ -487,6 +487,80 @@ pub fn harp_search_set(cx: &mut Context) {
     )
 }
 
+pub fn harp_register_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp register get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let values = match HarpOutput::build("harp_registers", input, HarpContract::extra()) {
+                Ok(values) => values,
+                Err(msg) => {
+                    cx.editor.set_error(msg);
+                    return;
+                }
+            };
+
+            match cx
+                .editor
+                .registers
+                .write('"', vec![values.extra.clone().unwrap()])
+            {
+                Ok(_) => cx
+                    .editor
+                    .set_status(format!("harp: get `{}`", values.extra.unwrap())),
+                Err(_) => cx
+                    .editor
+                    .set_error("harp: couldn't write to default register"),
+            }
+        },
+    )
+}
+
+pub fn harp_register_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp register set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let Some(values) = cx.editor.registers.read('"', cx.editor) else {
+                cx.editor.set_error("harp: default register is unset");
+                return;
+            };
+            let register_contents = values.collect();
+
+            if let Err(msg) = harp_update(
+                "harp_registers",
+                input,
+                HarpInput {
+                    extra: Some(register_contents),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harp: set success");
+            };
+        },
+    )
+}
+
 pub fn shell_replace_with_output(cx: &mut Context) {
     super::shell_prompt(
         cx,
