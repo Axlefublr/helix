@@ -1,5 +1,6 @@
 use crate::{
     commands::ShellBehavior,
+    compositor,
     ui::{self, PromptEvent},
 };
 use std::path::PathBuf;
@@ -131,6 +132,41 @@ pub fn harp_update(section: &str, register: &str, values: HarpInput) -> Result<(
     }
 }
 
+fn eval_harp_relativity(
+    cx: &mut compositor::Context,
+    section_name: &str,
+    register_input: &str,
+) -> Option<(String, String)> {
+    // relative to buffer
+    if let Some(register_input) = register_input.strip_prefix(',') {
+        let (_, doc) = current!(cx.editor);
+        let Some(path) = &doc.path else {
+            cx.editor
+                .set_error("harp: current buffer doesn't have a path");
+            return None;
+        };
+        let section_name = format!("{}_{}", section_name, path.display());
+        Some((section_name, register_input.to_owned()))
+    // relative to project
+    } else if let Some(register_input) = register_input.strip_prefix('.') {
+        let section_name = format!(
+            "{}_{}",
+            section_name,
+            helix_stdx::env::current_working_dir().display()
+        );
+        Some((section_name, register_input.to_owned()))
+    // relative to filetype
+    } else if let Some(register_input) = register_input.strip_prefix(';') {
+        let (_, doc) = current!(cx.editor);
+        let language_name = doc.language_name().unwrap_or(DEFAULT_LANGUAGE_NAME);
+        let section_name = format!("{}!{}", section_name, language_name);
+        Some((section_name, register_input.to_owned()))
+    // not relative to anything (global)
+    } else {
+        Some((section_name.to_owned(), register_input.to_owned()))
+    }
+}
+
 pub fn harp_file_get(cx: &mut Context) {
     ui::prompt(
         cx,
@@ -145,13 +181,20 @@ pub fn harp_file_get(cx: &mut Context) {
                 return;
             }
 
-            let values = match HarpOutput::build("harp_files", input, HarpContract::path()) {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_files", input)
+            else {
+                return;
             };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::path()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
 
             cx.editor
                 .open(&values.path.unwrap(), Action::Replace)
@@ -175,23 +218,29 @@ pub fn harp_file_set(cx: &mut Context) {
             }
 
             let (_, doc) = current!(cx.editor);
-            let Some(path) = &doc.path else {
+            let Some(current_buffer_path) = doc.path.to_owned() else {
                 cx.editor
                     .set_error("harp: current buffer doesn't have a path");
                 return;
             };
 
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_files", input)
+            else {
+                return;
+            };
+
             if let Err(msg) = harp_update(
-                "harp_files",
-                input,
+                &section_name,
+                &register_input,
                 HarpInput {
-                    path: Some(path.display().to_string()),
+                    path: Some(current_buffer_path.display().to_string()),
                     ..Default::default()
                 },
             ) {
                 cx.editor.set_error(msg);
             } else {
-                cx.editor.set_status("harp: set success");
+                cx.editor.set_status("harped!");
             };
         },
     )
@@ -211,14 +260,20 @@ pub fn harp_relative_file_get(cx: &mut Context) {
                 return;
             }
 
-            let values = match HarpOutput::build("harp_relative_files", input, HarpContract::path())
-            {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_relative_files", input)
+            else {
+                return;
             };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::path()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
 
             cx.editor
                 .open(&values.path.unwrap(), Action::Replace)
@@ -242,7 +297,7 @@ pub fn harp_relative_file_set(cx: &mut Context) {
             }
 
             let (_, doc) = current!(cx.editor);
-            let Some(path) = &doc.path else {
+            let Some(path) = doc.path.to_owned() else {
                 cx.editor
                     .set_error("harp: current buffer doesn't have a path");
                 return;
@@ -250,10 +305,17 @@ pub fn harp_relative_file_set(cx: &mut Context) {
 
             let path = path
                 .strip_prefix(helix_stdx::env::current_working_dir())
-                .unwrap_or(path);
+                .unwrap_or(&path);
+
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_relative_files", input)
+            else {
+                return;
+            };
+
             if let Err(msg) = harp_update(
-                "harp_relative_files",
-                input,
+                &section_name,
+                &register_input,
                 HarpInput {
                     path: Some(path.display().to_string()),
                     ..Default::default()
@@ -261,83 +323,7 @@ pub fn harp_relative_file_set(cx: &mut Context) {
             ) {
                 cx.editor.set_error(msg);
             } else {
-                cx.editor.set_status("harp: set success");
-            };
-        },
-    )
-}
-
-pub fn harp_project_file_get(cx: &mut Context) {
-    ui::prompt(
-        cx,
-        "harp project file get:".into(),
-        None,
-        ui::completers::none,
-        move |cx, input: &str, event: PromptEvent| {
-            if event != PromptEvent::Validate {
-                return;
-            }
-            if input.is_empty() {
-                return;
-            }
-
-            let values = match HarpOutput::build(
-                &format!(
-                    "harp_files_{}",
-                    helix_stdx::env::current_working_dir().display()
-                ),
-                input,
-                HarpContract::path(),
-            ) {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
-            };
-
-            cx.editor
-                .open(&values.path.unwrap(), Action::Replace)
-                .unwrap();
-        },
-    )
-}
-
-pub fn harp_project_file_set(cx: &mut Context) {
-    ui::prompt(
-        cx,
-        "harp project file set:".into(),
-        None,
-        ui::completers::none,
-        move |cx, input: &str, event: PromptEvent| {
-            if event != PromptEvent::Validate {
-                return;
-            }
-            if input.is_empty() {
-                return;
-            }
-
-            let (_, doc) = current!(cx.editor);
-            let Some(path) = &doc.path else {
-                cx.editor
-                    .set_error("harp: current buffer doesn't have a path");
-                return;
-            };
-
-            if let Err(msg) = harp_update(
-                &format!(
-                    "harp_files_{}",
-                    helix_stdx::env::current_working_dir().display()
-                ),
-                input,
-                HarpInput {
-                    path: Some(path.display().to_string()),
-                    ..Default::default()
-                },
-            ) {
-                cx.editor.set_error(msg);
-            } else {
-                cx.editor.set_status("harp: set success");
+                cx.editor.set_status("harped!");
             };
         },
     )
@@ -357,13 +343,19 @@ pub fn harp_cwd_get(cx: &mut Context) {
                 return;
             }
 
-            let values = match HarpOutput::build("harp_dirs", input, HarpContract::path()) {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
+            let Some((section_name, register_input)) = eval_harp_relativity(cx, "harp_dirs", input)
+            else {
+                return;
             };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::path()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
 
             helix_stdx::env::set_current_working_dir(values.path.clone().unwrap()).unwrap();
             cx.editor.set_status(format!(
@@ -388,11 +380,16 @@ pub fn harp_cwd_set(cx: &mut Context) {
                 return;
             }
 
+            let Some((section_name, register_input)) = eval_harp_relativity(cx, "harp_dirs", input)
+            else {
+                return;
+            };
+
             let cwd = helix_stdx::env::current_working_dir();
 
             if let Err(msg) = harp_update(
-                "harp_dirs",
-                input,
+                &section_name,
+                &register_input,
                 HarpInput {
                     path: Some(cwd.display().to_string()),
                     ..Default::default()
@@ -400,7 +397,7 @@ pub fn harp_cwd_set(cx: &mut Context) {
             ) {
                 cx.editor.set_error(msg);
             } else {
-                cx.editor.set_status("harp: set success");
+                cx.editor.set_status("harped!");
             };
         },
     )
@@ -420,13 +417,20 @@ pub fn harp_search_get(cx: &mut Context) {
                 return;
             }
 
-            let values = match HarpOutput::build("harp_searches", input, HarpContract::extra()) {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_searches", input)
+            else {
+                return;
             };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::extra()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
 
             match cx
                 .editor
@@ -471,9 +475,15 @@ pub fn harp_search_set(cx: &mut Context) {
                 }
             };
 
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_searches", input)
+            else {
+                return;
+            };
+
             if let Err(msg) = harp_update(
-                "harp_searches",
-                input,
+                &section_name,
+                &register_input,
                 HarpInput {
                     extra: Some(search),
                     ..Default::default()
@@ -481,7 +491,7 @@ pub fn harp_search_set(cx: &mut Context) {
             ) {
                 cx.editor.set_error(msg);
             } else {
-                cx.editor.set_status("harp: set success");
+                cx.editor.set_status("harped!");
             };
         },
     )
@@ -501,13 +511,20 @@ pub fn harp_register_get(cx: &mut Context) {
                 return;
             }
 
-            let values = match HarpOutput::build("harp_registers", input, HarpContract::extra()) {
-                Ok(values) => values,
-                Err(msg) => {
-                    cx.editor.set_error(msg);
-                    return;
-                }
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_registers", input)
+            else {
+                return;
             };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::extra()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
 
             match cx
                 .editor
@@ -543,11 +560,17 @@ pub fn harp_register_set(cx: &mut Context) {
                 cx.editor.set_error("harp: default register is unset");
                 return;
             };
-            let register_contents = values.collect();
+            let register_contents = values.collect::<Vec<_>>().join("\n");
+
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_registers", input)
+            else {
+                return;
+            };
 
             if let Err(msg) = harp_update(
-                "harp_registers",
-                input,
+                &section_name,
+                &register_input,
                 HarpInput {
                     extra: Some(register_contents),
                     ..Default::default()
@@ -555,7 +578,7 @@ pub fn harp_register_set(cx: &mut Context) {
             ) {
                 cx.editor.set_error(msg);
             } else {
-                cx.editor.set_status("harp: set success");
+                cx.editor.set_status("harped!");
             };
         },
     )
