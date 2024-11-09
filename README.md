@@ -241,6 +241,25 @@ Useful global searches like `(TODO|FIXME|HACK|MOVE):?`, and buffer-specific sear
 
 Project-specific register harps, as a way to gain register session persistence, and filetype-specific register harps, that can act as a basic snippet implementation.
 
+When using harp relativity, you may eventually notice that you *mostly* want a certain relativity for a given harp type: global searches are rarer to want compared to project local ones, for example.
+
+You can actually change the default relativity, from "global"!
+
+When using a harp (whether `get` or `set`, doesn't matter), if you *just* supply `.` / `,` / `;` / `'` as your harp name (without anything afterwards), you will *set* the default relativity for *that* harp type only.
+
+`'` sets the default relativity back to "global", as you may have guessed. I omitted it above for clarity, but you can use `'` at the start of your harp names to override relativity to be global.
+
+The workflow goes like this:
+1. use a harp action
+2. enter just `,`
+3. now this harp action is relative to the current buffer by default. this stays forever, until you override it
+4. use it again, now entering `a`
+5. you used what is equivalent to `,a`, but without having to type in `,`, because you changed the default relativity
+6. use it again, now entering `'a`
+7. you just used the *global* relativity, overriding the (new) default of buffer-relative
+8. use it again, now entering *just* `'`
+9. you set default relativity *back* to "global"
+
 How you use relativity is up to you! In some cases relativity doesn't make sense logically, but this approach lets me implement flexible functionality that *you* may, in some cases, use in ways that I didn't think of.
 
 ---

@@ -138,7 +138,26 @@ fn eval_harp_relativity(
     register_input: &str,
 ) -> Option<(String, String)> {
     // relative to buffer
-    if let Some(register_input) = register_input.strip_prefix(',') {
+    if register_input == ","
+        || register_input == "."
+        || register_input == ";"
+        || register_input == "'"
+    {
+        if let Err(msg) = harp_update(
+            &format!("{}!!relativity", &section_name),
+            "current",
+            HarpInput {
+                extra: Some(register_input.to_owned()),
+                ..Default::default()
+            },
+        ) {
+            cx.editor.set_error(msg);
+        } else {
+            cx.editor
+                .set_status(format!("update section's relativity to {}", register_input));
+        };
+        None
+    } else if let Some(register_input) = register_input.strip_prefix(',') {
         let (_, doc) = current!(cx.editor);
         let Some(path) = &doc.path else {
             cx.editor
@@ -162,8 +181,22 @@ fn eval_harp_relativity(
         let section_name = format!("{}!{}", section_name, language_name);
         Some((section_name, register_input.to_owned()))
     // not relative to anything (global)
-    } else {
+    } else if let Some(register_input) = register_input.strip_prefix('\'') {
         Some((section_name.to_owned(), register_input.to_owned()))
+    } else {
+        let relativity = HarpOutput::build(
+            &format!("{}!!relativity", &section_name),
+            "current",
+            HarpContract::extra(),
+        )
+        .unwrap_or_default()
+        .extra
+        .unwrap_or_else(|| String::from("'"));
+        eval_harp_relativity(
+            cx,
+            section_name,
+            &format!("{}{}", relativity, register_input),
+        )
     }
 }
 
