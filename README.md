@@ -222,7 +222,7 @@ harp_register_get
 
 If you use `set` while having multiple selections, they are joined into a single one with newlines.
 
----
+#### Relativity
 
 Now that you're familiar with all the harp types, let me introduce you to the feature of relativity.
 
@@ -261,6 +261,18 @@ The workflow goes like this:
 9. you set default relativity *back* to "global"
 
 How you use relativity is up to you! In some cases relativity doesn't make sense logically, but this approach lets me implement flexible functionality that *you* may, in some cases, use in ways that I didn't think of.
+
+##### Exceptions
+
+One of those cases is `.` relativity in cwd harps.
+
+Cwd harps take your *current working directory* automatically, as their input. \
+`.` relativity does as well. \
+If you ever try to set a `.` relative cwd harp, all you'll be able to do is `:cd` into a directory that you already are in.
+
+In other words, `.` relativity in cwd harps is useless. Useless enough for me to introduce a certain inconsistent behavior, to make the feature more useful.
+
+If you try to use `.` relativity while doing `harp_cwd_set`, instead of taking your current working directory like it usually would, it takes the *parent* directory of the *current buffer*.
 
 ---
 

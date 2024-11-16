@@ -413,18 +413,35 @@ pub fn harp_cwd_set(cx: &mut Context) {
                 return;
             }
 
+            let is_cwd_relative = input.starts_with('.');
+
             let Some((section_name, register_input)) = eval_harp_relativity(cx, "harp_dirs", input)
             else {
                 return;
             };
 
-            let cwd = helix_stdx::env::current_working_dir();
+            let path = if is_cwd_relative {
+                let (_, doc) = current!(cx.editor);
+                let Some(buffer_path) = &doc.path else {
+                    cx.editor
+                        .set_error("harp: current buffer doesn't have a path");
+                    return;
+                };
+                let Some(buffer_head) = buffer_path.parent() else {
+                    cx.editor
+                        .set_error("harp: current buffer doesn't have a parent directory");
+                    return;
+                };
+                buffer_head.into()
+            } else {
+                helix_stdx::env::current_working_dir()
+            };
 
             if let Err(msg) = harp_update(
                 &section_name,
                 &register_input,
                 HarpInput {
-                    path: Some(cwd.display().to_string()),
+                    path: Some(path.display().to_string()),
                     ..Default::default()
                 },
             ) {
