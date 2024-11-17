@@ -224,6 +224,18 @@ harp_register_get
 
 If you use `set` while having multiple selections, they are joined into a single one with newlines.
 
+#### Command harps
+
+```
+harp_command_set
+harp_command_get
+```
+
+`set` puts your most recent command mode command (register `:`) into a harp. \
+`get` executes a stored command mode command.
+
+Supports command expansions! :3
+
 #### Relativity
 
 Now that you're familiar with all the harp types, let me introduce you to the feature of relativity.

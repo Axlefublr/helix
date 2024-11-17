@@ -586,6 +586,8 @@ impl MappableCommand {
         harp_search_set, "Set a search harp to your last search",
         harp_register_get, "Get a register harp into default register",
         harp_register_set, "Set a register harp from default register",
+        harp_command_get, "Execute command harp",
+        harp_command_set, "Set a command harp from register :",
         shell_replace_with_output, "Replace selections with the output of a shell command",
     );
 }

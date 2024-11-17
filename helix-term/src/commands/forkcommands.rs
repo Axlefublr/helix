@@ -1,11 +1,12 @@
 use crate::{
-    commands::ShellBehavior,
+    commands::{typed, ShellBehavior},
     compositor,
     ui::{self, PromptEvent},
 };
-use std::path::PathBuf;
+use std::{borrow::Cow, path::PathBuf};
 
 use axleharp::HarpReady;
+use helix_core::shellwords::Shellwords;
 use helix_view::{document::DEFAULT_LANGUAGE_NAME, editor::Action, Document};
 
 use crate::commands::Context;
@@ -614,6 +615,125 @@ pub fn harp_register_set(cx: &mut Context) {
 
             let Some((section_name, register_input)) =
                 eval_harp_relativity(cx, "harp_registers", input)
+            else {
+                return;
+            };
+
+            if let Err(msg) = harp_update(
+                &section_name,
+                &register_input,
+                HarpInput {
+                    extra: Some(register_contents),
+                    ..Default::default()
+                },
+            ) {
+                cx.editor.set_error(msg);
+            } else {
+                cx.editor.set_status("harped!");
+            };
+        },
+    )
+}
+
+pub fn harp_command_get(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp command get:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_commands", input)
+            else {
+                return;
+            };
+
+            let values =
+                match HarpOutput::build(&section_name, &register_input, HarpContract::extra()) {
+                    Ok(values) => values,
+                    Err(msg) => {
+                        cx.editor.set_error(msg);
+                        return;
+                    }
+                };
+
+            let value = values.extra.unwrap();
+            let input: &str = value.as_ref();
+
+            // everything beyond this point in the function is copied as-is from
+            // helix-term/src/commands/typed.rs
+            // definition of the command_mode function
+            // if it's not 1:1, open an issue to help out :3
+
+            let parts = input.split_whitespace().collect::<Vec<&str>>();
+            if parts.is_empty() {
+                return;
+            }
+
+            // If command is numeric, interpret as line number and go there.
+            if parts.len() == 1 && parts[0].parse::<usize>().ok().is_some() {
+                if let Err(e) = typed::goto_line_number(cx, &[Cow::from(parts[0])], event) {
+                    cx.editor.set_error(format!("{}", e));
+                }
+                return;
+            }
+
+            // Handle typable commands
+            if let Some(cmd) = typed::TYPABLE_COMMAND_MAP.get(parts[0]) {
+                let shellwords = Shellwords::from(input);
+                let args = shellwords.words();
+                let (_, doc) = current!(cx.editor);
+                let args: Vec<Cow<str>> = args
+                    .iter()
+                    .map(|word| Cow::Owned(expand_expansions(word, doc)))
+                    .collect();
+
+                if let Err(e) = (cmd.fun)(cx, &args[1..], event) {
+                    cx.editor.set_error(format!("{}", e));
+                }
+            } else if event == PromptEvent::Validate {
+                cx.editor
+                    .set_error(format!("no such command: '{}'", parts[0]));
+            }
+        },
+    )
+}
+
+pub fn harp_command_set(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "harp command set:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input: &str, event: PromptEvent| {
+            if event != PromptEvent::Validate {
+                return;
+            }
+            if input.is_empty() {
+                return;
+            }
+
+            let Some(values) = cx
+                .editor
+                .registers
+                .read(':', cx.editor)
+                .and_then(|mut commands| commands.next())
+            else {
+                cx.editor.set_error("harp: command register is unset");
+                return;
+            };
+
+            let register_contents = values.into();
+
+            let Some((section_name, register_input)) =
+                eval_harp_relativity(cx, "harp_commands", input)
             else {
                 return;
             };
