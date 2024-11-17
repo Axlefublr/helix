@@ -588,7 +588,6 @@ impl MappableCommand {
         harp_register_set, "Set a register harp from default register",
         harp_command_get, "Execute command harp",
         harp_command_set, "Set a command harp from register :",
-        shell_replace_with_output, "Replace selections with the output of a shell command",
     );
 }
 
@@ -5750,7 +5749,6 @@ enum ShellBehavior {
     Ignore,
     Insert,
     Append,
-    JustReplace, // fork
 }
 
 fn shell_pipe(cx: &mut Context) {
@@ -5888,7 +5886,7 @@ async fn shell_impl_async(
 fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let pipe = match behavior {
         ShellBehavior::Replace | ShellBehavior::Ignore => true,
-        ShellBehavior::Insert | ShellBehavior::Append | ShellBehavior::JustReplace => false,
+        ShellBehavior::Insert | ShellBehavior::Append => false,
     };
 
     let config = cx.editor.config();
@@ -5931,9 +5929,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
         let output_len = output.chars().count();
 
         let (from, to, deleted_len) = match behavior {
-            ShellBehavior::Replace | ShellBehavior::JustReplace => {
-                (range.from(), range.to(), range.len())
-            }
+            ShellBehavior::Replace => (range.from(), range.to(), range.len()),
             ShellBehavior::Insert => (range.from(), range.from(), 0),
             ShellBehavior::Append => (range.to(), range.to(), 0),
             _ => (range.from(), range.from(), 0),

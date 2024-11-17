@@ -69,8 +69,6 @@ In command mode (and other tab-completable prompts), <kbd>alt+;</kbd> acts the s
 
 In prompts (command mode, pickers, etc), <kbd>alt+,</kbd> moves you to the start of the line and <kbd>alt+.</kbd> to the end, like <kbd>ctrl+a</kbd> and <kbd>ctrl+e</kbd> also do.
 
-`shell_replace_with_output` mappable action, that acts like `shell_pipe`, but doesn't pipe the selections into the command. So, just execute a command and replace selections with the output.
-
 `:random` command with aliases `:rnd`, `:rng` that randomizes your selections.
 
 `whichkey` option in the `[editor]` section can be set to `true` (default) or `false`. \
@@ -102,7 +100,7 @@ The `insert-final-newline` option now only inserts newline if the file is not em
 
 ### Command expansions
 
-Supported in: `shell_pipe`, `shell_pipe_to`, `shell_insert_output`, `shell_append_output`, `shell_replace_with_output` and **all** `:command`s. I'm not yet sure if the latter is a good idea, but feel free to `:cd %p` if you wish /j.
+Supported in: `shell_pipe`, `shell_pipe_to`, `shell_insert_output`, `shell_append_output` and **all** `:command`s. I'm not yet sure if the latter is a good idea, but feel free to `:cd %p` if you wish /j.
 
 Example usage: `:sh echo %p`.
 

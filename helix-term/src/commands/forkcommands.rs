@@ -1,5 +1,5 @@
 use crate::{
-    commands::{typed, ShellBehavior},
+    commands::typed,
     compositor,
     ui::{self, PromptEvent},
 };
@@ -752,14 +752,6 @@ pub fn harp_command_set(cx: &mut Context) {
             };
         },
     )
-}
-
-pub fn shell_replace_with_output(cx: &mut Context) {
-    super::shell_prompt(
-        cx,
-        "replace-with-output:".into(),
-        ShellBehavior::JustReplace,
-    );
 }
 
 pub fn get_git_repo_root() -> Option<String> {
