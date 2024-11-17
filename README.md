@@ -92,6 +92,8 @@ All pickers now take up the entire screen, rather than 90%. Thanks to @satoqz fo
 
 The `insert-final-newline` option now only inserts newline if the file is not empty.
 
+`:run-shell-command` now also has a `:s` alias, along with `:sh`.
+
 ### Implemented PRs from upstream
 
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
