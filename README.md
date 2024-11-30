@@ -97,6 +97,7 @@ The `insert-final-newline` option now only inserts newline if the file is not em
 * [11234](https://github.com/helix-editor/helix/issues/11234) by @Swordelf2
 * [9143](https://github.com/helix-editor/helix/pull/9143) by @intarga
 * [2608](https://github.com/helix-editor/helix/pull/2608) by @Philipp-M
+* [11285](https://github.com/helix-editor/helix/pull/11285) by @drybalka
 
 ### Command expansions
 
