@@ -233,6 +233,10 @@ impl EditorView {
             Self::render_diagnostics(doc, view, inner, surface, theme);
         }
 
+        if !config.should_statusline {
+            return;
+        }
+
         let statusline_area = view
             .area
             .clip_top(view.area.height.saturating_sub(1))
@@ -903,7 +907,11 @@ impl EditorView {
             KeymapResult::Matched(command) => {
                 execute_command(command);
             }
-            KeymapResult::Pending(node) => cxt.editor.autoinfo = Some(node.infobox()),
+            KeymapResult::Pending(node) => {
+                if cxt.editor.config.load().whichkey {
+                    cxt.editor.autoinfo = Some(node.infobox());
+                }
+            }
             KeymapResult::MatchedSequence(commands) => {
                 for command in commands {
                     execute_command(command);
@@ -1488,7 +1496,7 @@ impl Component for EditorView {
         };
 
         // -1 for commandline and -1 for bufferline
-        let mut editor_area = area.clip_bottom(1);
+        let mut editor_area = area.clip_bottom(if config.ephemeral_messages { 0 } else { 1 });
         if use_bufferline {
             editor_area = editor_area.clip_top(1);
         }
