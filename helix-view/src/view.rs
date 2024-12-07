@@ -191,7 +191,11 @@ impl View {
     }
 
     pub fn inner_area(&self, doc: &Document) -> Rect {
-        self.area.clip_left(self.gutter_offset(doc)).clip_bottom(1) // -1 for statusline
+        let rect = self.area.clip_left(self.gutter_offset(doc));
+        if doc.config.load().should_statusline {
+            rect.clip_bottom(1); // -1 for statusline
+        }
+        rect
     }
 
     pub fn inner_height(&self) -> usize {
@@ -483,24 +487,25 @@ impl View {
         };
         let config = doc.config.load();
         let width = self.inner_width(doc);
-        let enable_cursor_line = self
-            .diagnostics_handler
-            .show_cursorline_diagnostics(doc, self.id);
-        let config = config.inline_diagnostics.prepare(width, enable_cursor_line);
-        if !config.disabled() {
-            let cursor = doc
-                .selection(self.id)
-                .primary()
-                .cursor(doc.text().slice(..));
-            text_annotations.add_line_annotation(InlineDiagnostics::new(
-                doc,
-                cursor,
-                width,
-                doc.view_offset(self.id).horizontal_offset,
-                config,
-            ));
+        if config.show_diagnostics {
+            let enable_cursor_line = self
+                .diagnostics_handler
+                .show_cursorline_diagnostics(doc, self.id);
+            let config = config.inline_diagnostics.prepare(width, enable_cursor_line);
+            if !config.disabled() {
+                let cursor = doc
+                    .selection(self.id)
+                    .primary()
+                    .cursor(doc.text().slice(..));
+                text_annotations.add_line_annotation(InlineDiagnostics::new(
+                    doc,
+                    cursor,
+                    width,
+                    doc.view_offset(self.id).horizontal_offset,
+                    config,
+                ));
+            }
         }
-
         text_annotations
     }
 

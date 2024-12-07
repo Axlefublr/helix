@@ -188,17 +188,20 @@ impl EditorView {
         }
         let width = view.inner_width(doc);
         let config = doc.config.load();
-        let enable_cursor_line = view
-            .diagnostics_handler
-            .show_cursorline_diagnostics(doc, view.id);
-        let inline_diagnostic_config = config.inline_diagnostics.prepare(width, enable_cursor_line);
-        decorations.add_decoration(InlineDiagnostics::new(
-            doc,
-            theme,
-            primary_cursor,
-            inline_diagnostic_config,
-            config.end_of_line_diagnostics,
-        ));
+        if config.show_diagnostics {
+            let enable_cursor_line = view
+                .diagnostics_handler
+                .show_cursorline_diagnostics(doc, view.id);
+            let inline_diagnostic_config =
+                config.inline_diagnostics.prepare(width, enable_cursor_line);
+            decorations.add_decoration(InlineDiagnostics::new(
+                doc,
+                theme,
+                primary_cursor,
+                inline_diagnostic_config,
+                config.end_of_line_diagnostics,
+            ));
+        }
         render_document(
             surface,
             inner,
@@ -228,6 +231,10 @@ impl EditorView {
             && config.end_of_line_diagnostics == DiagnosticFilter::Disable
         {
             Self::render_diagnostics(doc, view, inner, surface, theme);
+        }
+
+        if !config.should_statusline {
+            return;
         }
 
         let statusline_area = view
@@ -918,7 +925,11 @@ impl EditorView {
             KeymapResult::Matched(command) => {
                 execute_command(command);
             }
-            KeymapResult::Pending(node) => cxt.editor.autoinfo = Some(node.infobox()),
+            KeymapResult::Pending(node) => {
+                if cxt.editor.config.load().whichkey {
+                    cxt.editor.autoinfo = Some(node.infobox());
+                }
+            }
             KeymapResult::MatchedSequence(commands) => {
                 for command in commands {
                     execute_command(command);
@@ -975,7 +986,9 @@ impl EditorView {
                 cxt.editor.count = NonZeroUsize::new(i);
             }
             // special handling for repeat operator
-            (key!('.'), _) if self.keymaps.pending().is_empty() => {
+            (key!('.'), _)
+                if self.keymaps.pending().is_empty() && !cxt.editor.config().disable_dot_repeat =>
+            {
                 for _ in 0..cxt.editor.count.map_or(1, NonZeroUsize::into) {
                     // first execute whatever put us into insert mode
                     self.last_insert.0.execute(cxt);
@@ -1545,7 +1558,7 @@ impl Component for EditorView {
         };
 
         // -1 for commandline and -1 for bufferline
-        let mut editor_area = area.clip_bottom(1);
+        let mut editor_area = area.clip_bottom(if config.ephemeral_messages { 0 } else { 1 });
         if use_bufferline {
             editor_area = editor_area.clip_top(1);
         }
