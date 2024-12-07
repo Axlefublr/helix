@@ -1053,10 +1053,10 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
             key!(Tab) | key!(Down) | ctrl!('n') => {
                 self.move_by(1, Direction::Forward);
             }
-            key!(PageDown) | ctrl!('d') => {
+            key!(PageDown) | alt!('l') => {
                 self.page_down();
             }
-            key!(PageUp) | ctrl!('u') => {
+            key!(PageUp) | alt!('h') => {
                 self.page_up();
             }
             key!(Home) => {
@@ -1112,7 +1112,7 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
                 }
                 return close_fn(self);
             }
-            ctrl!('v') => {
+            ctrl!('r') => {
                 if let Some(option) = self.selection() {
                     (self.callback_fn)(ctx, option, Action::VerticalSplit);
                 }
