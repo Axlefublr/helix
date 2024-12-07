@@ -8,4 +8,4 @@
 *.md       text diff=markdown
 
 book/theme/highlight.js linguist-vendored
-Cargo.lock text
+Cargo.lock binary
