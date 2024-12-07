@@ -592,8 +592,8 @@ impl Component for Prompt {
             alt!('f') | ctrl!(Right) => self.move_cursor(Movement::ForwardWord(1)),
             ctrl!('b') | key!(Left) => self.move_cursor(Movement::BackwardChar(1)),
             ctrl!('f') | key!(Right) => self.move_cursor(Movement::ForwardChar(1)),
-            ctrl!('e') | key!(End) => self.move_end(),
-            ctrl!('a') | key!(Home) => self.move_start(),
+            ctrl!('e') | key!(End) | alt!('.') => self.move_end(),
+            ctrl!('a') | key!(Home) | alt!(',') => self.move_start(),
             ctrl!('w') | alt!(Backspace) | ctrl!(Backspace) => {
                 self.delete_word_backwards(cx.editor);
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
@@ -669,13 +669,28 @@ impl Component for Prompt {
                 }
             }
             ctrl!('p') | key!(Up) => {
-                if let Some(register) = self.history_register {
-                    self.change_history(cx, register, CompletionDirection::Backward);
+                if self.line.is_empty() {
+                    if let Some(register) = self.history_register {
+                        self.change_history(cx, register, CompletionDirection::Backward);
+                    }
+                } else {
+                    self.change_completion_selection(CompletionDirection::Backward);
+                    (self.callback_fn)(cx, &self.line, PromptEvent::Update)
                 }
             }
             ctrl!('n') | key!(Down) => {
-                if let Some(register) = self.history_register {
-                    self.change_history(cx, register, CompletionDirection::Forward);
+                if self.line.is_empty() {
+                    if let Some(register) = self.history_register {
+                        self.change_history(cx, register, CompletionDirection::Forward);
+                    }
+                } else {
+                    self.change_completion_selection(CompletionDirection::Forward);
+                    // if single completion candidate is a directory list content in completion
+                    if self.completion.len() == 1 && self.line.ends_with(std::path::MAIN_SEPARATOR)
+                    {
+                        self.recalculate_completion(cx.editor);
+                    }
+                    (self.callback_fn)(cx, &self.line, PromptEvent::Update)
                 }
             }
             key!(Tab) => {
@@ -710,6 +725,15 @@ impl Component for Prompt {
                 }));
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 return EventResult::Consumed(None);
+            }
+            alt!(';') => {
+                self.insert_str(
+                    &cx.editor
+                        .registers
+                        .first(cx.editor.config.load().default_yank_register, cx.editor)
+                        .unwrap_or_default(),
+                    cx.editor,
+                );
             }
             // any char event that's not mapped to any other combo
             KeyEvent {
