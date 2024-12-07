@@ -744,6 +744,66 @@ impl Component for Prompt {
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 return EventResult::Consumed(None);
             }
+            ctrl!('v') => {
+                self.insert_str(
+                    &cx.editor
+                        .registers
+                        .first(cx.editor.config().default_yank_register, cx.editor)
+                        .unwrap_or_default(),
+                    cx.editor,
+                );
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            ctrl!('x') => {
+                let to_copy = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                } else {
+                    Some(self.line().to_owned())
+                };
+                if let Some(to_copy) = to_copy {
+                    let _ = cx
+                        .editor
+                        .registers
+                        .write(cx.editor.config().default_yank_register, vec![to_copy]);
+                }
+            }
+            alt!('o') => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_else(|| String::from(""))
+                } else {
+                    self.line().into()
+                };
+                let new_line = if line.starts_with("\\b") || line.ends_with("\\b") {
+                    line.trim_start_matches("\\b")
+                        .trim_end_matches("\\b")
+                        .into()
+                } else {
+                    format!("\\b{}\\b", line)
+                };
+                self.set_line(new_line, cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            alt!('i') => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_else(|| String::from(""))
+                } else {
+                    self.line().into()
+                };
+                let new_line = if let Some(line) = line.strip_prefix("(?-i)") {
+                    format!("(?i){}", line)
+                } else if let Some(line) = line.strip_prefix("(?i)") {
+                    line.into()
+                } else {
+                    format!("(?-i){}", line)
+                };
+                self.set_line(new_line, cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
             // any char event that's not mapped to any other combo
             KeyEvent {
                 code: KeyCode::Char(c),
