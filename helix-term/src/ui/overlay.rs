@@ -21,14 +21,7 @@ pub struct Overlay<T> {
 pub fn overlaid<T>(content: T) -> Overlay<T> {
     Overlay {
         content,
-        calc_child_size: Box::new(|rect: Rect| {
-            let percentage = if rect.width < FULL_OVERLAID_MAX_WIDTH {
-                100
-            } else {
-                90
-            };
-            clip_rect_relative(rect.clip_bottom(2), percentage, percentage)
-        }),
+        calc_child_size: Box::new(|rect: Rect| clip_rect_relative(rect.clip_bottom(1), 100, 100)),
     }
 }
 
