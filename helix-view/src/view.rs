@@ -191,7 +191,11 @@ impl View {
     }
 
     pub fn inner_area(&self, doc: &Document) -> Rect {
-        self.area.clip_left(self.gutter_offset(doc)).clip_bottom(1) // -1 for statusline
+        let rect = self.area.clip_left(self.gutter_offset(doc));
+        if doc.config.load().should_statusline {
+            rect.clip_bottom(1); // -1 for statusline
+        }
+        rect
     }
 
     pub fn inner_height(&self) -> usize {
