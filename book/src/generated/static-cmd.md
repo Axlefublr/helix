@@ -292,3 +292,16 @@
 | `command_palette` | Open command palette | normal: `` <space>? ``, select: `` <space>? `` |
 | `goto_word` | Jump to a two-character label | normal: `` gw `` |
 | `extend_to_word` | Extend to a two-character label | select: `` gw `` |
+| `harp_file_get` | Open a file harp |  |
+| `harp_file_set` | Set a file harp to the current buffer |  |
+| `harp_relative_file_get` | Open a relative file harp |  |
+| `harp_relative_file_set` | Set a relative file harp to the current buffer |  |
+| `harp_cwd_get` | Change directory to a cwd harp |  |
+| `harp_cwd_set` | Update cwd harp to be the current working directory |  |
+| `harp_search_get` | Search for a stored search harp |  |
+| `harp_search_set` | Set a search harp to your last search |  |
+| `harp_register_get` | Get a register harp into default register |  |
+| `harp_register_set` | Set a register harp from default register |  |
+| `harp_command_get` | Execute command harp |  |
+| `harp_command_set` | Set a command harp from register : |  |
+| `count_selections` | Print amount of selections to messages |  |
