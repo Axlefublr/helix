@@ -603,6 +603,7 @@ impl Prompt {
 }
 
 impl Component for Prompt {
+    #[allow(clippy::obfuscated_if_else)]
     fn handle_event(&mut self, event: &Event, cx: &mut Context) -> EventResult {
         let event = match event {
             Event::Paste(data) => {
@@ -623,6 +624,231 @@ impl Component for Prompt {
             compositor.pop();
         })));
 
+        use std::str::FromStr;
+        #[derive(PartialEq, Default, Debug)]
+        enum Trule {
+            Yes,
+            No,
+            #[default]
+            Unspecified,
+        }
+
+        impl Trule {
+            fn yes(&self) -> bool {
+                *self == Self::Yes
+            }
+
+            fn no(&self) -> bool {
+                *self == Self::No
+            }
+
+            fn unspecified(&self) -> bool {
+                *self == Self::Unspecified
+            }
+        }
+
+        #[derive(Default, Debug)]
+        struct RegexFlags {
+            insensitive: Trule,
+            suka: Trule,
+            ungreedy: Trule,
+        }
+
+        impl RegexFlags {
+            fn specify_insensitive() -> Self {
+                RegexFlags {
+                    insensitive: Trule::Yes,
+                    ..Default::default()
+                }
+            }
+
+            fn specify_suka() -> Self {
+                RegexFlags {
+                    suka: Trule::Yes,
+                    ..Default::default()
+                }
+            }
+
+            fn all_unspecified(&self) -> bool {
+                self.insensitive.unspecified()
+                    && self.suka.unspecified()
+                    && self.ungreedy.unspecified()
+            }
+
+            fn has_noes(&self) -> bool {
+                self.insensitive.no() || self.suka.no() || self.ungreedy.no()
+            }
+
+            fn yes_insensitive(&self) -> &str {
+                self.insensitive.yes().then_some("i").unwrap_or_default()
+            }
+
+            fn yes_suka(&self) -> &str {
+                self.suka.yes().then_some("s").unwrap_or_default()
+            }
+
+            fn yes_ungreedy(&self) -> &str {
+                self.ungreedy.yes().then_some("U").unwrap_or_default()
+            }
+
+            fn no_insensitive(&self) -> &str {
+                self.insensitive.no().then_some("i").unwrap_or_default()
+            }
+
+            fn no_suka(&self) -> &str {
+                self.suka.no().then_some("s").unwrap_or_default()
+            }
+
+            fn no_ungreedy(&self) -> &str {
+                self.ungreedy.no().then_some("U").unwrap_or_default()
+            }
+
+            fn rotate_insensitive(mut self) -> Self {
+                match self.insensitive {
+                    Trule::Yes => self.insensitive = Trule::No,
+                    Trule::No => self.insensitive = Trule::Unspecified,
+                    Trule::Unspecified => self.insensitive = Trule::Yes,
+                }
+                self
+            }
+
+            fn rotate_suka(mut self) -> Self {
+                match self.suka {
+                    Trule::Yes => self.suka = Trule::Unspecified,
+                    Trule::No => self.suka = Trule::Unspecified,
+                    Trule::Unspecified => self.suka = Trule::Yes,
+                }
+                self
+            }
+
+            // fn rotate_ungreedy(mut self) -> Self {
+            //     match self.ungreedy {
+            //         Trule::Yes => self.ungreedy = Trule::Unspecified,
+            //         Trule::No => self.ungreedy = Trule::Unspecified,
+            //         Trule::Unspecified => self.ungreedy = Trule::Yes,
+            //     }
+            //     self
+            // }
+
+            fn modify_insensitive(line: &str) -> Option<String> {
+                if let Some(line_stripped) = line.strip_prefix("(?") {
+                    let mut flags = String::new();
+                    let mut rest_of_line = String::new();
+                    let mut line_now = false;
+                    for ch in line_stripped.chars() {
+                        if ch == ')' {
+                            line_now = true;
+                            continue;
+                        }
+                        if line_now {
+                            rest_of_line.push(ch);
+                        } else {
+                            flags.push(ch);
+                        }
+                    }
+                    let Ok(regexflags): anyhow::Result<RegexFlags> = flags.parse() else {
+                        return None;
+                    };
+                    Some(format!(
+                        "{}{}",
+                        regexflags.rotate_insensitive(),
+                        rest_of_line
+                    ))
+                } else {
+                    Some(format!("{}{}", RegexFlags::specify_insensitive(), line))
+                }
+            }
+
+            fn modify_suka(line: &str) -> Option<String> {
+                if let Some(line_stripped) = line.strip_prefix("(?") {
+                    let mut flags = String::new();
+                    let mut rest_of_line = String::new();
+                    let mut line_now = false;
+                    for ch in line_stripped.chars() {
+                        if ch == ')' {
+                            line_now = true;
+                            continue;
+                        }
+                        if line_now {
+                            rest_of_line.push(ch);
+                        } else {
+                            flags.push(ch);
+                        }
+                    }
+                    let Ok(regexflags): anyhow::Result<RegexFlags> = flags.parse() else {
+                        return None;
+                    };
+                    Some(format!("{}{}", regexflags.rotate_suka(), rest_of_line))
+                } else {
+                    Some(format!("{}{}", RegexFlags::specify_suka(), line))
+                }
+            }
+        }
+
+        impl FromStr for RegexFlags {
+            type Err = anyhow::Error;
+
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                let mut the = Self {
+                    insensitive: Trule::default(),
+                    suka: Trule::default(),
+                    ungreedy: Trule::default(),
+                };
+                let mut noes_now = false;
+                for ch in s.chars() {
+                    match ch {
+                        '-' => {
+                            noes_now = true;
+                            continue;
+                        }
+                        'i' => {
+                            if noes_now {
+                                the.insensitive = Trule::No
+                            } else {
+                                the.insensitive = Trule::Yes
+                            }
+                        }
+                        's' => {
+                            if noes_now {
+                                the.suka = Trule::No
+                            } else {
+                                the.suka = Trule::Yes
+                            }
+                        }
+                        'U' => {
+                            if noes_now {
+                                the.ungreedy = Trule::No
+                            } else {
+                                the.ungreedy = Trule::Yes
+                            }
+                        }
+                        _ => (),
+                    }
+                }
+                Ok(the)
+            }
+        }
+
+        impl std::fmt::Display for RegexFlags {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                if self.all_unspecified() {
+                    return Ok(());
+                }
+                let has_noes = self.has_noes().then_some("-").unwrap_or_default();
+                write!(
+                    f,
+                    "(?{}{}{}{has_noes}{}{}{})",
+                    self.yes_suka(),
+                    self.yes_ungreedy(),
+                    self.yes_insensitive(),
+                    self.no_suka(),
+                    self.no_ungreedy(),
+                    self.no_insensitive(),
+                )
+            }
+        }
+
+        let mut user_edited = true;
         match event {
             ctrl!('c') | key!(Esc) => {
                 (self.callback_fn)(cx, &self.line, PromptEvent::Abort);
@@ -750,6 +976,93 @@ impl Component for Prompt {
                 }));
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 return EventResult::Consumed(None);
+            }
+            ctrl!('v') => {
+                self.insert_str(
+                    &cx.editor
+                        .registers
+                        .first(cx.editor.config().default_yank_register, cx.editor)
+                        .unwrap_or_default(),
+                    cx.editor,
+                );
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            ctrl!('x') => {
+                let to_copy = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                } else {
+                    Some(self.line().to_owned())
+                };
+                if let Some(to_copy) = to_copy {
+                    let _ = cx
+                        .editor
+                        .registers
+                        .write(cx.editor.config().default_yank_register, vec![to_copy]);
+                }
+            }
+            alt!('o') => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_default()
+                } else {
+                    self.line().into()
+                };
+                let new_line = if line.starts_with("\\b") || line.ends_with("\\b") {
+                    line.trim_start_matches("\\b")
+                        .trim_end_matches("\\b")
+                        .into()
+                } else {
+                    format!(
+                        "{start_b}{}{end_b}",
+                        line,
+                        start_b = if line.starts_with(|ch: char| ch.is_ascii_alphanumeric()) {
+                            "\\b"
+                        } else {
+                            Default::default()
+                        },
+                        end_b = if line.ends_with(|ch: char| ch.is_ascii_alphanumeric()) {
+                            "\\b"
+                        } else {
+                            Default::default()
+                        }
+                    )
+                };
+                self.set_line(new_line, cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            alt!('i') => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_default()
+                } else {
+                    self.line().into()
+                };
+                let Some(new_line) = RegexFlags::modify_insensitive(&line) else {
+                    return EventResult::Consumed(None);
+                };
+                self.set_line(new_line, cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            shift!(Insert) => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_default()
+                } else {
+                    self.line().into()
+                };
+                let Some(new_line) = RegexFlags::modify_suka(&line) else {
+                    return EventResult::Consumed(None);
+                };
+                self.set_line(new_line, cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
+            }
+            key!(Insert) => {
+                self.insert_str(".*?", cx.editor);
+                (self.callback_fn)(cx, &self.line, PromptEvent::Update);
             }
             // any char event that's not mapped to any other combo
             KeyEvent {
