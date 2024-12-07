@@ -246,6 +246,17 @@ where
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
 pub struct Config {
+    //--------------------------------------------------fork--------------------------------------------------
+    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
+    pub whichkey: bool,
+    /// Whether to display the statusline at all. Defaults to true.
+    pub should_statusline: bool,
+    /// Whether to make messages take up an entire line in the UI, or appear over editor text. Defaults to false (take up entire line in the UI).
+    pub ephemeral_messages: bool,
+    /// Disable the `.` mapping that repeats your last action, making `.` rebindable. Defaults to false.
+    pub disable_dot_repeat: bool,
+    pub show_diagnostics: bool,
+    //--------------------------------------------------fork--------------------------------------------------
     /// Padding to keep between the edge of the screen and the cursor when scrolling. Defaults to 5.
     pub scrolloff: usize,
     /// Number of lines to scroll at once. Defaults to 3
@@ -953,6 +964,13 @@ pub enum PopupBorderConfig {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            //----------------------------------------------fork----------------------------------------------
+            should_statusline: true,
+            whichkey: true,
+            ephemeral_messages: false,
+            disable_dot_repeat: false,
+            show_diagnostics: true,
+            //----------------------------------------------fork----------------------------------------------
             scrolloff: 5,
             scroll_lines: 3,
             mouse: true,
