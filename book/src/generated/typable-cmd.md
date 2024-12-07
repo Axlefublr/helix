@@ -80,12 +80,12 @@
 | `:append-output` | Run shell command, appending output after each selection. |
 | `:pipe` | Pipe each selection to the shell command. |
 | `:pipe-to` | Pipe each selection to the shell command, ignoring output. |
-| `:run-shell-command`, `:sh` | Run a shell command |
+| `:run-shell-command`, `:sh`, `:s` | Run a shell command |
 | `:reset-diff-change`, `:diffget`, `:diffg` | Reset the diff change at the cursor position. |
 | `:clear-register` | Clear given register. If no argument is provided, clear all registers. |
 | `:redraw` | Clear and re-render the whole UI |
 | `:move`, `:mv` | Move the current buffer and its corresponding file to a different path |
 | `:yank-diagnostic` | Yank diagnostic(s) under primary cursor to register, or clipboard by default |
 | `:read`, `:r` | Load a file into buffer |
-| `:echo` | Prints the given arguments to the statusline. |
+| `:echo`, `:c` | Prints the given arguments to the statusline. |
 | `:noop` | Does nothing. |
