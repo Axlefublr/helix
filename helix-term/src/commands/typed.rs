@@ -3181,7 +3181,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     },
     TypableCommand {
         name: "run-shell-command",
-        aliases: &["sh"],
+        aliases: &["sh", "s"],
         doc: "Run a shell command",
         fun: run_shell_command,
         signature: CommandSignature::all(completers::filename)
