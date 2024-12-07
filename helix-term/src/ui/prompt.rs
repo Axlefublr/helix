@@ -743,6 +743,15 @@ impl Component for Prompt {
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 return EventResult::Consumed(None);
             }
+            ctrl!('v') => {
+                self.insert_str(
+                    &cx.editor
+                        .registers
+                        .first(cx.editor.config().default_yank_register, cx.editor)
+                        .unwrap_or_default(),
+                    cx.editor,
+                );
+            }
             // any char event that's not mapped to any other combo
             KeyEvent {
                 code: KeyCode::Char(c),
