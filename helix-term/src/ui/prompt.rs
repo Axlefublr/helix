@@ -743,6 +743,32 @@ impl Component for Prompt {
                 (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 return EventResult::Consumed(None);
             }
+            ctrl!('v') => {
+                self.insert_str(
+                    &cx.editor
+                        .registers
+                        .first(cx.editor.config().default_yank_register, cx.editor)
+                        .unwrap_or_default(),
+                    cx.editor,
+                );
+            }
+            ctrl!('i') => {
+                let line = if self.line.is_empty() {
+                    self.first_history_completion(cx.editor)
+                        .map(|entry| entry.to_string())
+                        .unwrap_or_else(|| String::from(""))
+                } else {
+                    self.line().into()
+                };
+                let new_line = if line.starts_with("\\b") || line.ends_with("\\b") {
+                    line.trim_start_matches("\\b")
+                        .trim_end_matches("\\b")
+                        .into()
+                } else {
+                    format!("\\b{}\\b", line)
+                };
+                self.set_line(new_line, cx.editor)
+            }
             // any char event that's not mapped to any other combo
             KeyEvent {
                 code: KeyCode::Char(c),
