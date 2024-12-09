@@ -93,3 +93,4 @@
 | `:random`, `:rng`, `:rnd` | Randomize your selections |
 | `:echo`, `:c` | Print to the messages line |
 | `:echopy`, `:cc` | Put string into clipboard |
+| `:reload-history` | Reload history files for persistent state |
