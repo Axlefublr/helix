@@ -88,3 +88,11 @@
 | `:move`, `:mv` | Move the current buffer and its corresponding file to a different path |
 | `:yank-diagnostic` | Yank diagnostic(s) under primary cursor to register, or clipboard by default |
 | `:read`, `:r` | Load a file into buffer |
+| `:random`, `:rng`, `:rnd` | Randomize your selections |
+| `:echo`, `:c` | Print to the messages line |
+| `:echopy`, `:cc` | Put string into clipboard |
+| `:reload-history` | Reload history files for persistent state |
+| `:write-buffer-close-or-quit`, `:wbcq` | If on scratch buffer, :quit. If on normal buffer, :write-buffer-close |
+| `:write-buffer-close-or-quit!`, `:wbcq!` | If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close! |
+| `:buffer-close-or-quit`, `:bcq` | If on scratch buffer, :quit. If on normal buffer, :buffer-close |
+| `:buffer-close-or-quit!`, `:bcq!` | If on scratch buffer, :quit!. If on normal buffer, :buffer-close! |
