@@ -1,3 +1,5 @@
+mod forktyped;
+
 use std::fmt::Write;
 use std::io::BufReader;
 use std::ops::{self, Deref};
@@ -5,6 +7,7 @@ use std::ops::{self, Deref};
 use crate::job::Job;
 
 use super::*;
+use forktyped::*;
 
 use helix_core::command_line::{Args, Flag, Signature, Token, TokenKind};
 use helix_core::fuzzy::fuzzy_match;
@@ -3552,6 +3555,85 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, None),
+            ..Signature::DEFAULT
+        },
+    },
+    //---------------------------------------- fork ----------------------------------------
+    TypableCommand {
+        name: "random",
+        aliases: &["rng", "rnd"],
+        doc: "Randomize your selections.",
+        fun: random,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "echopy",
+        aliases: &["cc"],
+        doc: "Put string into clipboard",
+        fun: echopy,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
+            raw_after: Some(0),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "buffer-delete-file",
+        aliases: &["db", "del", "delete"],
+        doc: "Delete current buffer's real file and close the buffer",
+        fun: buffer_delete_file,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (1, Some(1)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "write-buffer-close-or-quit",
+        aliases: &["wbcq"],
+        doc: "If on scratch buffer, :quit. If on normal buffer, :write-buffer-close",
+        fun: write_buffer_close_or_quit,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "write-buffer-close-or-quit!",
+        aliases: &["wbcq!"],
+        doc: "If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close!",
+        fun: force_write_buffer_close_or_quit,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "buffer-close-or-quit",
+        aliases: &["bcq"],
+        doc: "If on scratch buffer, :quit. If on normal buffer, :buffer-close",
+        fun: buffer_close_or_quit,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "buffer-close-or-quit!",
+        aliases: &["bcq!"],
+        doc: "If on scratch buffer, :quit!. If on normal buffer, :buffer-close!",
+        fun: force_buffer_close_or_quit,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
             ..Signature::DEFAULT
         },
     },
