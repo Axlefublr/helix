@@ -1,3 +1,5 @@
+mod forktyped;
+
 use std::fmt::Write;
 use std::io::BufReader;
 use std::ops::Deref;
@@ -5,6 +7,7 @@ use std::ops::Deref;
 use crate::job::Job;
 
 use super::*;
+use forktyped::*;
 
 use helix_core::fuzzy::fuzzy_match;
 use helix_core::indent::MAX_INDENT;
@@ -3227,6 +3230,56 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         doc: "Load a file into buffer",
         fun: read,
         signature: CommandSignature::positional(&[completers::filename]),
+    },
+    //---------------------------------------- fork ----------------------------------------
+    TypableCommand {
+        name: "random",
+        aliases: &["rng", "rnd"],
+        doc: "Randomize your selections",
+        fun: random,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "echo",
+        aliases: &["c"],
+        doc: "Print to the messages line",
+        fun: echo,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "echopy",
+        aliases: &["cc"],
+        doc: "Put string into clipboard",
+        fun: echopy,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "write-buffer-close-or-quit",
+        aliases: &["wbcq"],
+        doc: "If on scratch buffer, :quit. If on normal buffer, :write-buffer-close",
+        fun: write_buffer_close_or_quit,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "write-buffer-close-or-quit!",
+        aliases: &["wbcq!"],
+        doc: "If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close!",
+        fun: force_write_buffer_close_or_quit,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "buffer-close-or-quit",
+        aliases: &["bcq"],
+        doc: "If on scratch buffer, :quit. If on normal buffer, :buffer-close",
+        fun: buffer_close_or_quit,
+        signature: CommandSignature::none(),
+    },
+    TypableCommand {
+        name: "buffer-close-or-quit!",
+        aliases: &["bcq!"],
+        doc: "If on scratch buffer, :quit!. If on normal buffer, :buffer-close!",
+        fun: force_buffer_close_or_quit,
+        signature: CommandSignature::none(),
     },
 ];
 
