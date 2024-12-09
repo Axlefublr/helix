@@ -89,3 +89,10 @@
 | `:read`, `:r` | Load a file into buffer |
 | `:echo`, `:c` | Prints the given arguments to the statusline. |
 | `:noop` | Does nothing. |
+| `:random`, `:rng`, `:rnd` | Randomize your selections. |
+| `:echopy`, `:cc` | Put string into clipboard |
+| `:buffer-delete-file`, `:db`, `:del`, `:delete` | Delete current buffer's real file and close the buffer |
+| `:write-buffer-close-or-quit`, `:wbcq` | If on scratch buffer, :quit. If on normal buffer, :write-buffer-close |
+| `:write-buffer-close-or-quit!`, `:wbcq!` | If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close! |
+| `:buffer-close-or-quit`, `:bcq` | If on scratch buffer, :quit. If on normal buffer, :buffer-close |
+| `:buffer-close-or-quit!`, `:bcq!` | If on scratch buffer, :quit!. If on normal buffer, :buffer-close! |
