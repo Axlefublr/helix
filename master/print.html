@@ -1822,6 +1822,7 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <tr><td><code>line-number</code></td><td>Line number display: <code>absolute</code> simply shows each line's number, while <code>relative</code> shows the distance from the current line. When unfocused or in insert mode, <code>relative</code> will still show absolute line numbers</td><td><code>absolute</code></td></tr>
 <tr><td><code>cursorline</code></td><td>Highlight all lines with a cursor</td><td><code>false</code></td></tr>
 <tr><td><code>cursorcolumn</code></td><td>Highlight all columns with a cursor</td><td><code>false</code></td></tr>
+<tr><td><code>continue-comments</code></td><td>if helix should automatically add a line comment token if you create a new line inside a comment.</td><td><code>true</code></td></tr>
 <tr><td><code>gutters</code></td><td>Gutters to display: Available are <code>diagnostics</code> and <code>diff</code> and <code>line-numbers</code> and <code>spacer</code>, note that <code>diagnostics</code> also includes other features like breakpoints, 1-width padding will be inserted if gutters is non-empty</td><td><code>["diagnostics", "spacer", "line-numbers", "spacer", "diff"]</code></td></tr>
 <tr><td><code>auto-completion</code></td><td>Enable automatic pop up of auto-completion</td><td><code>true</code></td></tr>
 <tr><td><code>path-completion</code></td><td>Enable filepath completion. Show files and directories if an existing path at the cursor was recognized, either absolute or relative to the current opened document or current working directory (if the buffer is not yet saved). Defaults to true.</td><td><code>true</code></td></tr>
@@ -1849,7 +1850,7 @@ Its settings will be merged with the configuration directory <code>config.toml</
 </tbody></table>
 </div>
 <h3 id="editorclipboard-provider-section"><a class="header" href="#editorclipboard-provider-section"><code>[editor.clipboard-provider]</code> Section</a></h3>
-<p>Helix can be configured wither to use a builtin clipboard configuration or to use
+<p>Helix can be configured either to use a builtin clipboard configuration or to use
 a provided command.</p>
 <p>For instance, setting it to use OSC 52 termcodes, the configuration would be:</p>
 <pre><code class="language-toml">[editor]
@@ -2645,8 +2646,18 @@ c = ":run-shell-command cargo build"
 t = ":run-shell-command cargo test"
 </code></pre>
 <h2 id="special-keys-and-modifiers"><a class="header" href="#special-keys-and-modifiers">Special keys and modifiers</a></h2>
-<p>Ctrl, Shift and Alt modifiers are encoded respectively with the prefixes
-<code>C-</code>, <code>S-</code> and <code>A-</code>. Special keys are encoded as follows:</p>
+<p>Ctrl, Shift and Alt modifiers are encoded respectively with the prefixes <code>C-</code>, <code>S-</code> and <code>A-</code>.</p>
+<p>The <a href="https://en.wikipedia.org/wiki/Super_key_(keyboard_button)">Super key</a> - the Windows/Linux
+key or the Command key on Mac keyboards - is also supported when using a terminal emulator that
+supports the <a href="https://github.com/helix-editor/helix/wiki/Terminal-Support#enhanced-keyboard-protocol">enhanced keyboard protocol</a>.
+The super key is encoded with prefixes <code>Meta-</code>, <code>Cmd-</code> or <code>Win-</code>. These are all synonyms for the
+super modifier - binding a key with a <code>Win-</code> modifier will mean it can be used with the
+Windows/Linux key or the Command key.</p>
+<pre><code class="language-toml">[keys.normal]
+C-s = ":write" # Ctrl and 's' to write
+Cmd-s = ":write" # Cmd or Win or Meta and 's' to write
+</code></pre>
+<p>Special keys are encoded as follows:</p>
 <div class="table-wrapper"><table><thead><tr><th>Key name</th><th>Representation</th></tr></thead><tbody>
 <tr><td>Backspace</td><td><code>"backspace"</code></td></tr>
 <tr><td>Space</td><td><code>"space"</code></td></tr>
