@@ -216,10 +216,8 @@
 <tr><td><code>:show-directory</code>, <code>:pwd</code></td><td>Show the current working directory.</td></tr>
 <tr><td><code>:encoding</code></td><td>Set encoding. Based on <code>https://encoding.spec.whatwg.org</code>.</td></tr>
 <tr><td><code>:character-info</code>, <code>:char</code></td><td>Get info about the character under the primary cursor.</td></tr>
-<tr><td><code>:reload</code>, <code>:rl</code></td><td>Reload from the source file, if no changes were made.</td></tr>
-<tr><td><code>:reload!</code>, <code>:rl!</code></td><td>Discard changes and reload from the source file.</td></tr>
-<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Reload all documents from the source files, if no changes were made.</td></tr>
-<tr><td><code>:reload-all!</code>, <code>:rla!</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
+<tr><td><code>:reload</code>, <code>:rl</code></td><td>Discard changes and reload from the source file.</td></tr>
+<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
 <tr><td><code>:update</code>, <code>:u</code></td><td>Write changes only if the file has been modified.</td></tr>
 <tr><td><code>:lsp-workspace-command</code></td><td>Open workspace command picker</td></tr>
 <tr><td><code>:lsp-restart</code></td><td>Restarts the language servers used by the current doc</td></tr>
@@ -336,7 +334,6 @@
 <tr><td><code>page_cursor_half_up</code></td><td>Move page and cursor half up</td><td>normal: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code>, select: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code></td></tr>
 <tr><td><code>page_cursor_half_down</code></td><td>Move page and cursor half down</td><td>normal: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code>, select: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code></td></tr>
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
-<tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
@@ -372,9 +369,6 @@
 <tr><td><code>file_picker</code></td><td>Open file picker</td><td>normal: <code>&lt;space&gt;f</code>, select: <code>&lt;space&gt;f</code></td></tr>
 <tr><td><code>file_picker_in_current_buffer_directory</code></td><td>Open file picker at current buffer's directory</td><td></td></tr>
 <tr><td><code>file_picker_in_current_directory</code></td><td>Open file picker at current working directory</td><td>normal: <code>&lt;space&gt;F</code>, select: <code>&lt;space&gt;F</code></td></tr>
-<tr><td><code>file_browser</code></td><td>Open file browser in workspace root</td><td></td></tr>
-<tr><td><code>file_browser_in_current_buffer_directory</code></td><td>Open file browser at current buffer's directory</td><td></td></tr>
-<tr><td><code>file_browser_in_current_directory</code></td><td>Open file browser at current working directory</td><td></td></tr>
 <tr><td><code>code_action</code></td><td>Perform code action</td><td>normal: <code>&lt;space&gt;a</code>, select: <code>&lt;space&gt;a</code></td></tr>
 <tr><td><code>buffer_picker</code></td><td>Open buffer picker</td><td>normal: <code>&lt;space&gt;b</code>, select: <code>&lt;space&gt;b</code></td></tr>
 <tr><td><code>jumplist_picker</code></td><td>Open jumplist picker</td><td>normal: <code>&lt;space&gt;j</code>, select: <code>&lt;space&gt;j</code></td></tr>
