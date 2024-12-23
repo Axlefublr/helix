@@ -6393,6 +6393,21 @@ fn shell_prompt(cx: &mut Context, prompt: Cow<'static, str>, behavior: ShellBeha
 fn suspend(_cx: &mut Context) {
     #[cfg(not(windows))]
     {
+        let _ = std::fs::write(
+            "/tmp/helix-cwd-suspend",
+            helix_stdx::env::current_working_dir()
+                .display()
+                .to_string()
+                .as_bytes(),
+        );
+        let doc = doc!(_cx.editor);
+        if let Some(mut path) = doc.path().cloned() {
+            path.pop();
+            let _ = std::fs::write(
+                "/tmp/helix-buffer-head-suspend",
+                path.display().to_string().into_bytes(),
+            );
+        };
         _cx.block_try_flush_writes().ok();
         signal_hook::low_level::raise(signal_hook::consts::signal::SIGTSTP).unwrap();
     }
