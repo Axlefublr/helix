@@ -216,8 +216,10 @@
 <tr><td><code>:show-directory</code>, <code>:pwd</code></td><td>Show the current working directory.</td></tr>
 <tr><td><code>:encoding</code></td><td>Set encoding. Based on <code>https://encoding.spec.whatwg.org</code>.</td></tr>
 <tr><td><code>:character-info</code>, <code>:char</code></td><td>Get info about the character under the primary cursor.</td></tr>
-<tr><td><code>:reload</code>, <code>:rl</code></td><td>Discard changes and reload from the source file.</td></tr>
-<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
+<tr><td><code>:reload</code>, <code>:rl</code></td><td>Reload from the source file, if no changes were made.</td></tr>
+<tr><td><code>:reload!</code>, <code>:rl!</code></td><td>Discard changes and reload from the source file.</td></tr>
+<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Reload all documents from the source files, if no changes were made.</td></tr>
+<tr><td><code>:reload-all!</code>, <code>:rla!</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
 <tr><td><code>:update</code>, <code>:u</code></td><td>Write changes only if the file has been modified.</td></tr>
 <tr><td><code>:lsp-workspace-command</code></td><td>Open workspace command picker</td></tr>
 <tr><td><code>:lsp-restart</code></td><td>Restarts the language servers used by the current doc</td></tr>
@@ -256,10 +258,10 @@
 <tr><td><code>:move</code>, <code>:mv</code></td><td>Move the current buffer and its corresponding file to a different path</td></tr>
 <tr><td><code>:yank-diagnostic</code></td><td>Yank diagnostic(s) under primary cursor to register, or clipboard by default</td></tr>
 <tr><td><code>:read</code>, <code>:r</code></td><td>Load a file into buffer</td></tr>
+<tr><td><code>:reload-history</code></td><td>Reload history files for persistent state</td></tr>
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections</td></tr>
 <tr><td><code>:echo</code>, <code>:c</code></td><td>Print to the messages line</td></tr>
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
-<tr><td><code>:reload-history</code></td><td>Reload history files for persistent state</td></tr>
 <tr><td><code>:write-buffer-close-or-quit</code>, <code>:wbcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :write-buffer-close</td></tr>
 <tr><td><code>:write-buffer-close-or-quit!</code>, <code>:wbcq!</code></td><td>If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close!</td></tr>
 <tr><td><code>:buffer-close-or-quit</code>, <code>:bcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :buffer-close</td></tr>
@@ -334,6 +336,7 @@
 <tr><td><code>page_cursor_half_up</code></td><td>Move page and cursor half up</td><td>normal: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code>, select: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code></td></tr>
 <tr><td><code>page_cursor_half_down</code></td><td>Move page and cursor half down</td><td>normal: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code>, select: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code></td></tr>
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
+<tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
@@ -369,6 +372,9 @@
 <tr><td><code>file_picker</code></td><td>Open file picker</td><td>normal: <code>&lt;space&gt;f</code>, select: <code>&lt;space&gt;f</code></td></tr>
 <tr><td><code>file_picker_in_current_buffer_directory</code></td><td>Open file picker at current buffer's directory</td><td></td></tr>
 <tr><td><code>file_picker_in_current_directory</code></td><td>Open file picker at current working directory</td><td>normal: <code>&lt;space&gt;F</code>, select: <code>&lt;space&gt;F</code></td></tr>
+<tr><td><code>file_browser</code></td><td>Open file browser in workspace root</td><td></td></tr>
+<tr><td><code>file_browser_in_current_buffer_directory</code></td><td>Open file browser at current buffer's directory</td><td></td></tr>
+<tr><td><code>file_browser_in_current_directory</code></td><td>Open file browser at current working directory</td><td></td></tr>
 <tr><td><code>code_action</code></td><td>Perform code action</td><td>normal: <code>&lt;space&gt;a</code>, select: <code>&lt;space&gt;a</code></td></tr>
 <tr><td><code>buffer_picker</code></td><td>Open buffer picker</td><td>normal: <code>&lt;space&gt;b</code>, select: <code>&lt;space&gt;b</code></td></tr>
 <tr><td><code>jumplist_picker</code></td><td>Open jumplist picker</td><td>normal: <code>&lt;space&gt;j</code>, select: <code>&lt;space&gt;j</code></td></tr>
@@ -561,6 +567,8 @@
 <tr><td><code>command_palette</code></td><td>Open command palette</td><td>normal: <code>&lt;space&gt;?</code>, select: <code>&lt;space&gt;?</code></td></tr>
 <tr><td><code>goto_word</code></td><td>Jump to a two-character label</td><td>normal: <code>gw</code></td></tr>
 <tr><td><code>extend_to_word</code></td><td>Extend to a two-character label</td><td>select: <code>gw</code></td></tr>
+<tr><td><code>goto_next_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
+<tr><td><code>goto_prev_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
 <tr><td><code>harp_file_get</code></td><td>Open a file harp</td><td></td></tr>
 <tr><td><code>harp_file_set</code></td><td>Set a file harp to the current buffer</td><td></td></tr>
 <tr><td><code>harp_relative_file_get</code></td><td>Open a relative file harp</td><td></td></tr>

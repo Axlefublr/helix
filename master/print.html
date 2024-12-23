@@ -1133,8 +1133,10 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>:show-directory</code>, <code>:pwd</code></td><td>Show the current working directory.</td></tr>
 <tr><td><code>:encoding</code></td><td>Set encoding. Based on <code>https://encoding.spec.whatwg.org</code>.</td></tr>
 <tr><td><code>:character-info</code>, <code>:char</code></td><td>Get info about the character under the primary cursor.</td></tr>
-<tr><td><code>:reload</code>, <code>:rl</code></td><td>Discard changes and reload from the source file.</td></tr>
-<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
+<tr><td><code>:reload</code>, <code>:rl</code></td><td>Reload from the source file, if no changes were made.</td></tr>
+<tr><td><code>:reload!</code>, <code>:rl!</code></td><td>Discard changes and reload from the source file.</td></tr>
+<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Reload all documents from the source files, if no changes were made.</td></tr>
+<tr><td><code>:reload-all!</code>, <code>:rla!</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
 <tr><td><code>:update</code>, <code>:u</code></td><td>Write changes only if the file has been modified.</td></tr>
 <tr><td><code>:lsp-workspace-command</code></td><td>Open workspace command picker</td></tr>
 <tr><td><code>:lsp-restart</code></td><td>Restarts the language servers used by the current doc</td></tr>
@@ -1173,10 +1175,10 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>:move</code>, <code>:mv</code></td><td>Move the current buffer and its corresponding file to a different path</td></tr>
 <tr><td><code>:yank-diagnostic</code></td><td>Yank diagnostic(s) under primary cursor to register, or clipboard by default</td></tr>
 <tr><td><code>:read</code>, <code>:r</code></td><td>Load a file into buffer</td></tr>
+<tr><td><code>:reload-history</code></td><td>Reload history files for persistent state</td></tr>
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections</td></tr>
 <tr><td><code>:echo</code>, <code>:c</code></td><td>Print to the messages line</td></tr>
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
-<tr><td><code>:reload-history</code></td><td>Reload history files for persistent state</td></tr>
 <tr><td><code>:write-buffer-close-or-quit</code>, <code>:wbcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :write-buffer-close</td></tr>
 <tr><td><code>:write-buffer-close-or-quit!</code>, <code>:wbcq!</code></td><td>If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close!</td></tr>
 <tr><td><code>:buffer-close-or-quit</code>, <code>:bcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :buffer-close</td></tr>
@@ -1251,6 +1253,7 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>page_cursor_half_up</code></td><td>Move page and cursor half up</td><td>normal: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code>, select: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code></td></tr>
 <tr><td><code>page_cursor_half_down</code></td><td>Move page and cursor half down</td><td>normal: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code>, select: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code></td></tr>
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
+<tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
@@ -1286,6 +1289,9 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>file_picker</code></td><td>Open file picker</td><td>normal: <code>&lt;space&gt;f</code>, select: <code>&lt;space&gt;f</code></td></tr>
 <tr><td><code>file_picker_in_current_buffer_directory</code></td><td>Open file picker at current buffer's directory</td><td></td></tr>
 <tr><td><code>file_picker_in_current_directory</code></td><td>Open file picker at current working directory</td><td>normal: <code>&lt;space&gt;F</code>, select: <code>&lt;space&gt;F</code></td></tr>
+<tr><td><code>file_browser</code></td><td>Open file browser in workspace root</td><td></td></tr>
+<tr><td><code>file_browser_in_current_buffer_directory</code></td><td>Open file browser at current buffer's directory</td><td></td></tr>
+<tr><td><code>file_browser_in_current_directory</code></td><td>Open file browser at current working directory</td><td></td></tr>
 <tr><td><code>code_action</code></td><td>Perform code action</td><td>normal: <code>&lt;space&gt;a</code>, select: <code>&lt;space&gt;a</code></td></tr>
 <tr><td><code>buffer_picker</code></td><td>Open buffer picker</td><td>normal: <code>&lt;space&gt;b</code>, select: <code>&lt;space&gt;b</code></td></tr>
 <tr><td><code>jumplist_picker</code></td><td>Open jumplist picker</td><td>normal: <code>&lt;space&gt;j</code>, select: <code>&lt;space&gt;j</code></td></tr>
@@ -1478,6 +1484,8 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>command_palette</code></td><td>Open command palette</td><td>normal: <code>&lt;space&gt;?</code>, select: <code>&lt;space&gt;?</code></td></tr>
 <tr><td><code>goto_word</code></td><td>Jump to a two-character label</td><td>normal: <code>gw</code></td></tr>
 <tr><td><code>extend_to_word</code></td><td>Extend to a two-character label</td><td>select: <code>gw</code></td></tr>
+<tr><td><code>goto_next_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
+<tr><td><code>goto_prev_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
 <tr><td><code>harp_file_get</code></td><td>Open a file harp</td><td></td></tr>
 <tr><td><code>harp_file_set</code></td><td>Set a file harp to the current buffer</td><td></td></tr>
 <tr><td><code>harp_relative_file_get</code></td><td>Open a relative file harp</td><td></td></tr>
@@ -1615,6 +1623,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>kdl</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>koka</td><td>✓</td><td></td><td>✓</td><td><code>koka</code></td></tr>
 <tr><td>kotlin</td><td>✓</td><td></td><td></td><td><code>kotlin-language-server</code></td></tr>
+<tr><td>koto</td><td>✓</td><td>✓</td><td>✓</td><td><code>koto-ls</code></td></tr>
 <tr><td>latex</td><td>✓</td><td>✓</td><td></td><td><code>texlab</code></td></tr>
 <tr><td>ld</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>ldif</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1646,7 +1655,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>nunjucks</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>ocaml</td><td>✓</td><td></td><td>✓</td><td><code>ocamllsp</code></td></tr>
 <tr><td>ocaml-interface</td><td>✓</td><td></td><td></td><td><code>ocamllsp</code></td></tr>
-<tr><td>odin</td><td>✓</td><td></td><td>✓</td><td><code>ols</code></td></tr>
+<tr><td>odin</td><td>✓</td><td>✓</td><td>✓</td><td><code>ols</code></td></tr>
 <tr><td>ohm</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>opencl</td><td>✓</td><td>✓</td><td>✓</td><td><code>clangd</code></td></tr>
 <tr><td>openscad</td><td>✓</td><td></td><td></td><td><code>openscad-lsp</code></td></tr>
@@ -2143,6 +2152,7 @@ S-tab = "extend_parent_node_start"
 <tr><td><code>max-diagnostics</code></td><td>Maximum number of diagnostics to render inline for a given line</td><td><code>10</code></td></tr>
 </tbody></table>
 </div>
+<p>The allowed values for <code>cursor-line</code> and <code>other-lines</code> are: <code>error</code>, <code>warning</code>, <code>info</code>, <code>hint</code>.</p>
 <p>The (first) diagnostic with the highest severity that is not shown inline is rendered at the end of the line (as long as its severity is higher than the <code>end-of-line-diagnostics</code> config option):</p>
 <pre><code>fn main() {
   let baz = 1;
@@ -2156,7 +2166,20 @@ end-of-line-diagnostics = "hint"
 [editor.inline-diagnostics]
 cursor-line = "warning" # show warnings and errors on the cursorline inline
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
+<h3 id="editorpersistence-section"><a class="header" href="#editorpersistence-section"><code>[editor.persistence]</code> Section</a></h3>
+<p>Options for persisting editor state between sessions.</p>
+<p>The state is formatted with bincode, and stored in files in the state directory (<code>~/.local/state/helix</code> on Unix, <code>~\Local Settings\Application Data\helix\state</code> on Windows). You can reset your persisted state (and recover from any corruption) by deleting these files.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
+<tr><td><code>old-files</code></td><td>whether to persist file locations between sessions ( when you reopen the a file, it will open at the place you last closed it)</td><td><code>false</code></td></tr>
+<tr><td><code>commands</code></td><td>whether to persist command history between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>search</code></td><td>whether to persist search history between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>clipboard</code></td><td>whether to persist helix's internal clipboard between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>old-files-exclusions</code></td><td>a list of regexes defining file paths to exclude from persistence</td><td><code>[".*/\.git/.*", ".*/COMMIT_EDITMSG"]</code></td></tr>
+<tr><td><code>old-files-trim</code></td><td>number of old-files entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+<tr><td><code>commands-trim</code></td><td>number of command history entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+<tr><td><code>search-trim</code></td><td>number of search history entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
 <p>To use a theme add <code>theme = "&lt;name&gt;"</code> to the top of your <a href="./configuration.html"><code>config.toml</code></a> file, or select it during runtime using <code>:theme &lt;name&gt;</code>.</p>
 <h2 id="creating-a-theme"><a class="header" href="#creating-a-theme">Creating a theme</a></h2>
 <p>Create a file with the name of your theme as the file name (i.e <code>mytheme.toml</code>) and place it in your <code>themes</code> directory (i.e <code>~/.config/helix/themes</code> or <code>%AppData%\helix\themes</code> on Windows). The directory might have to be created beforehand.</p>
@@ -2534,6 +2557,7 @@ berry = "#2A2A4D"
 <tr><td><code>ui.text.focus</code></td><td>The currently selected line in the picker</td></tr>
 <tr><td><code>ui.text.inactive</code></td><td>Same as <code>ui.text</code> but when the text is inactive (e.g. suggestions)</td></tr>
 <tr><td><code>ui.text.info</code></td><td>The key: command text in <code>ui.popup.info</code> boxes</td></tr>
+<tr><td><code>ui.text.directory</code></td><td>Directory names in prompt completion</td></tr>
 <tr><td><code>ui.virtual.ruler</code></td><td>Ruler columns (see the <a href="./configuration.html#editor-section"><code>editor.rulers</code> config</a>)</td></tr>
 <tr><td><code>ui.virtual.whitespace</code></td><td>Visible whitespace characters</td></tr>
 <tr><td><code>ui.virtual.indent-guide</code></td><td>Vertical indent width guides</td></tr>
@@ -2646,7 +2670,6 @@ Cmd-s = ":write" # Cmd or Win or Meta and 's' to write
 <tr><td>Backspace</td><td><code>"backspace"</code></td></tr>
 <tr><td>Space</td><td><code>"space"</code></td></tr>
 <tr><td>Return/Enter</td><td><code>"ret"</code></td></tr>
-<tr><td>-</td><td><code>"minus"</code></td></tr>
 <tr><td>Left</td><td><code>"left"</code></td></tr>
 <tr><td>Right</td><td><code>"right"</code></td></tr>
 <tr><td>Up</td><td><code>"up"</code></td></tr>
@@ -2663,6 +2686,13 @@ Cmd-s = ":write" # Cmd or Win or Meta and 's' to write
 </tbody></table>
 </div>
 <p>Keys can be disabled by binding them to the <code>no_op</code> command.</p>
+<p>All other keys such as <code>?</code>, <code>!</code>, <code>-</code> etc. can be used literally:</p>
+<pre><code class="language-toml">[keys.normal]
+"?" = ":write"
+"!" = ":write"
+"-" = ":write"
+</code></pre>
+<p>Note: <code>-</code> can't be used when combined with a modifier, for example <code>Alt</code> + <code>-</code> should be written as <code>A-minus</code>. <code>A--</code> is not accepted.</p>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="languages"><a class="header" href="#languages">Languages</a></h2>
 <p>Language-specific settings and settings for language servers are configured
 in <code>languages.toml</code> files.</p>
@@ -2718,7 +2748,7 @@ language-servers = [ "mylang-lsp" ]
 <tr><td><code>shebangs</code></td><td>The interpreters from the shebang line, for example <code>["sh", "bash"]</code></td></tr>
 <tr><td><code>roots</code></td><td>A set of marker files to look for when trying to find the workspace root. For example <code>Cargo.lock</code>, <code>yarn.lock</code></td></tr>
 <tr><td><code>auto-format</code></td><td>Whether to autoformat this language when saving</td></tr>
-<tr><td><code>diagnostic-severity</code></td><td>Minimal severity of diagnostic for it to be displayed. (Allowed values: <code>Error</code>, <code>Warning</code>, <code>Info</code>, <code>Hint</code>)</td></tr>
+<tr><td><code>diagnostic-severity</code></td><td>Minimal severity of diagnostic for it to be displayed. (Allowed values: <code>error</code>, <code>warning</code>, <code>info</code>, <code>hint</code>)</td></tr>
 <tr><td><code>comment-tokens</code></td><td>The tokens to use as a comment token, either a single token <code>"//"</code> or an array <code>["//", "///", "//!"]</code> (the first token will be used for commenting). Also configurable as <code>comment-token</code> for backwards compatibility</td></tr>
 <tr><td><code>block-comment-tokens</code></td><td>The start and end tokens for a multiline comment either an array or single table of <code>{ start = "/*", end = "*/"}</code>. The first set of tokens will be used for commenting, any pairs in the array can be uncommented</td></tr>
 <tr><td><code>indent</code></td><td>The indent to use. Has sub keys <code>unit</code> (the text inserted into the document when indenting; usually set to N spaces or <code>"\t"</code> for tabs) and <code>tab-width</code> (the number of spaces rendered for a tab)</td></tr>
