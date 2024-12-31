@@ -1133,8 +1133,10 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>:show-directory</code>, <code>:pwd</code></td><td>Show the current working directory.</td></tr>
 <tr><td><code>:encoding</code></td><td>Set encoding. Based on <code>https://encoding.spec.whatwg.org</code>.</td></tr>
 <tr><td><code>:character-info</code>, <code>:char</code></td><td>Get info about the character under the primary cursor.</td></tr>
-<tr><td><code>:reload</code>, <code>:rl</code></td><td>Discard changes and reload from the source file.</td></tr>
-<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
+<tr><td><code>:reload</code>, <code>:rl</code></td><td>Reload from the source file, if no changes were made.</td></tr>
+<tr><td><code>:reload!</code>, <code>:rl!</code></td><td>Discard changes and reload from the source file.</td></tr>
+<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Reload all documents from the source files, if no changes were made.</td></tr>
+<tr><td><code>:reload-all!</code>, <code>:rla!</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
 <tr><td><code>:update</code>, <code>:u</code></td><td>Write changes only if the file has been modified.</td></tr>
 <tr><td><code>:lsp-workspace-command</code></td><td>Open workspace command picker</td></tr>
 <tr><td><code>:lsp-restart</code></td><td>Restarts the language servers used by the current doc</td></tr>
@@ -1173,6 +1175,7 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>:move</code>, <code>:mv</code></td><td>Move the current buffer and its corresponding file to a different path</td></tr>
 <tr><td><code>:yank-diagnostic</code></td><td>Yank diagnostic(s) under primary cursor to register, or clipboard by default</td></tr>
 <tr><td><code>:read</code>, <code>:r</code></td><td>Load a file into buffer</td></tr>
+<tr><td><code>:reload-history</code></td><td>Reload history files for persistent state</td></tr>
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections</td></tr>
 <tr><td><code>:echo</code>, <code>:c</code></td><td>Print to the messages line</td></tr>
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
@@ -1250,6 +1253,7 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>page_cursor_half_up</code></td><td>Move page and cursor half up</td><td>normal: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code>, select: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code></td></tr>
 <tr><td><code>page_cursor_half_down</code></td><td>Move page and cursor half down</td><td>normal: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code>, select: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code></td></tr>
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
+<tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
@@ -2161,7 +2165,20 @@ end-of-line-diagnostics = "hint"
 [editor.inline-diagnostics]
 cursor-line = "warning" # show warnings and errors on the cursorline inline
 </code></pre>
-<div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
+<h3 id="editorpersistence-section"><a class="header" href="#editorpersistence-section"><code>[editor.persistence]</code> Section</a></h3>
+<p>Options for persisting editor state between sessions.</p>
+<p>The state is formatted with bincode, and stored in files in the state directory (<code>~/.local/state/helix</code> on Unix, <code>~\Local Settings\Application Data\helix\state</code> on Windows). You can reset your persisted state (and recover from any corruption) by deleting these files.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
+<tr><td><code>old-files</code></td><td>whether to persist file locations between sessions ( when you reopen the a file, it will open at the place you last closed it)</td><td><code>false</code></td></tr>
+<tr><td><code>commands</code></td><td>whether to persist command history between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>search</code></td><td>whether to persist search history between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>clipboard</code></td><td>whether to persist helix's internal clipboard between sessions</td><td><code>false</code></td></tr>
+<tr><td><code>old-files-exclusions</code></td><td>a list of regexes defining file paths to exclude from persistence</td><td><code>[".*/\.git/.*", ".*/COMMIT_EDITMSG"]</code></td></tr>
+<tr><td><code>old-files-trim</code></td><td>number of old-files entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+<tr><td><code>commands-trim</code></td><td>number of command history entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+<tr><td><code>search-trim</code></td><td>number of search history entries to keep when helix trims the state files at startup</td><td><code>100</code></td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
 <p>To use a theme add <code>theme = "&lt;name&gt;"</code> to the top of your <a href="./configuration.html"><code>config.toml</code></a> file, or select it during runtime using <code>:theme &lt;name&gt;</code>.</p>
 <h2 id="creating-a-theme"><a class="header" href="#creating-a-theme">Creating a theme</a></h2>
 <p>Create a file with the name of your theme as the file name (i.e <code>mytheme.toml</code>) and place it in your <code>themes</code> directory (i.e <code>~/.config/helix/themes</code> or <code>%AppData%\helix\themes</code> on Windows). The directory might have to be created beforehand.</p>
