@@ -194,7 +194,8 @@ To set up Helix:</p>
 <ul>
 <li><a href="package-managers.html#linux">Linux</a>
 <ul>
-<li><a href="package-managers.html#ubuntu">Ubuntu</a></li>
+<li><a href="package-managers.html#ubuntudebian">Ubuntu/Debian</a></li>
+<li><a href="package-managers.html#ubuntu-ppa">Ubuntu (PPA)</a></li>
 <li><a href="package-managers.html#fedorarhel">Fedora/RHEL</a></li>
 <li><a href="package-managers.html#arch-linux-extra">Arch Linux extra</a></li>
 <li><a href="package-managers.html#nixos">NixOS</a></li>
@@ -221,7 +222,11 @@ To set up Helix:</p>
 <p><a href="https://repology.org/project/helix-editor/versions"><img src="https://repology.org/badge/vertical-allrepos/helix-editor.svg" alt="Packaging status" /></a></p>
 <h2 id="linux"><a class="header" href="#linux">Linux</a></h2>
 <p>The following third party repositories are available:</p>
-<h3 id="ubuntu"><a class="header" href="#ubuntu">Ubuntu</a></h3>
+<h3 id="ubuntudebian"><a class="header" href="#ubuntudebian">Ubuntu/Debian</a></h3>
+<p>Install the Debian package from the release page.</p>
+<p>If you are running a system older than Ubuntu 22.04, Mint 21, or Debian 12, you can build the <code>.deb</code> file locally
+<a href="./building-from-source.html#building-the-debian-package">from source</a>.</p>
+<h3 id="ubuntu-ppa"><a class="header" href="#ubuntu-ppa">Ubuntu (PPA)</a></h3>
 <p>Add the <code>PPA</code> for Helix:</p>
 <pre><code class="language-sh">sudo add-apt-repository ppa:maveonair/helix-editor
 sudo apt update
@@ -312,6 +317,7 @@ You can get <a href="https://www.microsoft.com/p/app-installer/9nblggh4nns1#acti
 </li>
 <li><a href="building-from-source.html#validating-the-installation">Validating the installation</a></li>
 <li><a href="building-from-source.html#configure-the-desktop-shortcut">Configure the desktop shortcut</a></li>
+<li><a href="building-from-source.html#building-the-debian-package">Building the Debian package</a></li>
 </ul>
 <p>Requirements:</p>
 <p>Clone the Helix GitHub repository into a directory of your choice. The
@@ -435,6 +441,35 @@ file. For example, to use <code>kitty</code>:</p>
 <pre><code class="language-sh">sed -i "s|Exec=hx %F|Exec=kitty hx %F|g" ~/.local/share/applications/Helix.desktop
 sed -i "s|Terminal=true|Terminal=false|g" ~/.local/share/applications/Helix.desktop
 </code></pre>
+<h3 id="building-the-debian-package"><a class="header" href="#building-the-debian-package">Building the Debian package</a></h3>
+<p>If the <code>.deb</code> file provided on the release page uses a <code>libc</code> version higher
+than that used by your Debian, Ubuntu, or Mint system, you can build the package
+from source to match your system's dependencies.</p>
+<p>Install <code>cargo-deb</code>, the tool used for building the <code>.deb</code> file:</p>
+<pre><code class="language-sh">cargo install cargo-deb
+</code></pre>
+<p>After cloning and entering the Helix repository as previously described,
+use the following command to build the release binary and package it into a <code>.deb</code> file in a single step.</p>
+<pre><code class="language-sh">cargo deb -- --locked
+</code></pre>
+<blockquote>
+<p>💡 This locks you into the <code>--release</code> profile. But you can also build helix in any way you like.
+As long as you leave a <code>target/release/hx</code> file, it will get packaged with <code>cargo deb --no-build</code></p>
+</blockquote>
+<blockquote>
+<p>💡 Don't worry about the repeated</p>
+<pre><code>warning: Failed to find dependency specification
+</code></pre>
+<p>warnings. Cargo deb just reports which packaged files it didn't derive dependencies for. But
+so far the dependency deriving seams very good, even if some of the grammar files are skipped.</p>
+</blockquote>
+<p>You can find the resulted <code>.deb</code> in <code>target/debian/</code>. It should contain everything it needs, including the</p>
+<ul>
+<li>completions for bash, fish, zsh</li>
+<li>.desktop file</li>
+<li>icon (though desktop environments might use their own since the name of the package is correctly <code>helix</code>)</li>
+<li>launcher to the binary with the runtime</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="using-helix"><a class="header" href="#using-helix">Using Helix</a></h1>
 <p>For a full interactive introduction to Helix, refer to the
 <a href="https://github.com/helix-editor/helix/blob/master/runtime/tutor">tutor</a> which
@@ -1533,6 +1568,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>circom</td><td>✓</td><td></td><td></td><td><code>circom-lsp</code></td></tr>
 <tr><td>clojure</td><td>✓</td><td></td><td></td><td><code>clojure-lsp</code></td></tr>
 <tr><td>cmake</td><td>✓</td><td>✓</td><td>✓</td><td><code>cmake-language-server</code></td></tr>
+<tr><td>codeql</td><td>✓</td><td>✓</td><td></td><td><code>codeql</code></td></tr>
 <tr><td>comment</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>common-lisp</td><td>✓</td><td></td><td>✓</td><td><code>cl-lsp</code></td></tr>
 <tr><td>cpon</td><td>✓</td><td></td><td>✓</td><td></td></tr>
@@ -1590,6 +1626,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>gowork</td><td>✓</td><td></td><td></td><td><code>gopls</code></td></tr>
 <tr><td>gpr</td><td>✓</td><td></td><td></td><td><code>ada_language_server</code></td></tr>
 <tr><td>graphql</td><td>✓</td><td>✓</td><td></td><td><code>graphql-lsp</code></td></tr>
+<tr><td>gren</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>groovy</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>gts</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code>, <code>vscode-eslint-language-server</code>, <code>ember-language-server</code></td></tr>
 <tr><td>hare</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1800,11 +1837,13 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <div style="break-before: page; page-break-before: always;"></div><h2 id="editor"><a class="header" href="#editor">Editor</a></h2>
 <ul>
 <li><a href="editor.html#editor-section"><code>[editor]</code> Section</a></li>
+<li><a href="editor.html#editorclipboard-provider-section"><code>[editor.clipboard-provider]</code> Section</a></li>
 <li><a href="editor.html#editorstatusline-section"><code>[editor.statusline]</code> Section</a></li>
 <li><a href="editor.html#editorlsp-section"><code>[editor.lsp]</code> Section</a></li>
 <li><a href="editor.html#editorcursor-shape-section"><code>[editor.cursor-shape]</code> Section</a></li>
 <li><a href="editor.html#editorfile-picker-section"><code>[editor.file-picker]</code> Section</a></li>
 <li><a href="editor.html#editorauto-pairs-section"><code>[editor.auto-pairs]</code> Section</a></li>
+<li><a href="editor.html#editorauto-save-section"><code>[editor.auto-save]</code> Section</a></li>
 <li><a href="editor.html#editorsearch-section"><code>[editor.search]</code> Section</a></li>
 <li><a href="editor.html#editorwhitespace-section"><code>[editor.whitespace]</code> Section</a></li>
 <li><a href="editor.html#editorindent-guides-section"><code>[editor.indent-guides]</code> Section</a></li>
