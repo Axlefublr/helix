@@ -977,7 +977,11 @@ fn yank_joined(
 
     let doc = doc!(cx.editor);
     let default_sep = Cow::Borrowed(doc.line_ending.as_str());
-    let separator = args.first().unwrap_or(&default_sep);
+    let register = cx.editor.selected_register.unwrap_or('"');
+    let separator = args
+        .first()
+        .map(|separator| if separator == "space" { " " } else { separator })
+        .unwrap_or(&default_sep);
     let register = cx.editor.selected_register.unwrap_or('"');
     yank_joined_impl(cx.editor, separator, register);
     Ok(())
