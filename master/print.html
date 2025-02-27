@@ -1227,16 +1227,28 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>no_op</code></td><td>Do nothing</td><td></td></tr>
 <tr><td><code>move_char_left</code></td><td>Move left</td><td>normal: <code>h</code>, <code>&lt;left&gt;</code>, insert: <code>&lt;left&gt;</code></td></tr>
 <tr><td><code>move_char_right</code></td><td>Move right</td><td>normal: <code>l</code>, <code>&lt;right&gt;</code>, insert: <code>&lt;right&gt;</code></td></tr>
+<tr><td><code>move_same_line_char_left</code></td><td>Move left within in the same line only</td><td></td></tr>
+<tr><td><code>move_same_line_char_right</code></td><td>Move right within in the same line only</td><td></td></tr>
 <tr><td><code>move_line_up</code></td><td>Move up</td><td>normal: <code>gk</code></td></tr>
 <tr><td><code>move_line_down</code></td><td>Move down</td><td>normal: <code>gj</code></td></tr>
+<tr><td><code>move_anchored_line_up</code></td><td>Move up with newline anchoring behaviour</td><td></td></tr>
+<tr><td><code>move_anchored_line_down</code></td><td>Move down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>move_visual_line_up</code></td><td>Move up</td><td>normal: <code>k</code>, <code>&lt;up&gt;</code>, insert: <code>&lt;up&gt;</code></td></tr>
 <tr><td><code>move_visual_line_down</code></td><td>Move down</td><td>normal: <code>j</code>, <code>&lt;down&gt;</code>, insert: <code>&lt;down&gt;</code></td></tr>
+<tr><td><code>move_anchored_visual_line_up</code></td><td>Move up with newline anchoring behaviour</td><td></td></tr>
+<tr><td><code>move_anchored_visual_line_down</code></td><td>Move down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>extend_char_left</code></td><td>Extend left</td><td>select: <code>h</code>, <code>&lt;left&gt;</code></td></tr>
 <tr><td><code>extend_char_right</code></td><td>Extend right</td><td>select: <code>l</code>, <code>&lt;right&gt;</code></td></tr>
+<tr><td><code>extend_same_line_char_left</code></td><td>Extend left within the same line only</td><td></td></tr>
+<tr><td><code>extend_same_line_char_right</code></td><td>Extend right within the same line only</td><td></td></tr>
 <tr><td><code>extend_line_up</code></td><td>Extend up</td><td>select: <code>gk</code></td></tr>
 <tr><td><code>extend_line_down</code></td><td>Extend down</td><td>select: <code>gj</code></td></tr>
+<tr><td><code>extend_anchored_line_up</code></td><td>Extend up with newline anchoring behaviour</td><td></td></tr>
+<tr><td><code>extend_anchored_line_down</code></td><td>Extend down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>extend_visual_line_up</code></td><td>Extend up</td><td>select: <code>k</code>, <code>&lt;up&gt;</code></td></tr>
 <tr><td><code>extend_visual_line_down</code></td><td>Extend down</td><td>select: <code>j</code>, <code>&lt;down&gt;</code></td></tr>
+<tr><td><code>extend_anchored_visual_line_up</code></td><td>Extend up with newline anchoring behaviour</td><td></td></tr>
+<tr><td><code>extend_anchored_visual_line_down</code></td><td>Extend down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>copy_selection_on_next_line</code></td><td>Copy selection on next line</td><td>normal: <code>C</code>, select: <code>C</code></td></tr>
 <tr><td><code>copy_selection_on_prev_line</code></td><td>Copy selection on previous line</td><td>normal: <code>&lt;A-C&gt;</code>, select: <code>&lt;A-C&gt;</code></td></tr>
 <tr><td><code>move_next_word_start</code></td><td>Move to start of next word</td><td>normal: <code>w</code></td></tr>
@@ -1321,6 +1333,7 @@ See the documentation page on <a href="./pickers.html">pickers</a> for more info
 <tr><td><code>ensure_selections_forward</code></td><td>Ensure all selections face forward</td><td>normal: <code>&lt;A-:&gt;</code>, select: <code>&lt;A-:&gt;</code></td></tr>
 <tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, select: <code>i</code></td></tr>
 <tr><td><code>append_mode</code></td><td>Append after selection</td><td>normal: <code>a</code>, select: <code>a</code></td></tr>
+<tr><td><code>append_mode_same_line</code></td><td>Append after selection within the same line only</td><td></td></tr>
 <tr><td><code>command_mode</code></td><td>Enter command mode</td><td>normal: <code>:</code>, select: <code>:</code></td></tr>
 <tr><td><code>file_picker</code></td><td>Open file picker</td><td>normal: <code>&lt;space&gt;f</code>, select: <code>&lt;space&gt;f</code></td></tr>
 <tr><td><code>file_picker_in_current_buffer_directory</code></td><td>Open file picker at current buffer's directory</td><td></td></tr>
