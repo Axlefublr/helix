@@ -33,11 +33,11 @@ pub enum Variable {
     BufferName,
     /// The absolute path of the currently focused document. For scratch buffers this will default
     /// to the current working directory.
-    FilePathAbsolute,
+    FullPath,
     /// A string containing the line-ending of the currently focused document.
     LineEnding,
     /// Curreng working directory
-    CurrentWorkingDirectory,
+    WorkingDirectory,
     /// Nearest ancestor directory of the current working directory that contains `.git`, `.svn`, `jj` or `.helix`
     WorkspaceDirectory,
     // The name of current buffers language as set in `languages.toml`
@@ -48,6 +48,8 @@ pub enum Variable {
     SelectionLineStart,
     // The one-indexed line number of the end of the primary selection in the currently focused document.
     SelectionLineEnd,
+    RelativePath,
+    BufferParent,
 }
 
 impl Variable {
@@ -55,14 +57,16 @@ impl Variable {
         Self::CursorLine,
         Self::CursorColumn,
         Self::BufferName,
-        Self::FilePathAbsolute,
+        Self::FullPath,
         Self::LineEnding,
-        Self::CurrentWorkingDirectory,
+        Self::WorkingDirectory,
         Self::WorkspaceDirectory,
         Self::Language,
         Self::Selection,
         Self::SelectionLineStart,
         Self::SelectionLineEnd,
+        Self::RelativePath,
+        Self::BufferParent,
     ];
 
     pub const fn as_str(&self) -> &'static str {
@@ -70,14 +74,16 @@ impl Variable {
             Self::CursorLine => "cursor_line",
             Self::CursorColumn => "cursor_column",
             Self::BufferName => "buffer_name",
-            Self::FilePathAbsolute => "file_path_absolute",
+            Self::FullPath => "full_path",
             Self::LineEnding => "line_ending",
-            Self::CurrentWorkingDirectory => "current_working_directory",
+            Self::WorkingDirectory => "working_directory",
             Self::WorkspaceDirectory => "workspace_directory",
             Self::Language => "language",
             Self::Selection => "selection",
             Self::SelectionLineStart => "selection_line_start",
             Self::SelectionLineEnd => "selection_line_end",
+            Self::RelativePath => "relative_path",
+            Self::BufferParent => "buffer_parent",
         }
     }
 
@@ -86,14 +92,16 @@ impl Variable {
             "cursor_line" => Some(Self::CursorLine),
             "cursor_column" => Some(Self::CursorColumn),
             "buffer_name" => Some(Self::BufferName),
-            "file_path_absolute" => Some(Self::FilePathAbsolute),
+            "full_path" => Some(Self::FullPath),
             "line_ending" => Some(Self::LineEnding),
             "workspace_directory" => Some(Self::WorkspaceDirectory),
-            "current_working_directory" => Some(Self::CurrentWorkingDirectory),
+            "working_directory" => Some(Self::WorkingDirectory),
             "language" => Some(Self::Language),
             "selection" => Some(Self::Selection),
             "selection_line_start" => Some(Self::SelectionLineStart),
             "selection_line_end" => Some(Self::SelectionLineEnd),
+            "relative_path" => Some(Self::RelativePath),
+            "buffer_parent" => Some(Self::BufferParent),
             _ => None,
         }
     }
@@ -242,26 +250,23 @@ fn expand_variable(editor: &Editor, variable: Variable) -> Result<Cow<'static, s
             Ok(Cow::Owned((position.col + 1).to_string()))
         }
         Variable::BufferName => {
-            // Note: usually we would use `Document::display_name` but we can statically borrow
-            // the scratch buffer name by partially reimplementing `display_name`.
-            if let Some(path) = doc.relative_path() {
+            if let Some(path) = doc.path().and_then(|path| path.file_name()) {
                 Ok(Cow::Owned(path.to_string_lossy().into_owned()))
             } else {
-                Ok(Cow::Borrowed(crate::document::SCRATCH_BUFFER_NAME))
+                Ok(Cow::Borrowed(""))
             }
         }
-        Variable::FilePathAbsolute => {
-            let path = match doc.path() {
-                Some(path) => path.to_owned(),
-                None => helix_stdx::env::current_working_dir(),
+        Variable::FullPath => Ok(Cow::Owned(
+            match doc.path() {
+                Some(path) => helix_stdx::path::fold_home_dir(path),
+                None => helix_stdx::path::fold_home_dir(helix_stdx::env::current_working_dir()),
             }
             .to_string_lossy()
-            .to_string();
-            Ok(Cow::Owned(path))
-        }
+            .to_string(),
+        )),
         Variable::LineEnding => Ok(Cow::Borrowed(doc.line_ending.as_str())),
-        Variable::CurrentWorkingDirectory => Ok(std::borrow::Cow::Owned(
-            helix_stdx::env::current_working_dir()
+        Variable::WorkingDirectory => Ok(std::borrow::Cow::Owned(
+            helix_stdx::path::fold_home_dir(helix_stdx::env::current_working_dir())
                 .to_string_lossy()
                 .to_string(),
         )),
@@ -286,5 +291,24 @@ fn expand_variable(editor: &Editor, variable: Variable) -> Result<Cow<'static, s
             let end_line = doc.selection(view.id).primary().line_range(text).1;
             Ok(Cow::Owned((end_line + 1).to_string()))
         }
+        Variable::RelativePath => Ok(
+            if let Some(path) = doc.path().map(|the| {
+                helix_stdx::path::get_relative_path(the)
+                    .into_owned()
+                    .display()
+                    .to_string()
+            }) {
+                Cow::Owned(path)
+            } else {
+                Cow::Borrowed("")
+            },
+        ),
+        Variable::BufferParent => Ok(if let Some(path) = doc.path() {
+            let mut path = path.clone();
+            path.pop();
+            Cow::Owned(helix_stdx::path::fold_home_dir(path).display().to_string())
+        } else {
+            Cow::Borrowed("")
+        }),
     }
 }
