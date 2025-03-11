@@ -33,6 +33,10 @@ pub enum Variable {
     BufferName,
     /// A string containing the line-ending of the currently focused document.
     LineEnding,
+    FullPath,
+    WorkingDirectory,
+    RelativePath,
+    BufferParent,
 }
 
 impl Variable {
@@ -41,6 +45,10 @@ impl Variable {
         Self::CursorColumn,
         Self::BufferName,
         Self::LineEnding,
+        Self::FullPath,
+        Self::WorkingDirectory,
+        Self::RelativePath,
+        Self::BufferParent,
     ];
 
     pub const fn as_str(&self) -> &'static str {
@@ -49,6 +57,10 @@ impl Variable {
             Self::CursorColumn => "cursor_column",
             Self::BufferName => "buffer_name",
             Self::LineEnding => "line_ending",
+            Self::FullPath => "full_path",
+            Self::WorkingDirectory => "working_directory",
+            Self::RelativePath => "relative_path",
+            Self::BufferParent => "buffer_parent",
         }
     }
 
@@ -58,6 +70,10 @@ impl Variable {
             "cursor_column" => Some(Self::CursorColumn),
             "buffer_name" => Some(Self::BufferName),
             "line_ending" => Some(Self::LineEnding),
+            "full_path" => Some(Self::FullPath),
+            "working_directory" => Some(Self::WorkingDirectory),
+            "relative_path" => Some(Self::RelativePath),
+            "buffer_parent" => Some(Self::BufferParent),
             _ => None,
         }
     }
@@ -215,5 +231,34 @@ fn expand_variable(editor: &Editor, variable: Variable) -> Result<Cow<'static, s
             }
         }
         Variable::LineEnding => Ok(Cow::Borrowed(doc.line_ending.as_str())),
+        Variable::FullPath => Ok(if let Some(path) = doc.path() {
+            Cow::Owned(helix_stdx::path::fold_home_dir(path).display().to_string())
+        } else {
+            Cow::Borrowed("")
+        }),
+        Variable::WorkingDirectory => Ok(Cow::Owned(
+            helix_stdx::path::fold_home_dir(helix_stdx::env::current_working_dir())
+                .display()
+                .to_string(),
+        )),
+        Variable::RelativePath => Ok(
+            if let Some(path) = doc.path().map(|the| {
+                helix_stdx::path::get_relative_path(the)
+                    .into_owned()
+                    .display()
+                    .to_string()
+            }) {
+                Cow::Owned(path)
+            } else {
+                Cow::Borrowed("")
+            },
+        ),
+        Variable::BufferParent => Ok(if let Some(path) = doc.path() {
+            let mut path = path.clone();
+            path.pop();
+            Cow::Owned(path.display().to_string())
+        } else {
+            Cow::Borrowed("")
+        }),
     }
 }
