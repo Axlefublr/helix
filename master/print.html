@@ -1940,6 +1940,7 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <li><a href="editor.html#editorguttersspacer-section"><code>[editor.gutters.spacer]</code> Section</a></li>
 </ul>
 </li>
+<li><a href="editor.html#editorgutters-right-section"><code>[editor.gutters-right]</code> Section</a></li>
 <li><a href="editor.html#editorsoft-wrap-section"><code>[editor.soft-wrap]</code> Section</a></li>
 <li><a href="editor.html#editorsmart-tab-section"><code>[editor.smart-tab]</code> Section</a></li>
 <li><a href="editor.html#editorinline-diagnostics-section"><code>[editor.inline-diagnostics]</code> Section</a></li>
@@ -1956,7 +1957,8 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <tr><td><code>cursorline</code></td><td>Highlight all lines with a cursor</td><td><code>false</code></td></tr>
 <tr><td><code>cursorcolumn</code></td><td>Highlight all columns with a cursor</td><td><code>false</code></td></tr>
 <tr><td><code>continue-comments</code></td><td>if helix should automatically add a line comment token if you create a new line inside a comment.</td><td><code>true</code></td></tr>
-<tr><td><code>gutters</code></td><td>Gutters to display: Available are <code>diagnostics</code> and <code>diff</code> and <code>line-numbers</code> and <code>spacer</code>, note that <code>diagnostics</code> also includes other features like breakpoints, 1-width padding will be inserted if gutters is non-empty</td><td><code>["diagnostics", "spacer", "line-numbers", "spacer", "diff"]</code></td></tr>
+<tr><td><code>gutters</code></td><td>Gutters to display: Available are <code>diagnostics</code> and <code>diff</code> and <code>line-numbers</code> and <code>spacer</code> and <code>scrollbar</code>, note that <code>diagnostics</code> also includes other features like breakpoints, 1-width padding will be inserted if gutters is non-empty</td><td><code>["diagnostics", "spacer", "line-numbers", "spacer", "diff"]</code></td></tr>
+<tr><td><code>gutters-right</code></td><td>Gutters to display on the right-hand side of the window. Configuration is identical to the <code>gutters</code> key above, but specified gutters will be rendered right-to-left.</td><td><code>[]</code></td></tr>
 <tr><td><code>auto-completion</code></td><td>Enable automatic pop up of auto-completion</td><td><code>true</code></td></tr>
 <tr><td><code>path-completion</code></td><td>Enable filepath completion. Show files and directories if an existing path at the cursor was recognized, either absolute or relative to the current opened document or current working directory (if the buffer is not yet saved). Defaults to true.</td><td><code>true</code></td></tr>
 <tr><td><code>auto-format</code></td><td>Enable automatic formatting on save</td><td><code>true</code></td></tr>
@@ -2231,6 +2233,13 @@ These colors are controlled by the theme attributes <code>diff.plus</code>, <cod
 <p>Other diff providers will eventually be supported by a future plugin system.</p>
 <p>There are currently no options for this section.</p>
 <h4 id="editorguttersspacer-section"><a class="header" href="#editorguttersspacer-section"><code>[editor.gutters.spacer]</code> Section</a></h4>
+<p>Currently unused</p>
+<h4 id="editorguttersscrollbar-section"><a class="header" href="#editorguttersscrollbar-section"><code>[editor.gutters.scrollbar]</code> Section</a></h4>
+<h3 id="editorgutters-right-section"><a class="header" href="#editorgutters-right-section"><code>[editor.gutters-right]</code> Section</a></h3>
+<p>Configuration options are identical to <code>[editor.gutters]</code> Section.</p>
+<pre><code class="language-toml">[editor]
+gutters-right = ["scrollbar"]
+</code></pre>
 <p>Currently unused</p>
 <h3 id="editorsoft-wrap-section"><a class="header" href="#editorsoft-wrap-section"><code>[editor.soft-wrap]</code> Section</a></h3>
 <p>Options for soft wrapping lines that exceed the view width:</p>
