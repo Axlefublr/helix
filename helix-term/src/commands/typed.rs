@@ -1,3 +1,5 @@
+pub mod axlefublr_custom_formatter;
+
 use std::fmt::Write;
 use std::io::BufReader;
 use std::ops::{self, Deref};
@@ -396,11 +398,16 @@ fn write_impl(
     if doc.insert_final_newline() {
         insert_final_newline(doc, view_id);
     }
+    let auto_format = config.auto_format && options.auto_format;
+    if auto_format {
+        if let Some(trans) = typed::axlefublr_custom_formatter::custom_formatter(doc, view_id) {
+            doc.apply(&trans, view_id);
+        }
+    }
 
     // Save an undo checkpoint for any outstanding changes.
     doc.append_changes_to_history(view);
 
-    let auto_format = config.auto_format && options.auto_format;
     let force = options.force;
     let path: Option<PathBuf> = path.map(Into::into);
 
@@ -901,11 +908,18 @@ pub fn write_all_impl(
         if doc.insert_final_newline() {
             insert_final_newline(doc, target_view);
         }
+        let auto_format = config.auto_format && options.auto_format;
+        if auto_format {
+            if let Some(trans) =
+                typed::axlefublr_custom_formatter::custom_formatter(doc, target_view)
+            {
+                doc.apply(&trans, target_view);
+            }
+        }
 
         // Save an undo checkpoint for any outstanding changes.
         doc.append_changes_to_history(view);
 
-        let auto_format = config.auto_format && options.auto_format;
         let force = options.force;
 
         let run_code_actions = options.code_actions
