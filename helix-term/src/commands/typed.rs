@@ -338,6 +338,7 @@ fn write_impl(cx: &mut compositor::Context, path: Option<&str>, force: bool) -> 
     if doc.insert_final_newline() {
         insert_final_newline(doc, view.id);
     }
+    custom_formatter(doc, view.id);
 
     // Save an undo checkpoint for any outstanding changes.
     doc.append_changes_to_history(view);
@@ -751,6 +752,7 @@ pub fn write_all_impl(
         if doc.insert_final_newline() {
             insert_final_newline(doc, target_view);
         }
+        custom_formatter(doc, view.id);
 
         // Save an undo checkpoint for any outstanding changes.
         doc.append_changes_to_history(view);
