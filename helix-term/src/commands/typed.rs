@@ -1,3 +1,5 @@
+mod axlefublr_custom_formatter;
+
 use std::fmt::Write;
 use std::io::BufReader;
 use std::ops::{self, Deref};
@@ -335,6 +337,7 @@ fn write_impl(cx: &mut compositor::Context, path: Option<&str>, force: bool) -> 
     if doc.insert_final_newline() {
         insert_final_newline(doc, view.id);
     }
+    axlefublr_custom_formatter::custom_formatter(doc, view.id);
 
     // Save an undo checkpoint for any outstanding changes.
     doc.append_changes_to_history(view);
@@ -748,6 +751,7 @@ pub fn write_all_impl(
         if doc.insert_final_newline() {
             insert_final_newline(doc, target_view);
         }
+        axlefublr_custom_formatter::custom_formatter(doc, view.id);
 
         // Save an undo checkpoint for any outstanding changes.
         doc.append_changes_to_history(view);
