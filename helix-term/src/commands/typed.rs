@@ -1,3 +1,5 @@
+mod axlefublr_custom_formatter;
+
 use std::fmt::Write;
 use std::io::BufReader;
 use std::ops::{self, Deref};
@@ -393,12 +395,16 @@ fn write_impl(
     if doc.insert_final_newline() {
         insert_final_newline(doc, view.id);
     }
+    let should_format = config.auto_format && options.auto_format;
+    if should_format {
+        axlefublr_custom_formatter::custom_formatter(doc, view.id);
+    }
 
     // Save an undo checkpoint for any outstanding changes.
     doc.append_changes_to_history(view);
 
     let (view, doc) = current_ref!(cx.editor);
-    let fmt = if config.auto_format && options.auto_format {
+    let fmt = if should_format {
         doc.auto_format(cx.editor).map(|fmt| {
             let callback = make_format_callback(
                 doc.id(),
@@ -854,6 +860,7 @@ pub fn write_all_impl(
         if doc.insert_final_newline() {
             insert_final_newline(doc, target_view);
         }
+        axlefublr_custom_formatter::custom_formatter(doc, view.id);
 
         // Save an undo checkpoint for any outstanding changes.
         doc.append_changes_to_history(view);
