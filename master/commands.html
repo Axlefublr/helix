@@ -216,10 +216,8 @@
 <tr><td><code>:show-directory</code>, <code>:pwd</code></td><td>Show the current working directory.</td></tr>
 <tr><td><code>:encoding</code></td><td>Set encoding. Based on <code>https://encoding.spec.whatwg.org</code>.</td></tr>
 <tr><td><code>:character-info</code>, <code>:char</code></td><td>Get info about the character under the primary cursor.</td></tr>
-<tr><td><code>:reload</code>, <code>:rl</code></td><td>Reload from the source file, if no changes were made.</td></tr>
-<tr><td><code>:reload!</code>, <code>:rl!</code></td><td>Discard changes and reload from the source file.</td></tr>
-<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Reload all documents from the source files, if no changes were made.</td></tr>
-<tr><td><code>:reload-all!</code>, <code>:rla!</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
+<tr><td><code>:reload</code>, <code>:rl</code></td><td>Discard changes and reload from the source file.</td></tr>
+<tr><td><code>:reload-all</code>, <code>:rla</code></td><td>Discard changes and reload all documents from the source files.</td></tr>
 <tr><td><code>:update</code>, <code>:u</code></td><td>Write changes only if the file has been modified.</td></tr>
 <tr><td><code>:lsp-workspace-command</code></td><td>Open workspace command picker</td></tr>
 <tr><td><code>:lsp-restart</code></td><td>Restarts the given language servers, or all language servers that are used by the current file if no arguments are supplied</td></tr>
@@ -248,9 +246,9 @@
 <tr><td><code>:log-open</code></td><td>Open the helix log file.</td></tr>
 <tr><td><code>:insert-output</code></td><td>Run shell command, inserting output before each selection.</td></tr>
 <tr><td><code>:append-output</code></td><td>Run shell command, appending output after each selection.</td></tr>
-<tr><td><code>:pipe</code></td><td>Pipe each selection to the shell command.</td></tr>
+<tr><td><code>:pipe</code>, `:</td><td>`</td></tr>
 <tr><td><code>:pipe-to</code></td><td>Pipe each selection to the shell command, ignoring output.</td></tr>
-<tr><td><code>:run-shell-command</code>, <code>:sh</code>, <code>:s</code></td><td>Run a shell command</td></tr>
+<tr><td><code>:run-shell-command</code>, <code>:sh</code>, <code>:s</code>, <code>:!</code></td><td>Run a shell command</td></tr>
 <tr><td><code>:reset-diff-change</code>, <code>:diffget</code>, <code>:diffg</code></td><td>Reset the diff change at the cursor position.</td></tr>
 <tr><td><code>:clear-register</code></td><td>Clear given register. If no argument is provided, clear all registers.</td></tr>
 <tr><td><code>:redraw</code></td><td>Clear and re-render the whole UI</td></tr>
@@ -274,28 +272,16 @@
 <tr><td><code>no_op</code></td><td>Do nothing</td><td></td></tr>
 <tr><td><code>move_char_left</code></td><td>Move left</td><td>normal: <code>h</code>, <code>&lt;left&gt;</code>, insert: <code>&lt;left&gt;</code></td></tr>
 <tr><td><code>move_char_right</code></td><td>Move right</td><td>normal: <code>l</code>, <code>&lt;right&gt;</code>, insert: <code>&lt;right&gt;</code></td></tr>
-<tr><td><code>move_same_line_char_left</code></td><td>Move left within in the same line only</td><td></td></tr>
-<tr><td><code>move_same_line_char_right</code></td><td>Move right within in the same line only</td><td></td></tr>
 <tr><td><code>move_line_up</code></td><td>Move up</td><td>normal: <code>gk</code></td></tr>
 <tr><td><code>move_line_down</code></td><td>Move down</td><td>normal: <code>gj</code></td></tr>
-<tr><td><code>move_anchored_line_up</code></td><td>Move up with newline anchoring behaviour</td><td></td></tr>
-<tr><td><code>move_anchored_line_down</code></td><td>Move down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>move_visual_line_up</code></td><td>Move up</td><td>normal: <code>k</code>, <code>&lt;up&gt;</code>, insert: <code>&lt;up&gt;</code></td></tr>
 <tr><td><code>move_visual_line_down</code></td><td>Move down</td><td>normal: <code>j</code>, <code>&lt;down&gt;</code>, insert: <code>&lt;down&gt;</code></td></tr>
-<tr><td><code>move_anchored_visual_line_up</code></td><td>Move up with newline anchoring behaviour</td><td></td></tr>
-<tr><td><code>move_anchored_visual_line_down</code></td><td>Move down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>extend_char_left</code></td><td>Extend left</td><td>select: <code>h</code>, <code>&lt;left&gt;</code></td></tr>
 <tr><td><code>extend_char_right</code></td><td>Extend right</td><td>select: <code>l</code>, <code>&lt;right&gt;</code></td></tr>
-<tr><td><code>extend_same_line_char_left</code></td><td>Extend left within the same line only</td><td></td></tr>
-<tr><td><code>extend_same_line_char_right</code></td><td>Extend right within the same line only</td><td></td></tr>
 <tr><td><code>extend_line_up</code></td><td>Extend up</td><td>select: <code>gk</code></td></tr>
 <tr><td><code>extend_line_down</code></td><td>Extend down</td><td>select: <code>gj</code></td></tr>
-<tr><td><code>extend_anchored_line_up</code></td><td>Extend up with newline anchoring behaviour</td><td></td></tr>
-<tr><td><code>extend_anchored_line_down</code></td><td>Extend down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>extend_visual_line_up</code></td><td>Extend up</td><td>select: <code>k</code>, <code>&lt;up&gt;</code></td></tr>
 <tr><td><code>extend_visual_line_down</code></td><td>Extend down</td><td>select: <code>j</code>, <code>&lt;down&gt;</code></td></tr>
-<tr><td><code>extend_anchored_visual_line_up</code></td><td>Extend up with newline anchoring behaviour</td><td></td></tr>
-<tr><td><code>extend_anchored_visual_line_down</code></td><td>Extend down with newline anchoring behaviour</td><td></td></tr>
 <tr><td><code>copy_selection_on_next_line</code></td><td>Copy selection on next line</td><td>normal: <code>C</code>, select: <code>C</code></td></tr>
 <tr><td><code>copy_selection_on_prev_line</code></td><td>Copy selection on previous line</td><td>normal: <code>&lt;A-C&gt;</code>, select: <code>&lt;A-C&gt;</code></td></tr>
 <tr><td><code>move_next_word_start</code></td><td>Move to start of next word</td><td>normal: <code>w</code></td></tr>
@@ -348,7 +334,6 @@
 <tr><td><code>page_cursor_half_up</code></td><td>Move page and cursor half up</td><td>normal: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code>, select: <code>&lt;C-u&gt;</code>, <code>Z&lt;C-u&gt;</code>, <code>z&lt;C-u&gt;</code>, <code>Z&lt;backspace&gt;</code>, <code>z&lt;backspace&gt;</code></td></tr>
 <tr><td><code>page_cursor_half_down</code></td><td>Move page and cursor half down</td><td>normal: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code>, select: <code>&lt;C-d&gt;</code>, <code>Z&lt;C-d&gt;</code>, <code>z&lt;C-d&gt;</code>, <code>Z&lt;space&gt;</code>, <code>z&lt;space&gt;</code></td></tr>
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
-<tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
@@ -380,7 +365,6 @@
 <tr><td><code>ensure_selections_forward</code></td><td>Ensure all selections face forward</td><td>normal: <code>&lt;A-:&gt;</code>, select: <code>&lt;A-:&gt;</code></td></tr>
 <tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, select: <code>i</code></td></tr>
 <tr><td><code>append_mode</code></td><td>Append after selection</td><td>normal: <code>a</code>, select: <code>a</code></td></tr>
-<tr><td><code>append_mode_same_line</code></td><td>Append after selection within the same line only</td><td></td></tr>
 <tr><td><code>command_mode</code></td><td>Enter command mode</td><td>normal: <code>:</code>, select: <code>:</code></td></tr>
 <tr><td><code>file_picker</code></td><td>Open file picker</td><td>normal: <code>&lt;space&gt;f</code>, select: <code>&lt;space&gt;f</code></td></tr>
 <tr><td><code>file_picker_in_current_buffer_directory</code></td><td>Open file picker at current buffer's directory</td><td></td></tr>
@@ -411,8 +395,10 @@
 <tr><td><code>add_newline_below</code></td><td>Add newline below</td><td>normal: <code>]&lt;space&gt;</code>, select: <code>]&lt;space&gt;</code></td></tr>
 <tr><td><code>goto_type_definition</code></td><td>Goto type definition</td><td>normal: <code>gy</code>, select: <code>gy</code></td></tr>
 <tr><td><code>goto_implementation</code></td><td>Goto implementation</td><td>normal: <code>gi</code>, select: <code>gi</code></td></tr>
-<tr><td><code>goto_file_start</code></td><td>Goto line number <n> else file start</td><td>normal: <code>gg</code>, select: <code>gg</code></td></tr>
+<tr><td><code>goto_file_start</code></td><td>Goto line number <n> else file start</td><td>normal: <code>gg</code></td></tr>
 <tr><td><code>goto_file_end</code></td><td>Goto file end</td><td></td></tr>
+<tr><td><code>extend_to_file_start</code></td><td>Extend to line number<n> else file start</td><td>select: <code>gg</code></td></tr>
+<tr><td><code>extend_to_file_end</code></td><td>Extend to file end</td><td></td></tr>
 <tr><td><code>goto_file</code></td><td>Goto files/URLs in selections</td><td>normal: <code>gf</code>, select: <code>gf</code></td></tr>
 <tr><td><code>goto_file_hsplit</code></td><td>Goto files in selections (hsplit)</td><td>normal: <code>&lt;C-w&gt;f</code>, <code>&lt;space&gt;wf</code>, select: <code>&lt;C-w&gt;f</code>, <code>&lt;space&gt;wf</code></td></tr>
 <tr><td><code>goto_file_vsplit</code></td><td>Goto files in selections (vsplit)</td><td>normal: <code>&lt;C-w&gt;F</code>, <code>&lt;space&gt;wF</code>, select: <code>&lt;C-w&gt;F</code>, <code>&lt;space&gt;wF</code></td></tr>
@@ -424,7 +410,8 @@
 <tr><td><code>goto_last_modified_file</code></td><td>Goto last modified file</td><td>normal: <code>gm</code>, select: <code>gm</code></td></tr>
 <tr><td><code>goto_last_modification</code></td><td>Goto last modification</td><td>normal: <code>g.</code>, select: <code>g.</code></td></tr>
 <tr><td><code>goto_line</code></td><td>Goto line</td><td>normal: <code>G</code>, select: <code>G</code></td></tr>
-<tr><td><code>goto_last_line</code></td><td>Goto last line</td><td>normal: <code>ge</code>, select: <code>ge</code></td></tr>
+<tr><td><code>goto_last_line</code></td><td>Goto last line</td><td>normal: <code>ge</code></td></tr>
+<tr><td><code>extend_to_last_line</code></td><td>Extend to last line</td><td>select: <code>ge</code></td></tr>
 <tr><td><code>goto_first_diag</code></td><td>Goto first diagnostic</td><td>normal: <code>[D</code>, select: <code>[D</code></td></tr>
 <tr><td><code>goto_last_diag</code></td><td>Goto last diagnostic</td><td>normal: <code>]D</code>, select: <code>]D</code></td></tr>
 <tr><td><code>goto_next_diag</code></td><td>Goto next diagnostic</td><td>normal: <code>]d</code>, select: <code>]d</code></td></tr>
@@ -488,7 +475,6 @@
 <tr><td><code>remove_primary_selection</code></td><td>Remove primary selection</td><td>normal: <code>&lt;A-,&gt;</code>, select: <code>&lt;A-,&gt;</code></td></tr>
 <tr><td><code>completion</code></td><td>Invoke completion popup</td><td>insert: <code>&lt;C-x&gt;</code></td></tr>
 <tr><td><code>hover</code></td><td>Show docs for item under cursor</td><td>normal: <code>&lt;space&gt;k</code>, select: <code>&lt;space&gt;k</code></td></tr>
-<tr><td><code>hover_dump</code></td><td>Show docs for item under cursor in a new buffer</td><td>normal: <code>&lt;space&gt;K</code>, select: <code>&lt;space&gt;K</code></td></tr>
 <tr><td><code>toggle_comments</code></td><td>Comment/uncomment selections</td><td>normal: <code>&lt;C-c&gt;</code>, <code>&lt;space&gt;c</code>, select: <code>&lt;C-c&gt;</code>, <code>&lt;space&gt;c</code></td></tr>
 <tr><td><code>toggle_line_comments</code></td><td>Line comment/uncomment selections</td><td>normal: <code>&lt;space&gt;&lt;A-c&gt;</code>, select: <code>&lt;space&gt;&lt;A-c&gt;</code></td></tr>
 <tr><td><code>toggle_block_comments</code></td><td>Block comment/uncomment selections</td><td>normal: <code>&lt;space&gt;C</code>, select: <code>&lt;space&gt;C</code></td></tr>
