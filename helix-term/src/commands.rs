@@ -3162,6 +3162,8 @@ fn buffer_picker(cx: &mut Context) {
 
     // mru
     items.sort_unstable_by_key(|item| std::cmp::Reverse(item.focused_at));
+    let first_item = items.remove(0);
+    items.push(first_item);
 
     let columns = [
         PickerColumn::new("id", |meta: &BufferMeta, _| meta.id.to_string().into()),
