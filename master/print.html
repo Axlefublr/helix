@@ -866,6 +866,7 @@ useful when you're simply looking over text and not actively editing it.</p>
 <p>Jumps to various locations.</p>
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Command</th></tr></thead><tbody>
 <tr><td><code>g</code></td><td>Go to line number <code>&lt;n&gt;</code> else start of file</td><td><code>goto_file_start</code></td></tr>
+<tr><td><code>|</code></td><td>Go to column number <code>&lt;n&gt;</code> else start of line</td><td><code>goto_column</code></td></tr>
 <tr><td><code>e</code></td><td>Go to the end of the file</td><td><code>goto_last_line</code></td></tr>
 <tr><td><code>f</code></td><td>Go to files in the selections</td><td><code>goto_file</code></td></tr>
 <tr><td><code>h</code></td><td>Go to the start of the line</td><td><code>goto_line_start</code></td></tr>
@@ -1142,6 +1143,8 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>cursor_column</code></td><td>The column number of the primary cursor in the currently focused document, starting at 1. This is counted as the number of grapheme clusters from the start of the line rather than bytes or codepoints.</td></tr>
 <tr><td><code>buffer_name</code></td><td>The relative path of the currently focused document. <code>[scratch]</code> is expanded instead for scratch buffers.</td></tr>
 <tr><td><code>line_ending</code></td><td>A string containing the line ending of the currently focused document. For example on Unix systems this is usually a line-feed character (<code>\n</code>) but on Windows systems this may be a carriage-return plus a line-feed (<code>\r\n</code>). The line ending kind of the currently focused document can be inspected with the <code>:line-ending</code> command.</td></tr>
+<tr><td><code>language</code></td><td>A string containing the language name of the currently focused document.</td></tr>
+<tr><td><code>selection</code></td><td>A string containing the contents of the primary selection of the currently focused document.</td></tr>
 </tbody></table>
 </div>
 <p>Aside from editor variables, the following expansions may be used:</p>
@@ -1450,6 +1453,8 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>goto_last_change</code></td><td>Goto last change</td><td>normal: <code>]G</code>, select: <code>]G</code></td></tr>
 <tr><td><code>goto_line_start</code></td><td>Goto line start</td><td>normal: <code>gh</code>, <code>&lt;home&gt;</code>, select: <code>gh</code>, insert: <code>&lt;home&gt;</code></td></tr>
 <tr><td><code>goto_line_end</code></td><td>Goto line end</td><td>normal: <code>gl</code>, <code>&lt;end&gt;</code>, select: <code>gl</code></td></tr>
+<tr><td><code>goto_column</code></td><td>Goto column</td><td>normal: <code>g|</code></td></tr>
+<tr><td><code>extend_to_column</code></td><td>Extend to column</td><td>select: <code>g|</code></td></tr>
 <tr><td><code>goto_next_buffer</code></td><td>Goto next buffer</td><td>normal: <code>gn</code>, select: <code>gn</code></td></tr>
 <tr><td><code>goto_previous_buffer</code></td><td>Goto previous buffer</td><td>normal: <code>gp</code>, select: <code>gp</code></td></tr>
 <tr><td><code>goto_line_end_newline</code></td><td>Goto newline at line end</td><td>insert: <code>&lt;end&gt;</code></td></tr>
@@ -1669,6 +1674,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>dot</td><td>✓</td><td></td><td></td><td><code>dot-language-server</code></td></tr>
 <tr><td>dtd</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>dune</td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>dunstrc</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>earthfile</td><td>✓</td><td>✓</td><td>✓</td><td><code>earthlyls</code></td></tr>
 <tr><td>edoc</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>eex</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1803,6 +1809,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>prolog</td><td>✓</td><td></td><td>✓</td><td><code>swipl</code></td></tr>
 <tr><td>protobuf</td><td>✓</td><td>✓</td><td>✓</td><td><code>buf</code>, <code>pb</code>, <code>protols</code></td></tr>
 <tr><td>prql</td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>pug</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>purescript</td><td>✓</td><td>✓</td><td></td><td><code>purescript-language-server</code></td></tr>
 <tr><td>python</td><td>✓</td><td>✓</td><td>✓</td><td><code>ruff</code>, <code>jedi-language-server</code>, <code>pylsp</code></td></tr>
 <tr><td>qml</td><td>✓</td><td></td><td>✓</td><td><code>qmlls</code></td></tr>
@@ -1823,6 +1830,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>scala</td><td>✓</td><td>✓</td><td>✓</td><td><code>metals</code></td></tr>
 <tr><td>scheme</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>scss</td><td>✓</td><td></td><td></td><td><code>vscode-css-language-server</code></td></tr>
+<tr><td>slang</td><td>✓</td><td>✓</td><td>✓</td><td><code>slangd</code></td></tr>
 <tr><td>slint</td><td>✓</td><td>✓</td><td>✓</td><td><code>slint-lsp</code></td></tr>
 <tr><td>smali</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>smithy</td><td>✓</td><td></td><td></td><td><code>cs</code></td></tr>
@@ -2923,7 +2931,7 @@ language-servers = [ "mylang-lsp" ]
 <tr><td><code>indent</code></td><td>The indent to use. Has sub keys <code>unit</code> (the text inserted into the document when indenting; usually set to N spaces or <code>"\t"</code> for tabs) and <code>tab-width</code> (the number of spaces rendered for a tab)</td></tr>
 <tr><td><code>language-servers</code></td><td>The Language Servers used for this language. See below for more information in the section <a href="languages.html#configuring-language-servers-for-a-language">Configuring Language Servers for a language</a></td></tr>
 <tr><td><code>grammar</code></td><td>The tree-sitter grammar to use (defaults to the value of <code>name</code>)</td></tr>
-<tr><td><code>formatter</code></td><td>The formatter for the language, it will take precedence over the lsp when defined. The formatter must be able to take the original file as input from stdin and write the formatted file to stdout</td></tr>
+<tr><td><code>formatter</code></td><td>The formatter for the language, it will take precedence over the lsp when defined. The formatter must be able to take the original file as input from stdin and write the formatted file to stdout. The filename of the current buffer can be passed as argument by using the <code>%{buffer_name}</code> expansion variable. See below for more information in the <a href="languages.html#configuring-the-formatter-command">Configuring the formatter command</a></td></tr>
 <tr><td><code>soft-wrap</code></td><td><a href="./editor.html#editorsoft-wrap-section">editor.softwrap</a></td></tr>
 <tr><td><code>text-width</code></td><td>Maximum line length. Used for the <code>:reflow</code> command and soft-wrapping if <code>soft-wrap.wrap-at-text-width</code> is set, defaults to <code>editor.text-width</code></td></tr>
 <tr><td><code>rulers</code></td><td>Overrides the <code>editor.rulers</code> config key for the language.</td></tr>
@@ -2956,6 +2964,12 @@ If the glob isn't an absolute path or doesn't already start with a glob prefix,
 the file extension of a given file wins. In the example above, the <code>"toml"</code>
 config matches files like <code>Cargo.toml</code> or <code>languages.toml</code>.</li>
 </ol>
+<h3 id="configuring-the-formatter-command"><a class="header" href="#configuring-the-formatter-command">Configuring the formatter command</a></h3>
+<p><a href="./command-line.html#expansions">Command line expansions</a> are supported in the arguments
+of the formatter command. In particular, the <code>%{buffer_name}</code> variable can be passed as
+argument to the formatter:</p>
+<pre><code class="language-toml">formatter = { command = "mylang-formatter" , args = ["--stdin", "--stdin-filename %{buffer_name}"] }
+</code></pre>
 <h2 id="language-server-configuration"><a class="header" href="#language-server-configuration">Language Server configuration</a></h2>
 <p>Language servers are configured separately in the table <code>language-server</code> in the same file as the languages <code>languages.toml</code></p>
 <p>For example:</p>
@@ -3135,6 +3149,7 @@ for example).</p>
 <tr><td><code>test.inside</code></td></tr>
 <tr><td><code>test.around</code></td></tr>
 <tr><td><code>parameter.inside</code></td></tr>
+<tr><td><code>parameter.around</code></td></tr>
 <tr><td><code>comment.inside</code></td></tr>
 <tr><td><code>comment.around</code></td></tr>
 <tr><td><code>entry.inside</code></td></tr>
