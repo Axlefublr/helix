@@ -217,6 +217,10 @@ impl EditorView {
             Self::render_diagnostics(doc, view, inner, surface, theme);
         }
 
+        if !config.should_statusline {
+            return;
+        }
+
         let statusline_area = view
             .area
             .clip_top(view.area.height.saturating_sub(1))
