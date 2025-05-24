@@ -429,6 +429,8 @@ pub struct Config {
     pub whichkey: bool,
     /// Whether to display the statusline at all. Defaults to true.
     pub should_statusline: bool,
+    /// Disable the `.` mapping that repeats your last action, making `.` rebindable. Defaults to false.
+    pub disable_dot_repeat: bool,
     pub show_diagnostics: bool,
     /// Whether to enable Kitty Keyboard Protocol
     pub kitty_keyboard_protocol: KittyKeyboardProtocolConfig,
@@ -1124,6 +1126,7 @@ impl Default for Config {
             rainbow_brackets: false,
             should_statusline: true,
             whichkey: true,
+            disable_dot_repeat: false,
             show_diagnostics: true,
             kitty_keyboard_protocol: Default::default(),
         }
