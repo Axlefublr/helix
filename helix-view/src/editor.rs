@@ -425,6 +425,8 @@ pub struct Config {
     pub editor_config: bool,
     /// Whether to render rainbow colors for matching brackets. Defaults to `false`.
     pub rainbow_brackets: bool,
+    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
+    pub whichkey: bool,
     /// Whether to display the statusline at all. Defaults to true.
     pub should_statusline: bool,
     pub show_diagnostics: bool,
@@ -1121,6 +1123,7 @@ impl Default for Config {
             editor_config: true,
             rainbow_brackets: false,
             should_statusline: true,
+            whichkey: true,
             show_diagnostics: true,
             kitty_keyboard_protocol: Default::default(),
         }
