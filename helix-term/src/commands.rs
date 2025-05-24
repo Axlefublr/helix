@@ -1,7 +1,9 @@
+mod axlefublr_first_last_selection;
 pub(crate) mod dap;
 pub(crate) mod lsp;
 pub(crate) mod typed;
 
+use axlefublr_first_last_selection::*;
 pub use dap::*;
 use futures_util::FutureExt;
 use helix_event::status;
@@ -601,6 +603,8 @@ impl MappableCommand {
         extend_to_word, "Extend to a two-character label",
         goto_next_tabstop, "goto next snippet placeholder",
         goto_prev_tabstop, "goto next snippet placeholder",
+        goto_first_selection, "Make the first selection be your primary selection",
+        goto_last_selection, "Make the last selection be your primary selection",
     );
 }
 
