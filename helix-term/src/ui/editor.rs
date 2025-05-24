@@ -1548,7 +1548,7 @@ impl Component for EditorView {
         };
 
         // -1 for commandline and -1 for bufferline
-        let mut editor_area = area.clip_bottom(1);
+        let mut editor_area = area.clip_bottom(if config.ephemeral_messages { 0 } else { 1 });
         if use_bufferline {
             editor_area = editor_area.clip_top(1);
         }
