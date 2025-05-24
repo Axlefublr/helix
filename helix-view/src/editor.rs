@@ -373,6 +373,8 @@ pub struct Config {
     /// Whether to read settings from [EditorConfig](https://editorconfig.org) files. Defaults to
     /// `true`.
     pub editor_config: bool,
+    /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
+    pub whichkey: bool,
     /// Whether to display the statusline at all. Defaults to true.
     pub should_statusline: bool,
     pub show_diagnostics: bool,
@@ -1035,6 +1037,7 @@ impl Default for Config {
             clipboard_provider: ClipboardProvider::default(),
             editor_config: true,
             should_statusline: true,
+            whichkey: true,
             show_diagnostics: true,
         }
     }
