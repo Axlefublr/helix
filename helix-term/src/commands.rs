@@ -1,10 +1,12 @@
 pub(crate) mod dap;
 mod forkcommands;
+mod axlefublr_first_last_selection;
 pub(crate) mod lsp;
 pub(crate) mod typed;
 
 pub use dap::*;
 use forkcommands::*;
+use axlefublr_first_last_selection::*;
 use futures_util::FutureExt;
 use helix_event::status;
 use helix_stdx::{
@@ -620,6 +622,8 @@ impl MappableCommand {
         count_selections, "Print amount of selections to messages",
         toggle_line_select, "Toggle between trim_selections and extend_to_line_bounds",
         surround_add_tag, "Surround selections in an html tag",
+        goto_first_selection, "Make the first selection be your primary selection",
+        goto_last_selection, "Make the last selection be your primary selection",
     );
 }
 
