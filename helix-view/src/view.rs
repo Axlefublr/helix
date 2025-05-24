@@ -484,24 +484,25 @@ impl View {
         }
 
         let width = self.inner_width(doc);
-        let enable_cursor_line = self
-            .diagnostics_handler
-            .show_cursorline_diagnostics(doc, self.id);
-        let config = config.inline_diagnostics.prepare(width, enable_cursor_line);
-        if !config.disabled() {
-            let cursor = doc
-                .selection(self.id)
-                .primary()
-                .cursor(doc.text().slice(..));
-            text_annotations.add_line_annotation(InlineDiagnostics::new(
-                doc,
-                cursor,
-                width,
-                doc.view_offset(self.id).horizontal_offset,
-                config,
-            ));
+        if config.show_diagnostics {
+            let enable_cursor_line = self
+                .diagnostics_handler
+                .show_cursorline_diagnostics(doc, self.id);
+            let config = config.inline_diagnostics.prepare(width, enable_cursor_line);
+            if !config.disabled() {
+                let cursor = doc
+                    .selection(self.id)
+                    .primary()
+                    .cursor(doc.text().slice(..));
+                text_annotations.add_line_annotation(InlineDiagnostics::new(
+                    doc,
+                    cursor,
+                    width,
+                    doc.view_offset(self.id).horizontal_offset,
+                    config,
+                ));
+            }
         }
-
         text_annotations
     }
 
