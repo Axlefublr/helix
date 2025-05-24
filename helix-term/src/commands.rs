@@ -6092,7 +6092,9 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
         ("x", "Tag 󰌪"),
     ];
 
+    // if cx.editor.config().whichkey {
     cx.editor.autoinfo = Some(Info::new(title, &help_text));
+    // }
 }
 
 static SURROUND_HELP_TEXT: [(&str, &str); 6] = [
@@ -6149,10 +6151,12 @@ fn surround_add(cx: &mut Context) {
         exit_select_mode(cx);
     });
 
-    cx.editor.autoinfo = Some(Info::new(
-        "Surround selections with",
-        &SURROUND_HELP_TEXT[1..],
-    ));
+    if cx.editor.config().whichkey {
+        cx.editor.autoinfo = Some(Info::new(
+            "Surround selections with",
+            &SURROUND_HELP_TEXT[1..],
+        ));
+    }
 }
 
 fn surround_replace(cx: &mut Context) {
@@ -6214,16 +6218,20 @@ fn surround_replace(cx: &mut Context) {
             exit_select_mode(cx);
         });
 
-        cx.editor.autoinfo = Some(Info::new(
-            "Replace with a pair of",
-            &SURROUND_HELP_TEXT[1..],
-        ));
+        if cx.editor.config().whichkey {
+            cx.editor.autoinfo = Some(Info::new(
+                "Replace with a pair of",
+                &SURROUND_HELP_TEXT[1..],
+            ));
+        }
     });
 
-    cx.editor.autoinfo = Some(Info::new(
-        "Replace surrounding pair of",
-        &SURROUND_HELP_TEXT,
-    ));
+    if cx.editor.config().whichkey {
+        cx.editor.autoinfo = Some(Info::new(
+            "Replace surrounding pair of",
+            &SURROUND_HELP_TEXT,
+        ));
+    }
 }
 
 fn surround_delete(cx: &mut Context) {
@@ -6254,7 +6262,9 @@ fn surround_delete(cx: &mut Context) {
         exit_select_mode(cx);
     });
 
-    cx.editor.autoinfo = Some(Info::new("Delete surrounding pair of", &SURROUND_HELP_TEXT));
+    if cx.editor.config().whichkey {
+        cx.editor.autoinfo = Some(Info::new("Delete surrounding pair of", &SURROUND_HELP_TEXT));
+    }
 }
 
 #[derive(Eq, PartialEq)]
