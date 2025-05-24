@@ -427,6 +427,8 @@ pub struct Config {
     pub rainbow_brackets: bool,
     /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
     pub whichkey: bool,
+    /// Disable the `.` mapping that repeats your last action, making `.` rebindable. Defaults to false.
+    pub disable_dot_repeat: bool,
     pub show_diagnostics: bool,
     /// Whether to enable Kitty Keyboard Protocol
     pub kitty_keyboard_protocol: KittyKeyboardProtocolConfig,
@@ -1121,6 +1123,7 @@ impl Default for Config {
             editor_config: true,
             rainbow_brackets: false,
             whichkey: true,
+            disable_dot_repeat: false,
             show_diagnostics: true,
             kitty_keyboard_protocol: Default::default(),
         }
