@@ -909,7 +909,11 @@ impl EditorView {
             KeymapResult::Matched(command) => {
                 execute_command(command);
             }
-            KeymapResult::Pending(node) => cxt.editor.autoinfo = Some(node.infobox()),
+            KeymapResult::Pending(node) => {
+                if cxt.editor.config.load().whichkey {
+                    cxt.editor.autoinfo = Some(node.infobox());
+                }
+            }
             KeymapResult::MatchedSequence(commands) => {
                 for command in commands {
                     execute_command(command);
