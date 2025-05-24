@@ -373,6 +373,8 @@ pub struct Config {
     /// Whether to read settings from [EditorConfig](https://editorconfig.org) files. Defaults to
     /// `true`.
     pub editor_config: bool,
+    /// Whether to display the statusline at all. Defaults to true.
+    pub should_statusline: bool,
     pub show_diagnostics: bool,
 }
 
@@ -1032,6 +1034,7 @@ impl Default for Config {
             end_of_line_diagnostics: DiagnosticFilter::Disable,
             clipboard_provider: ClipboardProvider::default(),
             editor_config: true,
+            should_statusline: true,
             show_diagnostics: true,
         }
     }
