@@ -184,17 +184,20 @@ impl EditorView {
         }
         let width = view.inner_width(doc);
         let config = doc.config.load();
-        let enable_cursor_line = view
-            .diagnostics_handler
-            .show_cursorline_diagnostics(doc, view.id);
-        let inline_diagnostic_config = config.inline_diagnostics.prepare(width, enable_cursor_line);
-        decorations.add_decoration(InlineDiagnostics::new(
-            doc,
-            theme,
-            primary_cursor,
-            inline_diagnostic_config,
-            config.end_of_line_diagnostics,
-        ));
+        if config.show_diagnostics {
+            let enable_cursor_line = view
+                .diagnostics_handler
+                .show_cursorline_diagnostics(doc, view.id);
+            let inline_diagnostic_config =
+                config.inline_diagnostics.prepare(width, enable_cursor_line);
+            decorations.add_decoration(InlineDiagnostics::new(
+                doc,
+                theme,
+                primary_cursor,
+                inline_diagnostic_config,
+                config.end_of_line_diagnostics,
+            ));
+        }
         render_document(
             surface,
             inner,
