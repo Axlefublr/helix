@@ -1,8 +1,10 @@
+mod axlefublr_count_selections;
 pub(crate) mod dap;
 pub(crate) mod lsp;
 pub(crate) mod syntax;
 pub(crate) mod typed;
 
+use axlefublr_count_selections::*;
 pub use dap::*;
 use futures_util::FutureExt;
 use helix_event::status;
@@ -615,6 +617,7 @@ impl MappableCommand {
         goto_prev_tabstop, "Goto next snippet placeholder",
         rotate_selections_first, "Make the first selection your primary one",
         rotate_selections_last, "Make the last selection your primary one",
+        count_selections, "Print amount of selections to messages",
     );
 }
 
