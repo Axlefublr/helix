@@ -305,3 +305,4 @@
 | `goto_prev_tabstop` | goto next snippet placeholder |  |
 | `goto_first_selection` | Make the first selection be your primary selection |  |
 | `goto_last_selection` | Make the last selection be your primary selection |  |
+| `count_selections` | Print amount of selections to messages |  |
