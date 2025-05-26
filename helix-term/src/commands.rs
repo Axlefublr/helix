@@ -1,11 +1,13 @@
 mod axlefublr_count_selections;
 mod axlefublr_first_last_selection;
+mod axlefublr_toggle_line_select;
 pub(crate) mod dap;
 pub(crate) mod lsp;
 pub(crate) mod typed;
 
 use axlefublr_count_selections::*;
 use axlefublr_first_last_selection::*;
+use axlefublr_toggle_line_select::*;
 pub use dap::*;
 use futures_util::FutureExt;
 use helix_event::status;
@@ -608,6 +610,7 @@ impl MappableCommand {
         goto_first_selection, "Make the first selection be your primary selection",
         goto_last_selection, "Make the last selection be your primary selection",
         count_selections, "Print amount of selections to messages",
+        toggle_line_select, "Toggle between trim_selections and extend_to_line_bounds",
     );
 }
 
