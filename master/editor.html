@@ -185,6 +185,7 @@
 <li><a href="#editorsoft-wrap-section"><code>[editor.soft-wrap]</code> Section</a></li>
 <li><a href="#editorsmart-tab-section"><code>[editor.smart-tab]</code> Section</a></li>
 <li><a href="#editorinline-diagnostics-section"><code>[editor.inline-diagnostics]</code> Section</a></li>
+<li><a href="#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></li>
 </ul>
 <h3 id="editor-section"><a class="header" href="#editor-section"><code>[editor]</code> Section</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
@@ -202,8 +203,6 @@
 <tr><td><code>gutters-right</code></td><td>Gutters to display on the right-hand side of the window. Configuration is identical to the <code>gutters</code> key above, but specified gutters will be rendered right-to-left.</td><td><code>[]</code></td></tr>
 <tr><td><code>auto-completion</code></td><td>Enable automatic pop up of auto-completion</td><td><code>true</code></td></tr>
 <tr><td><code>path-completion</code></td><td>Enable filepath completion. Show files and directories if an existing path at the cursor was recognized, either absolute or relative to the current opened document or current working directory (if the buffer is not yet saved). Defaults to true.</td><td><code>true</code></td></tr>
-<tr><td><code>word-completion</code></td><td>Enable completion of words from open buffers.</td><td><code>true</code></td></tr>
-<tr><td><code>word-completion-trigger-length</code></td><td>Minimum number of characters required to automatically trigger word completion.</td><td><code>7</code></td></tr>
 <tr><td><code>auto-format</code></td><td>Enable automatic formatting on save</td><td><code>true</code></td></tr>
 <tr><td><code>idle-timeout</code></td><td>Time in milliseconds since last keypress before idle timers trigger.</td><td><code>250</code></td></tr>
 <tr><td><code>completion-timeout</code></td><td>Time in milliseconds after typing a word character before completions are shown, set to 5 for instant.</td><td><code>250</code></td></tr>
@@ -289,7 +288,7 @@ workspace-diagnostics = ["warning", "error"]
 <tr><td><code>file-type</code></td><td>The type of the opened file</td></tr>
 <tr><td><code>diagnostics</code></td><td>The number of warnings and/or errors</td></tr>
 <tr><td><code>workspace-diagnostics</code></td><td>The number of warnings and/or errors on workspace</td></tr>
-<tr><td><code>selections</code></td><td>The number of active selections</td></tr>
+<tr><td><code>selections</code></td><td>The primary selection index out of the number of active selections</td></tr>
 <tr><td><code>primary-selection-length</code></td><td>The number of characters currently in primary selection</td></tr>
 <tr><td><code>position</code></td><td>The cursor position</td></tr>
 <tr><td><code>position-percentage</code></td><td>The cursor position as a percentage of the total number of lines</td></tr>
@@ -553,6 +552,19 @@ S-tab = "extend_parent_node_start"
 end-of-line-diagnostics = "hint"
 [editor.inline-diagnostics]
 cursor-line = "warning" # show warnings and errors on the cursorline inline
+</code></pre>
+<h3 id="editorword-completion-section"><a class="header" href="#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></h3>
+<p>Options for controlling completion of words from open buffers.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
+<tr><td><code>enable</code></td><td>Whether word completion is enabled</td><td><code>true</code></td></tr>
+<tr><td><code>trigger-length</code></td><td>Number of word characters to type before triggering completion</td><td><code>7</code></td></tr>
+</tbody></table>
+</div>
+<p>Example:</p>
+<pre><code class="language-toml">[editor.word-completion]
+enable = true
+# Set the trigger length lower so that words are completed more often
+trigger-length = 4
 </code></pre>
 
                     </main>

@@ -340,9 +340,17 @@ cd helix
 </li>
 <li>
 <p>Compile from source:</p>
-<pre><code class="language-sh">cargo install --path helix-term --locked
+<pre><code class="language-sh"># Reproducible
+cargo install --path helix-term --locked
 </code></pre>
-<p>This command will create the <code>hx</code> executable and construct the tree-sitter
+<pre><code class="language-sh"># Optimized
+cargo install \
+   --profile opt \
+   --config 'build.rustflags="-C target-cpu=native"' \
+   --path helix-term \
+   --locked
+</code></pre>
+<p>Either command will create the <code>hx</code> executable and construct the tree-sitter
 grammars in the local <code>runtime</code> folder.</p>
 </li>
 </ol>
@@ -716,9 +724,9 @@ selection to the "func" <code>identifier</code>.</p>
 <tr><td><code>W</code></td><td>Move next WORD start</td><td><code>move_next_long_word_start</code></td></tr>
 <tr><td><code>B</code></td><td>Move previous WORD start</td><td><code>move_prev_long_word_start</code></td></tr>
 <tr><td><code>E</code></td><td>Move next WORD end</td><td><code>move_next_long_word_end</code></td></tr>
-<tr><td><code>t</code></td><td>Find 'till next char</td><td><code>find_till_char</code></td></tr>
+<tr><td><code>t</code></td><td>Find till next char</td><td><code>find_till_char</code></td></tr>
 <tr><td><code>f</code></td><td>Find next char</td><td><code>find_next_char</code></td></tr>
-<tr><td><code>T</code></td><td>Find 'till previous char</td><td><code>till_prev_char</code></td></tr>
+<tr><td><code>T</code></td><td>Find till previous char</td><td><code>till_prev_char</code></td></tr>
 <tr><td><code>F</code></td><td>Find previous char</td><td><code>find_prev_char</code></td></tr>
 <tr><td><code>G</code></td><td>Go to line number <code>&lt;n&gt;</code></td><td><code>goto_line</code></td></tr>
 <tr><td><code>Alt-.</code></td><td>Repeat last motion (<code>f</code>, <code>t</code>, <code>m</code>, <code>[</code> or <code>]</code>)</td><td><code>repeat_last_motion</code></td></tr>
@@ -1263,22 +1271,18 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>:append-output</code></td><td>Run shell command, appending output after each selection.</td></tr>
 <tr><td><code>:pipe</code>, `:</td><td>`</td></tr>
 <tr><td><code>:pipe-to</code></td><td>Pipe each selection to the shell command, ignoring output.</td></tr>
-<tr><td><code>:run-shell-command</code>, <code>:sh</code>, <code>:s</code>, <code>:!</code></td><td>Run a shell command</td></tr>
+<tr><td><code>:run-shell-command</code>, <code>:sh</code>, <code>:!</code></td><td>Run a shell command</td></tr>
 <tr><td><code>:reset-diff-change</code>, <code>:diffget</code>, <code>:diffg</code></td><td>Reset the diff change at the cursor position.</td></tr>
 <tr><td><code>:clear-register</code></td><td>Clear given register. If no argument is provided, clear all registers.</td></tr>
 <tr><td><code>:redraw</code></td><td>Clear and re-render the whole UI</td></tr>
 <tr><td><code>:move</code>, <code>:mv</code></td><td>Move the current buffer and its corresponding file to a different path</td></tr>
 <tr><td><code>:yank-diagnostic</code></td><td>Yank diagnostic(s) under primary cursor to register, or clipboard by default</td></tr>
 <tr><td><code>:read</code>, <code>:r</code></td><td>Load a file into buffer</td></tr>
-<tr><td><code>:echo</code>, <code>:c</code></td><td>Prints the given arguments to the statusline.</td></tr>
+<tr><td><code>:echo</code></td><td>Prints the given arguments to the statusline.</td></tr>
 <tr><td><code>:noop</code></td><td>Does nothing.</td></tr>
-<tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections.</td></tr>
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
 <tr><td><code>:buffer-delete-file</code>, <code>:db</code>, <code>:del</code>, <code>:delete</code></td><td>Delete current buffer's real file and close the buffer</td></tr>
-<tr><td><code>:write-buffer-close-or-quit</code>, <code>:wbcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :write-buffer-close</td></tr>
-<tr><td><code>:write-buffer-close-or-quit!</code>, <code>:wbcq!</code></td><td>If on scratch buffer, :quit!. If on normal buffer, :write-buffer-close!</td></tr>
-<tr><td><code>:buffer-close-or-quit</code>, <code>:bcq</code></td><td>If on scratch buffer, :quit. If on normal buffer, :buffer-close</td></tr>
-<tr><td><code>:buffer-close-or-quit!</code>, <code>:bcq!</code></td><td>If on scratch buffer, :quit!. If on normal buffer, :buffer-close!</td></tr>
+<tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections.</td></tr>
 </tbody></table>
 </div>
 <h2 id="static-commands"><a class="header" href="#static-commands">Static Commands</a></h2>
@@ -1603,22 +1607,11 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>extend_to_word</code></td><td>Extend to a two-character label</td><td>select: <code>gw</code></td></tr>
 <tr><td><code>goto_next_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
 <tr><td><code>goto_prev_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
-<tr><td><code>harp_file_get</code></td><td>Open a file harp</td><td></td></tr>
-<tr><td><code>harp_file_set</code></td><td>Set a file harp to the current buffer</td><td></td></tr>
-<tr><td><code>harp_relative_file_get</code></td><td>Open a relative file harp</td><td></td></tr>
-<tr><td><code>harp_relative_file_set</code></td><td>Set a relative file harp to the current buffer</td><td></td></tr>
-<tr><td><code>harp_cwd_get</code></td><td>Change directory to a cwd harp</td><td></td></tr>
-<tr><td><code>harp_fuzzy_get</code></td><td>Open harped directory in the file picker</td><td></td></tr>
-<tr><td><code>harp_cwd_set</code></td><td>Update cwd harp to be the current working directory</td><td></td></tr>
-<tr><td><code>harp_search_get</code></td><td>Search for a stored search harp</td><td></td></tr>
-<tr><td><code>harp_search_set</code></td><td>Set a search harp to your last search</td><td></td></tr>
-<tr><td><code>harp_register_get</code></td><td>Get a register harp into default register</td><td></td></tr>
-<tr><td><code>harp_register_set</code></td><td>Set a register harp from default register</td><td></td></tr>
-<tr><td><code>harp_command_get</code></td><td>Execute command harp</td><td></td></tr>
-<tr><td><code>harp_command_set</code></td><td>Set a command harp from register :</td><td></td></tr>
+<tr><td><code>goto_first_selection</code></td><td>Make the first selection be your primary selection</td><td></td></tr>
+<tr><td><code>goto_last_selection</code></td><td>Make the last selection be your primary selection</td><td></td></tr>
 <tr><td><code>count_selections</code></td><td>Print amount of selections to messages</td><td></td></tr>
 <tr><td><code>toggle_line_select</code></td><td>Toggle between trim_selections and extend_to_line_bounds</td><td></td></tr>
-<tr><td><code>surround_add_tag</code></td><td>Surround selections in an html tag</td><td></td></tr>
+<tr><td><code>surround_add_tag</code></td><td>Surround selections with an html tag</td><td></td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><h2 id="language-support"><a class="header" href="#language-support">Language Support</a></h2>
 <p>The following languages and Language Servers are supported. To use
@@ -1769,6 +1762,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>make</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>markdoc</td><td>✓</td><td></td><td></td><td><code>markdoc-ls</code></td></tr>
 <tr><td>markdown</td><td>✓</td><td></td><td></td><td><code>marksman</code>, <code>markdown-oxide</code></td></tr>
+<tr><td>markdown-rustdoc</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>markdown.inline</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>matlab</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>mermaid</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1826,6 +1820,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>rst</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>ruby</td><td>✓</td><td>✓</td><td>✓</td><td><code>ruby-lsp</code>, <code>solargraph</code></td></tr>
 <tr><td>rust</td><td>✓</td><td>✓</td><td>✓</td><td><code>rust-analyzer</code></td></tr>
+<tr><td>rust-format-args</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>sage</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>scala</td><td>✓</td><td>✓</td><td>✓</td><td><code>metals</code></td></tr>
 <tr><td>scheme</td><td>✓</td><td></td><td>✓</td><td></td></tr>
@@ -1988,6 +1983,7 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <li><a href="editor.html#editorsoft-wrap-section"><code>[editor.soft-wrap]</code> Section</a></li>
 <li><a href="editor.html#editorsmart-tab-section"><code>[editor.smart-tab]</code> Section</a></li>
 <li><a href="editor.html#editorinline-diagnostics-section"><code>[editor.inline-diagnostics]</code> Section</a></li>
+<li><a href="editor.html#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></li>
 </ul>
 <h3 id="editor-section"><a class="header" href="#editor-section"><code>[editor]</code> Section</a></h3>
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
@@ -2005,8 +2001,6 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <tr><td><code>gutters-right</code></td><td>Gutters to display on the right-hand side of the window. Configuration is identical to the <code>gutters</code> key above, but specified gutters will be rendered right-to-left.</td><td><code>[]</code></td></tr>
 <tr><td><code>auto-completion</code></td><td>Enable automatic pop up of auto-completion</td><td><code>true</code></td></tr>
 <tr><td><code>path-completion</code></td><td>Enable filepath completion. Show files and directories if an existing path at the cursor was recognized, either absolute or relative to the current opened document or current working directory (if the buffer is not yet saved). Defaults to true.</td><td><code>true</code></td></tr>
-<tr><td><code>word-completion</code></td><td>Enable completion of words from open buffers.</td><td><code>true</code></td></tr>
-<tr><td><code>word-completion-trigger-length</code></td><td>Minimum number of characters required to automatically trigger word completion.</td><td><code>7</code></td></tr>
 <tr><td><code>auto-format</code></td><td>Enable automatic formatting on save</td><td><code>true</code></td></tr>
 <tr><td><code>idle-timeout</code></td><td>Time in milliseconds since last keypress before idle timers trigger.</td><td><code>250</code></td></tr>
 <tr><td><code>completion-timeout</code></td><td>Time in milliseconds after typing a word character before completions are shown, set to 5 for instant.</td><td><code>250</code></td></tr>
@@ -2092,7 +2086,7 @@ workspace-diagnostics = ["warning", "error"]
 <tr><td><code>file-type</code></td><td>The type of the opened file</td></tr>
 <tr><td><code>diagnostics</code></td><td>The number of warnings and/or errors</td></tr>
 <tr><td><code>workspace-diagnostics</code></td><td>The number of warnings and/or errors on workspace</td></tr>
-<tr><td><code>selections</code></td><td>The number of active selections</td></tr>
+<tr><td><code>selections</code></td><td>The primary selection index out of the number of active selections</td></tr>
 <tr><td><code>primary-selection-length</code></td><td>The number of characters currently in primary selection</td></tr>
 <tr><td><code>position</code></td><td>The cursor position</td></tr>
 <tr><td><code>position-percentage</code></td><td>The cursor position as a percentage of the total number of lines</td></tr>
@@ -2356,6 +2350,19 @@ S-tab = "extend_parent_node_start"
 end-of-line-diagnostics = "hint"
 [editor.inline-diagnostics]
 cursor-line = "warning" # show warnings and errors on the cursorline inline
+</code></pre>
+<h3 id="editorword-completion-section"><a class="header" href="#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></h3>
+<p>Options for controlling completion of words from open buffers.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
+<tr><td><code>enable</code></td><td>Whether word completion is enabled</td><td><code>true</code></td></tr>
+<tr><td><code>trigger-length</code></td><td>Number of word characters to type before triggering completion</td><td><code>7</code></td></tr>
+</tbody></table>
+</div>
+<p>Example:</p>
+<pre><code class="language-toml">[editor.word-completion]
+enable = true
+# Set the trigger length lower so that words are completed more often
+trigger-length = 4
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
 <p>To use a theme add <code>theme = "&lt;name&gt;"</code> to the top of your <a href="./configuration.html"><code>config.toml</code></a> file, or select it during runtime using <code>:theme &lt;name&gt;</code>.</p>
@@ -2938,7 +2945,7 @@ language-servers = [ "mylang-lsp" ]
 <tr><td><code>text-width</code></td><td>Maximum line length. Used for the <code>:reflow</code> command and soft-wrapping if <code>soft-wrap.wrap-at-text-width</code> is set, defaults to <code>editor.text-width</code></td></tr>
 <tr><td><code>rulers</code></td><td>Overrides the <code>editor.rulers</code> config key for the language.</td></tr>
 <tr><td><code>path-completion</code></td><td>Overrides the <code>editor.path-completion</code> config key for the language.</td></tr>
-<tr><td><code>word-completion</code></td><td>Overrides the <code>editor.word-completion</code> config key for the language.</td></tr>
+<tr><td><code>word-completion</code></td><td>Overrides the <a href="./editor.html#editorword-completion-section"><code>editor.word-completion</code></a> configuration for the language.</td></tr>
 <tr><td><code>workspace-lsp-roots</code></td><td>Directories relative to the workspace root that are treated as LSP roots. Should only be set in <code>.helix/config.toml</code>. Overwrites the setting of the same name in <code>config.toml</code> if set.</td></tr>
 <tr><td><code>persistent-diagnostic-sources</code></td><td>An array of LSP diagnostic sources assumed unchanged when the language server resends the same set of diagnostics. Helix can track the position for these diagnostics internally instead. Useful for diagnostics that are recomputed on save.</td></tr>
 </tbody></table>
