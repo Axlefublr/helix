@@ -91,3 +91,4 @@
 | `:read`, `:r` | Load a file into buffer |
 | `:echo` | Prints the given arguments to the statusline. |
 | `:noop` | Does nothing. |
+| `:echopy`, `:cc` | Put string into clipboard |
