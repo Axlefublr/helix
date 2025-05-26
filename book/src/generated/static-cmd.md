@@ -316,3 +316,4 @@
 | `rotate_selections_first` | Make the first selection your primary one |  |
 | `rotate_selections_last` | Make the last selection your primary one |  |
 | `toggle_line_select` | Toggle between trim_selections and extend_to_line_bounds |  |
+| `surround_add_tag` | Surround selections with an html tag |  |
