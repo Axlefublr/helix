@@ -87,6 +87,7 @@ serde = { version = "1.0", features = ["derive"] }
 
 dashmap = "6.2"
 axleharp = "4.0.0"
+rand = "0.8.5"
 
 parking_lot.workspace = true
 
