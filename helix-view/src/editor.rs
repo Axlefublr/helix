@@ -444,6 +444,7 @@ pub struct Config {
     pub rainbow_brackets: bool,
     /// Whether to display infoboxes for mappings. If `auto_info` is true, and `whichkey` is false, you will only get infoboxes for `register_select`. Defaults to true.
     pub whichkey: bool,
+    pub harp: HarpConfig,
     /// Whether to enable Kitty Keyboard Protocol
     pub kitty_keyboard_protocol: KittyKeyboardProtocolConfig,
     pub buffer_picker: BufferPickerConfig,
@@ -482,6 +483,77 @@ pub enum KittyKeyboardProtocolConfig {
     Auto,
     Disabled,
     Enabled,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
+pub enum HarpRelativity {
+    Global,
+    Buffer,
+    Directory,
+    Filetype,
+}
+
+impl Default for HarpRelativity {
+    fn default() -> Self {
+        Self::Global
+    }
+}
+
+impl std::fmt::Display for HarpRelativity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Global => "global",
+                Self::Buffer => "buffer",
+                Self::Directory => "directory",
+                Self::Filetype => "filetype",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
+#[serde(default, rename_all = "kebab-case", deny_unknown_fields)]
+pub struct HarpHotkeys {
+    pub global: String,
+    pub directory: String,
+    pub buffer: String,
+    pub filetype: String,
+    pub switch: String,
+    pub delete_all: String,
+    pub delete: String,
+    pub alt: String,
+}
+
+impl Default for HarpHotkeys {
+    fn default() -> Self {
+        Self {
+            global: String::from("'"),
+            directory: String::from("."),
+            buffer: String::from(","),
+            filetype: String::from(";"),
+            switch: String::from("<space>"),
+            delete_all: String::from("<A-backspace>"),
+            delete: String::from("<backspace>"),
+            alt: String::from("/"),
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord, Default)]
+#[serde(default, rename_all = "kebab-case", deny_unknown_fields)]
+pub struct HarpConfig {
+    pub command: HarpRelativity,
+    pub cwd: HarpRelativity,
+    pub file: HarpRelativity,
+    pub mark: HarpRelativity,
+    pub register: HarpRelativity,
+    pub relative_file: HarpRelativity,
+    pub search: HarpRelativity,
+    pub hotkeys: HarpHotkeys,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
@@ -1182,6 +1254,7 @@ impl Default for Config {
             editor_config: true,
             rainbow_brackets: false,
             whichkey: true,
+            harp: HarpConfig::default(),
             kitty_keyboard_protocol: Default::default(),
             buffer_picker: BufferPickerConfig::default(),
         }

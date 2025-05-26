@@ -1,3 +1,4 @@
+mod axlefublr_harp;
 mod axlefublr_surround_add_tag;
 mod axlefublr_toggle_line_select;
 pub(crate) mod dap;
@@ -5,6 +6,7 @@ pub(crate) mod lsp;
 pub(crate) mod syntax;
 pub(crate) mod typed;
 
+use axlefublr_harp::*;
 use axlefublr_surround_add_tag::*;
 use axlefublr_toggle_line_select::*;
 pub use dap::*;
@@ -631,6 +633,13 @@ impl MappableCommand {
         toggle_line_select, "Toggle between trim_selections and extend_to_line_bounds",
         surround_add_tag, "Surround selections with an html tag",
         local_search_section, "Search for a ----section---- in buffer",
+        harp_file, "Interact with a file harp",
+        harp_relative_file, "Interact with a relative file harp",
+        harp_cwd, "Interact with a cwd harp",
+        harp_search, "Interact with a search harp",
+        harp_register, "Interact with a register harp",
+        harp_command, "Interact with a command harp",
+        harp_mark, "Interact with a mark harp",
     );
 }
 
