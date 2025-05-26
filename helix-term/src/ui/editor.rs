@@ -1558,6 +1558,9 @@ impl Component for EditorView {
                 status_msg,
                 style,
             );
+            if status_msg.len() <= area.width.into() && *severity == Severity::Error {
+                log::error!("Status bar could not fit this error message: {status_msg}");
+            };
         }
 
         if area.width.saturating_sub(status_msg_width as u16) > key_width {
