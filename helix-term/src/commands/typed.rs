@@ -2994,6 +2994,30 @@ fn echo(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow:
     Ok(())
 }
 
+pub fn echopy(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let output = args.into_iter().fold(String::new(), |mut acc, arg| {
+        if !acc.is_empty() {
+            acc.push(' ');
+        }
+        acc.push_str(&arg);
+        acc
+    });
+
+    match cx.editor.registers.write(
+        cx.editor.config().default_yank_register,
+        vec![output.clone()],
+    ) {
+        Ok(_) => cx.editor.set_status(output),
+        Err(err) => cx.editor.set_error(err.to_string()),
+    }
+
+    Ok(())
+}
+
 fn noop(_cx: &mut compositor::Context, _args: Args, _event: PromptEvent) -> anyhow::Result<()> {
     Ok(())
 }
@@ -4107,6 +4131,18 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (1, None),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "echopy",
+        aliases: &["cc"],
+        doc: "Put string into clipboard",
+        fun: echopy,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
+            raw_after: Some(0),
             ..Signature::DEFAULT
         },
     },
