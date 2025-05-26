@@ -307,3 +307,4 @@
 | `goto_last_selection` | Make the last selection be your primary selection |  |
 | `count_selections` | Print amount of selections to messages |  |
 | `toggle_line_select` | Toggle between trim_selections and extend_to_line_bounds |  |
+| `surround_add_tag` | Surround selections with an html tag |  |
