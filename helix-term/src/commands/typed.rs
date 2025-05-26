@@ -1,4 +1,5 @@
 mod axlefublr_custom_formatter;
+mod axlefublr_echopy;
 
 use std::fmt::Write;
 use std::io::BufReader;
@@ -3833,6 +3834,18 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, None),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "echopy",
+        aliases: &["cc"],
+        doc: "Put string into clipboard",
+        fun: axlefublr_echopy::echopy,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
+            raw_after: Some(0),
             ..Signature::DEFAULT
         },
     },
