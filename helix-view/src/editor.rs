@@ -382,6 +382,48 @@ pub struct Config {
     /// Disable the `.` mapping that repeats your last action, making `.` rebindable. Defaults to false.
     pub disable_dot_repeat: bool,
     pub show_diagnostics: bool,
+    pub harp: HarpConfig,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
+#[serde(rename_all = "kebab-case", deny_unknown_fields)]
+pub enum HarpRelativity {
+    Global,
+    Buffer,
+    Directory,
+    Filetype,
+}
+
+impl Default for HarpRelativity {
+    fn default() -> Self {
+        Self::Global
+    }
+}
+
+impl std::fmt::Display for HarpRelativity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match self {
+                Self::Global => "global",
+                Self::Buffer => "buffer",
+                Self::Directory => "directory",
+                Self::Filetype => "filetype",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord, Default)]
+#[serde(default, rename_all = "kebab-case", deny_unknown_fields)]
+pub struct HarpConfig {
+    pub command: HarpRelativity,
+    pub cwd: HarpRelativity,
+    pub file: HarpRelativity,
+    pub register: HarpRelativity,
+    pub relative_file: HarpRelativity,
+    pub search: HarpRelativity,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
@@ -1038,6 +1080,7 @@ impl Default for Config {
             ephemeral_messages: false,
             disable_dot_repeat: false,
             show_diagnostics: true,
+            harp: HarpConfig::default(),
         }
     }
 }
