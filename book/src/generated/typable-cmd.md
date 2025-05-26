@@ -97,6 +97,7 @@
 | `:read`, `:r` | Load a file into buffer |
 | `:echo` | Prints the given arguments to the statusline. |
 | `:echopy`, `:cc` | Put string into clipboard |
+| `:random`, `:rng`, `:rnd` | Randomize your selections. |
 | `:noop` | Does nothing. |
 | `:workspace-trust` | Allow language servers and local config for the current workspace. |
 | `:workspace-untrust` | Revoke the current workspace's trust grant or exclusion. |
