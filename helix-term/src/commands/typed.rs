@@ -1,3 +1,4 @@
+mod axlefublr_buffer_delete_file;
 mod axlefublr_custom_formatter;
 mod axlefublr_echopy;
 
@@ -3683,6 +3684,17 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         signature: Signature {
             positionals: (0, None),
             raw_after: Some(0),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "buffer-delete-file",
+        aliases: &["db", "del", "delete"],
+        doc: "Delete current buffer's real file and close the buffer",
+        fun: axlefublr_buffer_delete_file::buffer_delete_file,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
             ..Signature::DEFAULT
         },
     },
