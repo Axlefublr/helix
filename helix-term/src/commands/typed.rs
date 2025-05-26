@@ -1,6 +1,7 @@
 mod axlefublr_buffer_delete_file;
 mod axlefublr_custom_formatter;
 mod axlefublr_echopy;
+mod axlefublr_random;
 
 use std::fmt::Write;
 use std::io::BufReader;
@@ -3703,6 +3704,17 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "random",
+        aliases: &["rng", "rnd"],
+        doc: "Randomize your selections.",
+        fun: axlefublr_random::random,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
             ..Signature::DEFAULT
         },
     },
