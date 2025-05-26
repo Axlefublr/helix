@@ -618,6 +618,7 @@ impl MappableCommand {
         goto_prev_tabstop, "Goto next snippet placeholder",
         rotate_selections_first, "Make the first selection your primary one",
         rotate_selections_last, "Make the last selection your primary one",
+        toggle_line_select, "Toggle between trim_selections and extend_to_line_bounds",
     );
 }
 
@@ -3057,6 +3058,17 @@ fn shrink_to_line_bounds(cx: &mut Context) {
             Range::new(start, end).with_direction(range.direction())
         }),
     );
+}
+
+pub fn toggle_line_select(cx: &mut Context) {
+    let (view, doc) = current_ref!(cx.editor);
+    let old_selection = doc.selection(view.id).clone();
+    super::extend_to_line_bounds(cx);
+    let (view, doc) = current_ref!(cx.editor);
+    let new_selection = doc.selection(view.id);
+    if old_selection == *new_selection {
+        super::trim_selections(cx);
+    }
 }
 
 enum Operation {
