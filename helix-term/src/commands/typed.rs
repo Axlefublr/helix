@@ -1,3 +1,4 @@
+mod axlefublr_buffer_nth;
 mod axlefublr_custom_formatter;
 mod axlefublr_echopy;
 mod axlefublr_random;
@@ -3754,6 +3755,25 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, None),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "buffer-nth",
+        aliases: &["bi"],
+        doc: "Switch to the nth buffer, out of those you have open.",
+        fun: axlefublr_buffer_nth::buffer_nth,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (1, None),
+            flags: &[
+                Flag {
+                    name: "reverse",
+                    alias: Some('r'),
+                    doc: "count buffers from the end",
+                    ..Flag::DEFAULT
+                },
+            ],
             ..Signature::DEFAULT
         },
     },
