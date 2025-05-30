@@ -94,3 +94,4 @@
 | `:echopy`, `:cc` | Put string into clipboard |
 | `:buffer-delete-file`, `:db`, `:del`, `:delete` | Delete current buffer's real file and close the buffer |
 | `:random`, `:rng`, `:rnd` | Randomize your selections. |
+| `:buffer-nth`, `:bi` | Switch to the nth buffer, out of those you have open. |
