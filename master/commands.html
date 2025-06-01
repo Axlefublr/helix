@@ -262,7 +262,7 @@
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
 <tr><td><code>:buffer-delete-file</code>, <code>:db</code>, <code>:del</code>, <code>:delete</code></td><td>Delete current buffer's real file and close the buffer</td></tr>
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections.</td></tr>
-<tr><td><code>:buffer-nth</code></td><td>Switch to the nth buffer, out of those you have open.<br>Negative n will count from the end.</td></tr>
+<tr><td><code>:buffer-nth</code>, <code>:bi</code></td><td>Switch to the nth buffer, out of those you have open.</td></tr>
 </tbody></table>
 </div>
 <h2 id="static-commands"><a class="header" href="#static-commands">Static Commands</a></h2>
@@ -592,18 +592,12 @@
 <tr><td><code>count_selections</code></td><td>Print amount of selections to messages</td><td></td></tr>
 <tr><td><code>toggle_line_select</code></td><td>Toggle between trim_selections and extend_to_line_bounds</td><td></td></tr>
 <tr><td><code>surround_add_tag</code></td><td>Surround selections with an html tag</td><td></td></tr>
-<tr><td><code>harp_file_get</code></td><td>Open a file harp</td><td></td></tr>
-<tr><td><code>harp_file_set</code></td><td>Set a file harp to the current buffer</td><td></td></tr>
-<tr><td><code>harp_relative_file_get</code></td><td>Open a relative file harp</td><td></td></tr>
-<tr><td><code>harp_relative_file_set</code></td><td>Set a relative file harp to the current buffer</td><td></td></tr>
-<tr><td><code>harp_cwd_get</code></td><td>Change directory to a cwd harp</td><td></td></tr>
-<tr><td><code>harp_cwd_set</code></td><td>Update cwd harp to be the current working directory</td><td></td></tr>
-<tr><td><code>harp_search_get</code></td><td>Search for a stored search harp</td><td></td></tr>
-<tr><td><code>harp_search_set</code></td><td>Set a search harp to your last search</td><td></td></tr>
-<tr><td><code>harp_register_get</code></td><td>Get a register harp into default register</td><td></td></tr>
-<tr><td><code>harp_register_set</code></td><td>Set a register harp from default register</td><td></td></tr>
-<tr><td><code>harp_command_get</code></td><td>Execute command harp</td><td></td></tr>
-<tr><td><code>harp_command_set</code></td><td>Set a command harp from register :</td><td></td></tr>
+<tr><td><code>harp_file</code></td><td>Interact with a file harp</td><td></td></tr>
+<tr><td><code>harp_relative_file</code></td><td>Interact with a relative file harp</td><td></td></tr>
+<tr><td><code>harp_cwd</code></td><td>Interact with a cwd harp</td><td></td></tr>
+<tr><td><code>harp_search</code></td><td>Interact with a search harp</td><td></td></tr>
+<tr><td><code>harp_register</code></td><td>Interact with a register harp</td><td></td></tr>
+<tr><td><code>harp_command</code></td><td>Interact with a command harp</td><td></td></tr>
 </tbody></table>
 </div>
                     </main>
