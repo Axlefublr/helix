@@ -1606,10 +1606,10 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>command_palette</code></td><td>Open command palette</td><td>normal: <code>&lt;space&gt;?</code>, select: <code>&lt;space&gt;?</code></td></tr>
 <tr><td><code>goto_word</code></td><td>Jump to a two-character label</td><td>normal: <code>gw</code></td></tr>
 <tr><td><code>extend_to_word</code></td><td>Extend to a two-character label</td><td>select: <code>gw</code></td></tr>
-<tr><td><code>goto_next_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
-<tr><td><code>goto_prev_tabstop</code></td><td>goto next snippet placeholder</td><td></td></tr>
-<tr><td><code>goto_first_selection</code></td><td>Make the first selection be your primary selection</td><td></td></tr>
-<tr><td><code>goto_last_selection</code></td><td>Make the last selection be your primary selection</td><td></td></tr>
+<tr><td><code>goto_next_tabstop</code></td><td>Goto next snippet placeholder</td><td></td></tr>
+<tr><td><code>goto_prev_tabstop</code></td><td>Goto next snippet placeholder</td><td></td></tr>
+<tr><td><code>rotate_selections_first</code></td><td>Make the first selection your primary one</td><td></td></tr>
+<tr><td><code>rotate_selections_last</code></td><td>Make the last selection your primary one</td><td></td></tr>
 <tr><td><code>count_selections</code></td><td>Print amount of selections to messages</td><td></td></tr>
 <tr><td><code>toggle_line_select</code></td><td>Toggle between trim_selections and extend_to_line_bounds</td><td></td></tr>
 <tr><td><code>surround_add_tag</code></td><td>Surround selections with an html tag</td><td></td></tr>
@@ -1619,6 +1619,7 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>harp_search</code></td><td>Interact with a search harp</td><td></td></tr>
 <tr><td><code>harp_register</code></td><td>Interact with a register harp</td><td></td></tr>
 <tr><td><code>harp_command</code></td><td>Interact with a command harp</td><td></td></tr>
+<tr><td><code>harp_mark</code></td><td>Interact with a mark harp</td><td></td></tr>
 </tbody></table>
 </div><div style="break-before: page; page-break-before: always;"></div><h2 id="language-support"><a class="header" href="#language-support">Language Support</a></h2>
 <p>The following languages and Language Servers are supported. To use
@@ -1631,6 +1632,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>ada</td><td>✓</td><td>✓</td><td></td><td><code>ada_language_server</code></td></tr>
 <tr><td>adl</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>agda</td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>alloy</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>amber</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>astro</td><td>✓</td><td></td><td></td><td><code>astro-ls</code></td></tr>
 <tr><td>awk</td><td>✓</td><td>✓</td><td></td><td><code>awk-language-server</code></td></tr>
@@ -1649,6 +1651,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>capnp</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>cel</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>circom</td><td>✓</td><td></td><td></td><td><code>circom-lsp</code></td></tr>
+<tr><td>clarity</td><td>✓</td><td></td><td></td><td><code>clarinet</code></td></tr>
 <tr><td>clojure</td><td>✓</td><td></td><td></td><td><code>clojure-lsp</code></td></tr>
 <tr><td>cmake</td><td>✓</td><td>✓</td><td>✓</td><td><code>cmake-language-server</code></td></tr>
 <tr><td>codeql</td><td>✓</td><td>✓</td><td></td><td><code>codeql</code></td></tr>
@@ -1765,6 +1768,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>log</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>lpf</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>lua</td><td>✓</td><td>✓</td><td>✓</td><td><code>lua-language-server</code></td></tr>
+<tr><td>luau</td><td>✓</td><td>✓</td><td>✓</td><td><code>luau-lsp</code></td></tr>
 <tr><td>mail</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>make</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>markdoc</td><td>✓</td><td></td><td></td><td><code>markdoc-ls</code></td></tr>
@@ -1812,7 +1816,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>prql</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>pug</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>purescript</td><td>✓</td><td>✓</td><td></td><td><code>purescript-language-server</code></td></tr>
-<tr><td>python</td><td>✓</td><td>✓</td><td>✓</td><td><code>ruff</code>, <code>jedi-language-server</code>, <code>pylsp</code></td></tr>
+<tr><td>python</td><td>✓</td><td>✓</td><td>✓</td><td><code>ty</code>, <code>ruff</code>, <code>jedi-language-server</code>, <code>pylsp</code></td></tr>
 <tr><td>qml</td><td>✓</td><td></td><td>✓</td><td><code>qmlls</code></td></tr>
 <tr><td>quarto</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>quint</td><td>✓</td><td></td><td></td><td><code>quint-language-server</code></td></tr>
@@ -2088,6 +2092,7 @@ workspace-diagnostics = ["warning", "error"]
 <tr><td><code>file-modification-indicator</code></td><td>The indicator to show whether the file is modified (a <code>[+]</code> appears when there are unsaved changes)</td></tr>
 <tr><td><code>file-encoding</code></td><td>The encoding of the opened file if it differs from UTF-8</td></tr>
 <tr><td><code>file-line-ending</code></td><td>The file line endings (CRLF or LF)</td></tr>
+<tr><td><code>file-indent-style</code></td><td>The file indentation style</td></tr>
 <tr><td><code>read-only-indicator</code></td><td>An indicator that shows <code>[readonly]</code> when a file cannot be written</td></tr>
 <tr><td><code>total-line-numbers</code></td><td>The total line numbers of the opened file</td></tr>
 <tr><td><code>file-type</code></td><td>The type of the opened file</td></tr>
