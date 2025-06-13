@@ -615,7 +615,7 @@ impl EditorView {
         let mut x = viewport.x;
         let current_doc = view!(editor).doc;
 
-        for doc in editor.documents() {
+        for (index, doc) in editor.documents().enumerate() {
             let fname = doc
                 .path()
                 .unwrap_or(&scratch)
@@ -630,7 +630,12 @@ impl EditorView {
                 bufferline_inactive
             };
 
-            let text = format!("{}{}  ", fname, if doc.is_modified() { "[+]" } else { "" });
+            let text = format!(
+                "{} {}{}  ",
+                index + 1,
+                fname,
+                if doc.is_modified() { "[+]" } else { "" }
+            );
             let used_width = viewport.x.saturating_sub(x);
             let rem_width = surface.area.width.saturating_sub(used_width);
 
