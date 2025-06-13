@@ -390,6 +390,7 @@ pub struct Config {
     /// Disable the `.` mapping that repeats your last action, making `.` rebindable. Defaults to false.
     pub disable_dot_repeat: bool,
     pub show_diagnostics: bool,
+    pub bufferline_index: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
@@ -1075,6 +1076,7 @@ impl Default for Config {
             ephemeral_messages: false,
             disable_dot_repeat: false,
             show_diagnostics: true,
+            bufferline_index: false,
         }
     }
 }
