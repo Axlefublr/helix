@@ -265,6 +265,8 @@ pub struct Config {
     pub cursorcolumn: bool,
     #[serde(deserialize_with = "deserialize_gutter_seq_or_struct")]
     pub gutters: GutterConfig,
+    #[serde(deserialize_with = "deserialize_gutter_seq_or_struct")]
+    pub gutters_right: GutterConfig,
     /// Middle click paste support. Defaults to true.
     pub middle_click_paste: bool,
     /// Automatic insertion of pairs to parentheses, brackets,
@@ -790,6 +792,8 @@ pub enum GutterType {
     Spacer,
     /// Highlight local changes
     Diff,
+    /// Show scrollbar
+    Scrollbar,
 }
 
 impl std::str::FromStr for GutterType {
@@ -801,8 +805,9 @@ impl std::str::FromStr for GutterType {
             "spacer" => Ok(Self::Spacer),
             "line-numbers" => Ok(Self::LineNumbers),
             "diff" => Ok(Self::Diff),
+            "scrollbar" => Ok(Self::Scrollbar),
             _ => anyhow::bail!(
-                "Gutter type can only be `diagnostics`, `spacer`, `line-numbers` or `diff`."
+                "Gutter type can only be `diagnostics`, `spacer`, `line-numbers`, `diff`, or `scrollbar`."
             ),
         }
     }
@@ -1067,6 +1072,7 @@ impl Default for Config {
             cursorline: false,
             cursorcolumn: false,
             gutters: GutterConfig::default(),
+            gutters_right: GutterConfig::from(Vec::new()),
             middle_click_paste: true,
             auto_pairs: AutoPairConfig::default(),
             auto_completion: true,
@@ -1796,7 +1802,13 @@ impl Editor {
                     .try_get(self.tree.focus)
                     .filter(|v| id == v.doc) // Different Document
                     .cloned()
-                    .unwrap_or_else(|| View::new(id, self.config().gutters.clone()));
+                    .unwrap_or_else(|| {
+                        View::new(
+                            id,
+                            self.config().gutters.clone(),
+                            self.config().gutters_right.clone(),
+                        )
+                    });
                 let view_id = self.tree.split(
                     view,
                     match action {
@@ -1992,7 +2004,11 @@ impl Editor {
                         self.syn_loader.clone(),
                     ))
                 });
-            let view = View::new(doc_id, self.config().gutters.clone());
+            let view = View::new(
+                doc_id,
+                self.config().gutters.clone(),
+                self.config().gutters_right.clone(),
+            );
             let view_id = self.tree.insert(view);
             let doc = doc_mut!(self, &doc_id);
             doc.ensure_view_init(view_id);
