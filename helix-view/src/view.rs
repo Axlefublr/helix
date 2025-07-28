@@ -252,15 +252,7 @@ impl View {
                 scrolloff.min(viewport.height as usize / 2),
             )
         };
-        let (scrolloff_left, scrolloff_right) = if CENTERING {
-            (0, 0)
-        } else {
-            (
-                // - 1 from the left so we have at least one gap in the middle.
-                scrolloff.min(viewport.width.saturating_sub(1) as usize / 2),
-                scrolloff.min(viewport.width as usize / 2),
-            )
-        };
+        let (scrolloff_left, scrolloff_right) = (0, 0);
 
         let cursor = doc.selection(self.id).primary().cursor(doc_text);
         let mut offset = view_offset;
