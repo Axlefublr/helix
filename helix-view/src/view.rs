@@ -228,14 +228,16 @@ impl View {
         &self,
         doc: &Document,
         scrolloff: usize,
+        scrolloff_vertical_only: bool,
     ) -> Option<ViewPosition> {
-        self.offset_coords_to_in_view_center::<false>(doc, scrolloff)
+        self.offset_coords_to_in_view_center::<false>(doc, scrolloff, scrolloff_vertical_only)
     }
 
     pub fn offset_coords_to_in_view_center<const CENTERING: bool>(
         &self,
         doc: &Document,
         scrolloff: usize,
+        scrolloff_vertical_only: bool,
     ) -> Option<ViewPosition> {
         let view_offset = doc.get_view_offset(self.id)?;
         let doc_text = doc.text().slice(..);
@@ -253,7 +255,7 @@ impl View {
                 scrolloff.min(viewport.height as usize / 2),
             )
         };
-        let (scrolloff_left, scrolloff_right) = if CENTERING {
+        let (scrolloff_left, scrolloff_right) = if CENTERING || scrolloff_vertical_only {
             (0, 0)
         } else {
             (
@@ -336,22 +338,42 @@ impl View {
         Some(offset)
     }
 
-    pub fn ensure_cursor_in_view(&self, doc: &mut Document, scrolloff: usize) {
-        if let Some(offset) = self.offset_coords_to_in_view_center::<false>(doc, scrolloff) {
+    pub fn ensure_cursor_in_view(
+        &self,
+        doc: &mut Document,
+        scrolloff: usize,
+        scrolloff_vertical_only: bool,
+    ) {
+        if let Some(offset) =
+            self.offset_coords_to_in_view_center::<false>(doc, scrolloff, scrolloff_vertical_only)
+        {
             doc.set_view_offset(self.id, offset);
         }
     }
 
-    pub fn ensure_cursor_in_view_center(&self, doc: &mut Document, scrolloff: usize) {
-        if let Some(offset) = self.offset_coords_to_in_view_center::<true>(doc, scrolloff) {
+    pub fn ensure_cursor_in_view_center(
+        &self,
+        doc: &mut Document,
+        scrolloff: usize,
+        scrolloff_vertical_only: bool,
+    ) {
+        if let Some(offset) =
+            self.offset_coords_to_in_view_center::<true>(doc, scrolloff, scrolloff_vertical_only)
+        {
             doc.set_view_offset(self.id, offset);
         } else {
             align_view(doc, self, Align::Center);
         }
     }
 
-    pub fn is_cursor_in_view(&mut self, doc: &Document, scrolloff: usize) -> bool {
-        self.offset_coords_to_in_view(doc, scrolloff).is_none()
+    pub fn is_cursor_in_view(
+        &mut self,
+        doc: &Document,
+        scrolloff: usize,
+        scrolloff_vertical_only: bool,
+    ) -> bool {
+        self.offset_coords_to_in_view(doc, scrolloff, scrolloff_vertical_only)
+            .is_none()
     }
 
     /// Estimates the last visible document line on screen.
