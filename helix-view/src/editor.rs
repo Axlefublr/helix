@@ -391,6 +391,7 @@ pub struct Config {
     pub disable_dot_repeat: bool,
     pub show_diagnostics: bool,
     pub bufferline_index: bool,
+    pub scrolloff_vertical_only: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize, Eq, PartialOrd, Ord)]
@@ -1077,6 +1078,7 @@ impl Default for Config {
             disable_dot_repeat: false,
             show_diagnostics: true,
             bufferline_index: false,
+            scrolloff_vertical_only: false,
         }
     }
 }
@@ -1648,12 +1650,13 @@ impl Editor {
             let doc = doc_mut!(self, &view.doc);
             view.sync_changes(doc);
             view.gutters = config.gutters.clone();
-            view.ensure_cursor_in_view(doc, config.scrolloff)
+            view.ensure_cursor_in_view(doc, config.scrolloff, config.scrolloff_vertical_only)
         }
     }
 
     fn replace_document_in_view(&mut self, current_view: ViewId, doc_id: DocumentId) {
         let scrolloff = self.config().scrolloff;
+        let scrolloff_vertical_only = self.config().scrolloff_vertical_only;
         let view = self.tree.get_mut(current_view);
 
         view.doc = doc_id;
@@ -1663,7 +1666,7 @@ impl Editor {
         view.sync_changes(doc);
         doc.mark_as_focused();
 
-        view.ensure_cursor_in_view(doc, scrolloff)
+        view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only)
     }
 
     pub fn switch(&mut self, id: DocumentId, action: Action) {
@@ -2058,7 +2061,7 @@ impl Editor {
         let config = self.config();
         let view = self.tree.get(id);
         let doc = doc_mut!(self, &view.doc);
-        view.ensure_cursor_in_view(doc, config.scrolloff)
+        view.ensure_cursor_in_view(doc, config.scrolloff, config.scrolloff_vertical_only)
     }
 
     #[inline]

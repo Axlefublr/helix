@@ -2146,6 +2146,7 @@ fn search_impl(
     movement: Movement,
     direction: Direction,
     scrolloff: usize,
+    scrolloff_vertical_only: bool,
     wrap_around: bool,
     show_warnings: bool,
 ) {
@@ -2218,7 +2219,7 @@ fn search_impl(
         };
 
         doc.set_selection(view.id, selection);
-        view.ensure_cursor_in_view_center(doc, scrolloff);
+        view.ensure_cursor_in_view_center(doc, scrolloff, scrolloff_vertical_only);
     };
 }
 
@@ -2243,6 +2244,7 @@ fn searcher(cx: &mut Context, direction: Direction) {
     let reg = cx.register.unwrap_or('/');
     let config = cx.editor.config();
     let scrolloff = config.scrolloff;
+    let scrolloff_vertical_only = config.scrolloff_vertical_only;
     let wrap_around = config.search.wrap_around;
     let movement = if cx.editor.mode() == Mode::Select {
         Movement::Extend
@@ -2276,6 +2278,7 @@ fn searcher(cx: &mut Context, direction: Direction) {
                 movement,
                 direction,
                 scrolloff,
+                scrolloff_vertical_only,
                 wrap_around,
                 false,
             );
@@ -2290,6 +2293,7 @@ fn search_next_or_prev_impl(cx: &mut Context, movement: Movement, direction: Dir
         .unwrap_or(cx.editor.registers.last_search_register);
     let config = cx.editor.config();
     let scrolloff = config.scrolloff;
+    let scrolloff_vertical_only = config.scrolloff_vertical_only;
     if let Some(query) = cx.editor.registers.first(register, cx.editor) {
         let search_config = &config.search;
         let case_insensitive = if search_config.smart_case {
@@ -2313,6 +2317,7 @@ fn search_next_or_prev_impl(cx: &mut Context, movement: Movement, direction: Dir
                     movement,
                     direction,
                     scrolloff,
+                    scrolloff_vertical_only,
                     wrap_around,
                     true,
                 );
@@ -3294,7 +3299,11 @@ fn jumplist_picker(cx: &mut Context) {
             let (view, doc) = (view_mut!(cx.editor), doc_mut!(cx.editor, &meta.id));
             doc.set_selection(view.id, meta.selection.clone());
             if action.align_view(view, doc.id()) {
-                view.ensure_cursor_in_view_center(doc, config.scrolloff);
+                view.ensure_cursor_in_view_center(
+                    doc,
+                    config.scrolloff,
+                    config.scrolloff_vertical_only,
+                );
             }
         },
     )
@@ -3470,7 +3479,11 @@ pub fn command_palette(cx: &mut Context) {
                     let view = view_mut!(ctx.editor, focus);
                     let doc = doc_mut!(ctx.editor, &view.doc);
 
-                    view.ensure_cursor_in_view(doc, config.scrolloff);
+                    view.ensure_cursor_in_view(
+                        doc,
+                        config.scrolloff,
+                        config.scrolloff_vertical_only,
+                    );
 
                     if mode != Mode::Insert {
                         doc.append_changes_to_history(view);
@@ -3597,6 +3610,7 @@ async fn make_format_callback(
         }
 
         let scrolloff = editor.config().scrolloff;
+        let scrolloff_vertical_only = editor.config().scrolloff_vertical_only;
         let doc = doc_mut!(editor, &doc_id);
         let view = view_mut!(editor, view_id);
 
@@ -3606,7 +3620,7 @@ async fn make_format_callback(
                     doc.apply(&format, view.id);
                     doc.append_changes_to_history(view);
                     doc.detect_indent_and_line_ending();
-                    view.ensure_cursor_in_view(doc, scrolloff);
+                    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
                 } else {
                     log::info!("discarded formatting changes because the document changed");
                 }
@@ -4820,6 +4834,7 @@ fn replace_with_yanked_impl(editor: &mut Editor, register: char, count: usize) {
         return;
     };
     let scrolloff = editor.config().scrolloff;
+    let scrolloff_vertical_only = editor.config().scrolloff_vertical_only;
     let (view, doc) = current_ref!(editor);
 
     let map_value = |value: &Cow<str>| {
@@ -4851,7 +4866,7 @@ fn replace_with_yanked_impl(editor: &mut Editor, register: char, count: usize) {
     let (view, doc) = current!(editor);
     doc.apply(&transaction, view.id);
     doc.append_changes_to_history(view);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
 }
 
 fn replace_selections_with_clipboard(cx: &mut Context) {
@@ -5606,7 +5621,7 @@ fn jump_forward(cx: &mut Context) {
         doc.set_selection(view.id, selection);
         // Document we switch to might not have been opened in the view before
         doc.ensure_view_init(view.id);
-        view.ensure_cursor_in_view_center(doc, config.scrolloff);
+        view.ensure_cursor_in_view_center(doc, config.scrolloff, config.scrolloff_vertical_only);
     };
 }
 
@@ -5628,7 +5643,7 @@ fn jump_backward(cx: &mut Context) {
         doc.set_selection(view.id, selection);
         // Document we switch to might not have been opened in the view before
         doc.ensure_view_init(view.id);
-        view.ensure_cursor_in_view_center(doc, config.scrolloff);
+        view.ensure_cursor_in_view_center(doc, config.scrolloff, config.scrolloff_vertical_only);
     };
 }
 
@@ -6458,7 +6473,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
 
     // after replace cursor may be out of bounds, do this to
     // make sure cursor is in view and update scroll as well
-    view.ensure_cursor_in_view(doc, config.scrolloff);
+    view.ensure_cursor_in_view(doc, config.scrolloff, config.scrolloff_vertical_only);
 }
 
 fn shell_prompt(cx: &mut Context, prompt: Cow<'static, str>, behavior: ShellBehavior) {

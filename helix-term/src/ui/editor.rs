@@ -1400,7 +1400,7 @@ impl Component for EditorView {
                 let config = cx.editor.config();
                 let mode = cx.editor.mode();
                 let (view, doc) = current!(cx.editor);
-                view.ensure_cursor_in_view(doc, config.scrolloff);
+                view.ensure_cursor_in_view(doc, config.scrolloff, config.scrolloff_vertical_only);
 
                 // Store a history state if not in insert mode. Otherwise wait till we exit insert
                 // to include any edits to the paste in the history state.
@@ -1499,7 +1499,7 @@ impl Component for EditorView {
                 let mode = cx.editor.mode();
                 let (view, doc) = current!(cx.editor);
 
-                view.ensure_cursor_in_view(doc, config.scrolloff);
+                view.ensure_cursor_in_view(doc, config.scrolloff, config.scrolloff_vertical_only);
 
                 // Store a history state if not in insert mode. This also takes care of
                 // committing changes when leaving insert mode.

@@ -1397,9 +1397,10 @@ fn reload(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyh
     }
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let (view, doc) = current!(cx.editor);
     doc.reload(view, &cx.editor.diff_providers).map(|_| {
-        view.ensure_cursor_in_view(doc, scrolloff);
+        view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
     })?;
     if let Some(path) = doc.path() {
         cx.editor
@@ -1416,6 +1417,7 @@ fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> 
     }
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let view_id = view!(cx.editor).id;
 
     let docs_view_ids: Vec<(DocumentId, Vec<ViewId>)> = cx
@@ -1457,7 +1459,7 @@ fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> 
         for view_id in view_ids {
             let view = view_mut!(cx.editor, view_id);
             if view.doc.eq(&doc_id) {
-                view.ensure_cursor_in_view(doc, scrolloff);
+                view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
             }
         }
     }
@@ -1936,10 +1938,11 @@ fn tutor(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyho
 fn abort_goto_line_number_preview(cx: &mut compositor::Context) {
     if let Some(last_selection) = cx.editor.last_selection.take() {
         let scrolloff = cx.editor.config().scrolloff;
+        let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
 
         let (view, doc) = current!(cx.editor);
         doc.set_selection(view.id, last_selection);
-        view.ensure_cursor_in_view(doc, scrolloff);
+        view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
     }
 }
 
@@ -1950,6 +1953,7 @@ fn update_goto_line_number_preview(cx: &mut compositor::Context, args: Args) -> 
     });
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let line = args[0].parse::<usize>()?;
     goto_line_without_jumplist(
         cx.editor,
@@ -1962,7 +1966,7 @@ fn update_goto_line_number_preview(cx: &mut compositor::Context, args: Args) -> 
     );
 
     let (view, doc) = current!(cx.editor);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
 
     Ok(())
 }
@@ -2182,6 +2186,7 @@ fn sort(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow:
     }
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let (view, doc) = current!(cx.editor);
     let text = doc.text().slice(..);
 
@@ -2215,7 +2220,7 @@ fn sort(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow:
 
     doc.apply(&transaction, view.id);
     doc.append_changes_to_history(view);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
 
     Ok(())
 }
@@ -2226,6 +2231,7 @@ fn reflow(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyho
     }
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let (view, doc) = current!(cx.editor);
 
     // Find the text_width by checking the following sources in order:
@@ -2250,7 +2256,7 @@ fn reflow(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyho
 
     doc.apply(&transaction, view.id);
     doc.append_changes_to_history(view);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
 
     Ok(())
 }
@@ -2439,6 +2445,7 @@ fn reset_diff_change(
 
     let editor = &mut cx.editor;
     let scrolloff = editor.config().scrolloff;
+    let scrolloff_vertical_only = editor.config().scrolloff_vertical_only;
 
     let (view, doc) = current!(editor);
     let Some(handle) = doc.diff_handle() else {
@@ -2472,7 +2479,7 @@ fn reset_diff_change(
     drop(diff); // make borrow check happy
     doc.apply(&transaction, view.id);
     doc.append_changes_to_history(view);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
     cx.editor.set_status(format!(
         "Reset {changes} change{}",
         if changes == 1 { "" } else { "s" }
@@ -2601,6 +2608,7 @@ fn read(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow:
     }
 
     let scrolloff = cx.editor.config().scrolloff;
+    let scrolloff_vertical_only = cx.editor.config().scrolloff_vertical_only;
     let (view, doc) = current!(cx.editor);
 
     let filename = args.first().unwrap();
@@ -2621,7 +2629,7 @@ fn read(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow:
     let transaction = Transaction::insert(doc.text(), selection, contents);
     doc.apply(&transaction, view.id);
     doc.append_changes_to_history(view);
-    view.ensure_cursor_in_view(doc, scrolloff);
+    view.ensure_cursor_in_view(doc, scrolloff, scrolloff_vertical_only);
 
     Ok(())
 }
