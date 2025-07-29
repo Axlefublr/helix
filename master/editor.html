@@ -228,6 +228,7 @@
 <tr><td><code>end-of-line-diagnostics</code></td><td>Minimum severity of diagnostics to render at the end of the line. Set to <code>disable</code> to disable entirely. Refer to the setting about <code>inline-diagnostics</code> for more details</td><td>"disable"</td></tr>
 <tr><td><code>clipboard-provider</code></td><td>Which API to use for clipboard interaction. One of <code>pasteboard</code> (MacOS), <code>wayland</code>, <code>x-clip</code>, <code>x-sel</code>, <code>win-32-yank</code>, <code>termux</code>, <code>tmux</code>, <code>windows</code>, <code>termcode</code>, <code>none</code>, or a custom command set.</td><td>Platform and environment specific.</td></tr>
 <tr><td><code>editor-config</code></td><td>Whether to read settings from <a href="https://editorconfig.org">EditorConfig</a> files</td><td><code>true</code></td></tr>
+<tr><td><code>rainbow-brackets</code></td><td>Whether to render rainbow colors for matching brackets. Requires tree-sitter <code>rainbows.scm</code> queries for the language.</td><td><code>false</code></td></tr>
 </tbody></table>
 </div>
 <h3 id="editorclipboard-provider-section"><a class="header" href="#editorclipboard-provider-section"><code>[editor.clipboard-provider]</code> Section</a></h3>
@@ -281,6 +282,7 @@ workspace-diagnostics = ["warning", "error"]
 <tr><td><code>file-name</code></td><td>The path/name of the opened file</td></tr>
 <tr><td><code>file-absolute-path</code></td><td>The absolute path/name of the opened file</td></tr>
 <tr><td><code>file-base-name</code></td><td>The basename of the opened file</td></tr>
+<tr><td><code>current-working-directory</code></td><td>The current working directory</td></tr>
 <tr><td><code>file-modification-indicator</code></td><td>The indicator to show whether the file is modified (a <code>[+]</code> appears when there are unsaved changes)</td></tr>
 <tr><td><code>file-encoding</code></td><td>The encoding of the opened file if it differs from UTF-8</td></tr>
 <tr><td><code>file-line-ending</code></td><td>The file line endings (CRLF or LF)</td></tr>
@@ -549,12 +551,6 @@ S-tab = "extend_parent_node_start"
   let foo = bar; a local variable with a similar name exists: baz
             └─ no such value in this scope
 }
-</code></pre>
-<p>The new diagnostic rendering is not yet enabled by default. As soon as end of line or inline diagnostics are enabled the old diagnostics rendering is automatically disabled. The recommended default setting are:</p>
-<pre><code class="language-toml">[editor]
-end-of-line-diagnostics = "hint"
-[editor.inline-diagnostics]
-cursor-line = "warning" # show warnings and errors on the cursorline inline
 </code></pre>
 <h3 id="editorword-completion-section"><a class="header" href="#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></h3>
 <p>Options for controlling completion of words from open buffers.</p>
