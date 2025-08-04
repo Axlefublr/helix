@@ -586,6 +586,10 @@ impl Selection {
         self
     }
 
+    pub fn normalize_direction(self) -> Self {
+        self.transform(|range| range.with_direction(Direction::Backward))
+    }
+
     /// Replaces ranges with one spanning from first to last range.
     pub fn merge_ranges(self) -> Self {
         let first = self.ranges.first().unwrap();
