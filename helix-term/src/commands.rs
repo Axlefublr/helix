@@ -6037,7 +6037,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                 let selection = doc.selection(view.id).clone().transform(|range| {
                     match ch {
                         'w' => textobject::textobject_word(text, range, objtype, count, false),
-                        'W' => textobject::textobject_word(text, range, objtype, count, true),
+                        'W' | 'o' => textobject::textobject_word(text, range, objtype, count, true),
                         't' => textobject_treesitter("class", range),
                         'f' => textobject_treesitter("function", range),
                         'a' => textobject_treesitter("parameter", range),
@@ -6045,7 +6045,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                         'T' => textobject_treesitter("test", range),
                         'e' => textobject_treesitter("entry", range),
                         'x' => textobject_treesitter("xml-element", range),
-                        'p' => textobject::textobject_paragraph(text, range, objtype, count),
+                        'p' | 'l' => textobject::textobject_paragraph(text, range, objtype, count),
                         'm' => textobject::textobject_pair_surround_closest(
                             doc.syntax(),
                             text,
@@ -6081,16 +6081,15 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
         ("w", "Word"),
         ("W", "WORD"),
         ("p", "Paragraph"),
-        ("t", "Type definition (tree-sitter)"),
-        ("f", "Function (tree-sitter)"),
-        ("a", "Argument/parameter (tree-sitter)"),
-        ("c", "Comment (tree-sitter)"),
-        ("T", "Test (tree-sitter)"),
-        ("e", "Data structure entry (tree-sitter)"),
-        ("m", "Closest surrounding pair (tree-sitter)"),
         ("g", "Change"),
-        ("x", "(X)HTML element (tree-sitter)"),
-        (" ", "... or any character acting as a pair"),
+        ("m", "Pair 󰌪"),
+        ("a", "Argument 󰌪"),
+        ("e", "Entry 󰌪"),
+        ("f", "Function 󰌪"),
+        ("t", "Type 󰌪"),
+        ("T", "Test 󰌪"),
+        ("c", "Comment 󰌪"),
+        ("x", "Tag 󰌪"),
     ];
 
     cx.editor.autoinfo = Some(Info::new(title, &help_text));
