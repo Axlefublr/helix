@@ -6940,88 +6940,156 @@ fn select_textobject_inner(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Inside);
 }
 
+fn textobject_shortcut(ch: char) -> char {
+    match ch {
+        'j' => '`',
+        'k' => '_',
+        'i' => '*',
+        other => other,
+    }
+}
+
 fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
     let count = cx.count();
+
+    const INNER_BEHAVIOR_CHARS: [char; 3] = ['\'', '"', '`'];
 
     cx.on_next_key(move |cx, event| {
         cx.editor.autoinfo = None;
         if let Some(ch) = event.char() {
+            let ch = textobject_shortcut(ch);
             let textobject = move |editor: &mut Editor| {
-                let (view, doc) = current!(editor);
-                let loader = editor.syn_loader.load();
-                let text = doc.text().slice(..);
+                let mut do_behavior = true;
+                let (view, doc) = current_ref!(editor);
+                let stored_selection = doc.selection(view.id).clone();
+                for iteration in 1..=2 {
+                    let (view, doc) = current!(editor);
+                    let old_selection = doc.selection(view.id).clone().normalize_direction();
+                    let loader = editor.syn_loader.load();
+                    let text = doc.text().slice(..);
 
-                let textobject_treesitter = |obj_name: &str, range: Range| -> Range {
-                    let Some(syntax) = doc.syntax() else {
-                        return range;
+                    let textobject_treesitter = |obj_name: &str, range: Range| -> Range {
+                        let Some(syntax) = doc.syntax() else {
+                            return range;
+                        };
+                        textobject::textobject_treesitter(
+                            text, range, objtype, obj_name, syntax, &loader, count,
+                        )
                     };
-                    textobject::textobject_treesitter(
-                        text, range, objtype, obj_name, syntax, &loader, count,
-                    )
-                };
 
-                if ch == 'g' && doc.diff_handle().is_none() {
-                    editor.set_status("Diff is not available in current buffer");
-                    return;
-                }
-
-                let textobject_change = |range: Range| -> Range {
-                    let diff_handle = doc.diff_handle().unwrap();
-                    let diff = diff_handle.load();
-                    let line = range.cursor_line(text);
-                    let hunk_idx = if let Some(hunk_idx) = diff.hunk_at(line as u32, false) {
-                        hunk_idx
-                    } else {
-                        return range;
-                    };
-                    let hunk = diff.nth_hunk(hunk_idx).after;
-
-                    let start = text.line_to_char(hunk.start as usize);
-                    let end = text.line_to_char(hunk.end as usize);
-                    Range::new(start, end).with_direction(range.direction())
-                };
-
-                let selection = doc.selection(view.id).clone().transform(|range| {
-                    match ch {
-                        'w' => textobject::textobject_word(text, range, objtype, count, false),
-                        'W' => textobject::textobject_word(text, range, objtype, count, true),
-                        't' => textobject_treesitter("class", range),
-                        'f' => textobject_treesitter("function", range),
-                        'a' => textobject_treesitter("parameter", range),
-                        'c' => textobject_treesitter("comment", range),
-                        'T' => textobject_treesitter("test", range),
-                        'e' => textobject_treesitter("entry", range),
-                        'x' => textobject_treesitter("xml-element", range),
-                        'p' => textobject::textobject_paragraph(text, range, objtype, count),
-                        'i' => textobject::textobject_indentation_level(
-                            text,
-                            range,
-                            objtype,
-                            count,
-                            doc.indent_width(),
-                            doc.tab_width(),
-                        ),
-                        'm' => textobject::textobject_pair_surround_closest(
-                            doc.syntax(),
-                            text,
-                            range,
-                            objtype,
-                            count,
-                        ),
-                        'g' => textobject_change(range),
-                        // TODO: cancel new ranges if inconsistent surround matches across lines
-                        ch if !ch.is_ascii_alphanumeric() => textobject::textobject_pair_surround(
-                            doc.syntax(),
-                            text,
-                            range,
-                            objtype,
-                            ch,
-                            count,
-                        ),
-                        _ => range,
+                    if ch == 'g' && doc.diff_handle().is_none() {
+                        editor.set_status("Diff is not available in current buffer");
+                        return;
                     }
-                });
-                doc.set_selection(view.id, selection);
+
+                    let textobject_change = |range: Range| -> Range {
+                        let diff_handle = doc.diff_handle().unwrap();
+                        let diff = diff_handle.load();
+                        let line = range.cursor_line(text);
+                        let hunk_idx = if let Some(hunk_idx) = diff.hunk_at(line as u32, false) {
+                            hunk_idx
+                        } else {
+                            return range;
+                        };
+                        let hunk = diff.nth_hunk(hunk_idx).after;
+
+                        let start = text.line_to_char(hunk.start as usize);
+                        let end = text.line_to_char(hunk.end as usize);
+                        Range::new(start, end).with_direction(Direction::Backward)
+                    };
+
+                    let selection = doc.selection(view.id).clone().transform(|range| {
+                        let range = range.with_direction(Direction::Backward);
+                        match ch {
+                            'w' => {
+                                do_behavior = false;
+                                textobject::textobject_word(text, range, objtype, count, false)
+                            }
+                            'W' | 'q' => {
+                                do_behavior = false;
+                                textobject::textobject_word(text, range, objtype, count, true)
+                            }
+                            'c' => textobject_treesitter("class", range),
+                            'f' => textobject_treesitter("function", range),
+                            'a' => textobject_treesitter("parameter", range),
+                            'v' => textobject_treesitter("comment", range),
+                            't' => textobject_treesitter("test", range),
+                            'e' => textobject_treesitter("entry", range),
+                            'x' => textobject_treesitter("xml-element", range),
+                            'p' | 's' => {
+                                do_behavior = false;
+                                textobject::textobject_paragraph(text, range, objtype, count)
+                            }
+                            'd' => textobject::textobject_indentation_level(
+                                text,
+                                range,
+                                objtype,
+                                count,
+                                doc.indent_width(),
+                                doc.tab_width(),
+                            ),
+                            'm' => textobject::textobject_pair_surround_closest(
+                                doc.syntax(),
+                                text,
+                                range,
+                                objtype,
+                                count,
+                            ),
+                            'g' => {
+                                do_behavior = false;
+                                textobject_change(range)
+                            }
+                            // TODO: cancel new ranges if inconsistent surround matches across lines
+                            ch if !ch.is_ascii_alphanumeric() => {
+                                textobject::textobject_pair_surround(
+                                    doc.syntax(),
+                                    text,
+                                    range,
+                                    objtype,
+                                    ch,
+                                    count,
+                                )
+                            }
+                            _ => range,
+                        }
+                    });
+                    doc.set_selection(view.id, selection);
+                    let new_selection = doc.selection(view.id);
+                    if &old_selection != new_selection || !do_behavior {
+                        break;
+                    // after our first attempt, the selection didn't change. let's store it to later possibly roll back to, then adjust it and try again
+                    } else if iteration == 1 {
+                        let text = doc.text().slice(..);
+                        if INNER_BEHAVIOR_CHARS.contains(&ch) {
+                            doc.set_selection(
+                                view.id,
+                                new_selection.clone().transform(|range| {
+                                    Range::point(graphemes::prev_grapheme_boundary(
+                                        text,
+                                        graphemes::prev_grapheme_boundary(text, range.to()),
+                                    ))
+                                }),
+                            );
+                        } else {
+                            doc.set_selection(
+                                view.id,
+                                new_selection.clone().transform(|range| {
+                                    Range::point(if objtype == textobject::TextObject::Inside {
+                                        graphemes::prev_grapheme_boundary(
+                                            text,
+                                            graphemes::prev_grapheme_boundary(text, range.from()),
+                                        )
+                                    } else {
+                                        graphemes::prev_grapheme_boundary(text, range.from())
+                                    })
+                                }),
+                            );
+                        }
+                    } else {
+                        doc.set_selection(view.id, stored_selection);
+                        break;
+                    }
+                }
             };
             cx.editor.apply_motion(textobject);
         }
@@ -7070,6 +7138,7 @@ fn surround_add(cx: &mut Context) {
         // surround_len is the number of new characters being added.
         let (open, close, surround_len) = match event.char() {
             Some(ch) => {
+                let ch = textobject_shortcut(ch);
                 let (o, c) = match_brackets::get_pair(ch);
                 let mut open = Tendril::new();
                 open.push(o);
@@ -7122,7 +7191,7 @@ fn surround_replace(cx: &mut Context) {
         cx.editor.autoinfo = None;
         let surround_ch = match event.char() {
             Some('m') => None, // m selects the closest surround pair
-            Some(ch) => Some(ch),
+            Some(ch) => Some(textobject_shortcut(ch)),
             None => return,
         };
         let (view, doc) = current!(cx.editor);
@@ -7149,7 +7218,7 @@ fn surround_replace(cx: &mut Context) {
             cx.editor.autoinfo = None;
             let (view, doc) = current!(cx.editor);
             let to = match event.char() {
-                Some(to) => to,
+                Some(to) => textobject_shortcut(to),
                 None => return doc.set_selection(view.id, selection),
             };
             let (open, close) = match_brackets::get_pair(to);
@@ -7197,7 +7266,7 @@ fn surround_delete(cx: &mut Context) {
         cx.editor.autoinfo = None;
         let surround_ch = match event.char() {
             Some('m') => None, // m selects the closest surround pair
-            Some(ch) => Some(ch),
+            Some(ch) => Some(textobject_shortcut(ch)),
             None => return,
         };
         let (view, doc) = current!(cx.editor);
