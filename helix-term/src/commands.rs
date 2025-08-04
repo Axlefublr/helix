@@ -6307,7 +6307,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                     Range::new(start, end).with_direction(range.direction())
                 };
 
-                let selection = doc.selection(view.id).clone().transform(|range| {
+                let transform_closure = |range| {
                     match ch {
                         'w' => textobject::textobject_word(text, range, objtype, count, false),
                         'W' => textobject::textobject_word(text, range, objtype, count, true),
@@ -6346,8 +6346,46 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                         ),
                         _ => range,
                     }
+                };
+
+                let repeat_on_nothing_burger = helix_core::match_brackets::is_valid_bracket(ch)
+                    || matches!(
+                        ch,
+                        // all except word, WORD, paragraph, (git) change
+                        't' | 'f' | 'a' | 'c' | 'T' | 'e' | 'x' | 'i' | 'm'
+                    );
+                let canon_selection = doc.selection(view.id);
+
+                let new_selection = canon_selection.clone().transform(transform_closure);
+                if new_selection.clone().normalize_direction()
+                    != canon_selection.clone().normalize_direction()
+                {
+                    doc.set_selection(view.id, new_selection);
+                    return;
+                }
+
+                if !repeat_on_nothing_burger {
+                    return;
+                }
+
+                let text = doc.text().slice(..);
+                let shifted_selection = canon_selection.clone().transform(|range| {
+                    Range::point(if objtype == textobject::TextObject::Inside {
+                        graphemes::prev_grapheme_boundary(
+                            text,
+                            graphemes::prev_grapheme_boundary(text, range.from()),
+                        )
+                    } else {
+                        graphemes::prev_grapheme_boundary(text, range.from())
+                    })
                 });
-                doc.set_selection(view.id, selection);
+                let new_selection = shifted_selection.clone().transform(transform_closure);
+
+                if new_selection.clone().normalize_direction()
+                    != shifted_selection.normalize_direction()
+                {
+                    doc.set_selection(view.id, new_selection);
+                }
             };
             cx.editor.apply_motion(textobject);
         }
