@@ -6305,19 +6305,19 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                     Range::new(start, end).with_direction(range.direction())
                 };
 
-                let selection = doc.selection(view.id).clone().transform(|range| {
+                let transform_closure = |range| {
                     match ch {
                         'w' => textobject::textobject_word(text, range, objtype, count, false),
-                        'W' => textobject::textobject_word(text, range, objtype, count, true),
-                        't' => textobject_treesitter("class", range),
+                        'W' | 'q' => textobject::textobject_word(text, range, objtype, count, true),
+                        'c' => textobject_treesitter("class", range),
                         'f' => textobject_treesitter("function", range),
                         'a' => textobject_treesitter("parameter", range),
-                        'c' => textobject_treesitter("comment", range),
-                        'T' => textobject_treesitter("test", range),
+                        'v' => textobject_treesitter("comment", range),
+                        't' => textobject_treesitter("test", range),
                         'e' => textobject_treesitter("entry", range),
                         'x' => textobject_treesitter("xml-element", range),
-                        'p' => textobject::textobject_paragraph(text, range, objtype, count),
-                        'i' => textobject::textobject_indentation_level(
+                        'p' | 's' => textobject::textobject_paragraph(text, range, objtype, count),
+                        'd' => textobject::textobject_indentation_level(
                             text,
                             range,
                             objtype,
@@ -6344,8 +6344,46 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                         ),
                         _ => range,
                     }
+                };
+
+                let repeat_on_nothing_burger = helix_core::match_brackets::is_valid_bracket(ch)
+                    || matches!(
+                        ch,
+                        // all except word, WORD, paragraph, (git) change
+                        'c' | 'f' | 'a' | 'v' | 't' | 'e' | 'x' | 'd' | 'm' | 'g'
+                    );
+                let canon_selection = doc.selection(view.id);
+
+                let new_selection = canon_selection.clone().transform(transform_closure);
+                if new_selection.clone().normalize_direction()
+                    != canon_selection.clone().normalize_direction()
+                {
+                    doc.set_selection(view.id, new_selection);
+                    return;
+                }
+
+                if !repeat_on_nothing_burger {
+                    return;
+                }
+
+                let text = doc.text().slice(..);
+                let shifted_selection = canon_selection.clone().transform(|range| {
+                    Range::point(if objtype == textobject::TextObject::Inside {
+                        graphemes::prev_grapheme_boundary(
+                            text,
+                            graphemes::prev_grapheme_boundary(text, range.from()),
+                        )
+                    } else {
+                        graphemes::prev_grapheme_boundary(text, range.from())
+                    })
                 });
-                doc.set_selection(view.id, selection);
+                let new_selection = shifted_selection.clone().transform(transform_closure);
+
+                if new_selection.clone().normalize_direction()
+                    != shifted_selection.normalize_direction()
+                {
+                    doc.set_selection(view.id, new_selection);
+                }
             };
             cx.editor.apply_motion(textobject);
         }
