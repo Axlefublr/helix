@@ -65,6 +65,7 @@
 | `extend_prev_char` | Extend to previous occurrence of char | select: `` F `` |
 | `repeat_last_motion` | Repeat last motion | normal: `` <A-.> ``, select: `` <A-.> `` |
 | `replace` | Replace with new char | normal: `` r ``, select: `` r `` |
+| `overtype_mode` | Enter overtype mode | normal: `` <C-r> ``, select: `` <C-r> `` |
 | `switch_case` | Switch (toggle) case | normal: `` ~ ``, select: `` ~ `` |
 | `switch_to_uppercase` | Switch to uppercase | normal: `` <A-`> ``, select: `` <A-`> `` |
 | `switch_to_lowercase` | Switch to lowercase | normal: `` ` ``, select: `` ` `` |
@@ -109,7 +110,7 @@
 | `collapse_selection` | Collapse selection into single cursor | normal: `` ; ``, select: `` ; `` |
 | `flip_selections` | Flip selection cursor and anchor | normal: `` <A-;> ``, select: `` <A-;> `` |
 | `ensure_selections_forward` | Ensure all selections face forward | normal: `` <A-:> ``, select: `` <A-:> `` |
-| `insert_mode` | Insert before selection | normal: `` i ``, select: `` i `` |
+| `insert_mode` | Insert before selection | normal: `` i ``, `` <ins> ``, select: `` i ``, `` <ins> `` |
 | `append_mode` | Append after selection | normal: `` a ``, select: `` a `` |
 | `append_mode_same_line` | Append after selection within the same line only |  |
 | `command_mode` | Enter command mode | normal: `` : ``, select: `` : `` |
