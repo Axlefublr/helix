@@ -55,7 +55,7 @@ use crate::{
 const BUF_SIZE: usize = 8192;
 
 const DEFAULT_INDENT: IndentStyle = IndentStyle::Tabs;
-const DEFAULT_TAB_WIDTH: usize = 4;
+const DEFAULT_TAB_WIDTH: usize = 3;
 
 pub const DEFAULT_LANGUAGE_NAME: &str = "text";
 
