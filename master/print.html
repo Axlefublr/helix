@@ -195,7 +195,6 @@ To set up Helix:</p>
 <li><a href="package-managers.html#linux">Linux</a>
 <ul>
 <li><a href="package-managers.html#ubuntudebian">Ubuntu/Debian</a></li>
-<li><a href="package-managers.html#ubuntu-ppa">Ubuntu (PPA)</a></li>
 <li><a href="package-managers.html#fedorarhel">Fedora/RHEL</a></li>
 <li><a href="package-managers.html#arch-linux-extra">Arch Linux extra</a></li>
 <li><a href="package-managers.html#nixos">NixOS</a></li>
@@ -226,12 +225,6 @@ To set up Helix:</p>
 <p>Install the Debian package from the release page.</p>
 <p>If you are running a system older than Ubuntu 22.04, Mint 21, or Debian 12, you can build the <code>.deb</code> file locally
 <a href="./building-from-source.html#building-the-debian-package">from source</a>.</p>
-<h3 id="ubuntu-ppa"><a class="header" href="#ubuntu-ppa">Ubuntu (PPA)</a></h3>
-<p>Add the <code>PPA</code> for Helix:</p>
-<pre><code class="language-sh">sudo add-apt-repository ppa:maveonair/helix-editor
-sudo apt update
-sudo apt install helix
-</code></pre>
 <h3 id="fedorarhel"><a class="header" href="#fedorarhel">Fedora/RHEL</a></h3>
 <pre><code class="language-sh">sudo dnf install helix
 </code></pre>
@@ -1732,6 +1725,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>common-lisp</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td><code>cl-lsp</code></td></tr>
 <tr><td>cpon</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>cpp</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>clangd</code></td></tr>
+<tr><td>cross-config</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>taplo</code>, <code>tombi</code></td></tr>
 <tr><td>crystal</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>crystalline</code>, <code>ameba-ls</code></td></tr>
 <tr><td>css</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td><code>vscode-css-language-server</code></td></tr>
 <tr><td>csv</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1748,6 +1742,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>docker-compose</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>docker-compose-langserver</code>, <code>yaml-language-server</code></td></tr>
 <tr><td>dockerfile</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>docker-langserver</code></td></tr>
 <tr><td>dot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>dot-language-server</code></td></tr>
+<tr><td>doxyfile</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>dtd</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>dune</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>dunstrc</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1767,6 +1762,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>fga</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>fidl</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>fish</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>fish-lsp</code></td></tr>
+<tr><td>flatbuffers</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>forth</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>forth-lsp</code></td></tr>
 <tr><td>fortran</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>fortls</code></td></tr>
 <tr><td>fsharp</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>fsautocomplete</code></td></tr>
@@ -1816,7 +1812,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>ini</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>ink</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>inko</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
-<tr><td>janet</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>janet</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>java</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>jdtls</code></td></tr>
 <tr><td>javascript</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>jinja</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1834,6 +1830,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>jsx</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>julia</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>julia</code></td></tr>
 <tr><td>just</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>just-lsp</code></td></tr>
+<tr><td>kconfig</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>kdl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>koka</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>koka</code></td></tr>
 <tr><td>kotlin</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>kotlin-language-server</code></td></tr>
@@ -1848,7 +1845,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>llvm-mir-yaml</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>log</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>lpf</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>lua</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>lua-language-server</code></td></tr>
+<tr><td>lua</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>lua-language-server</code></td></tr>
 <tr><td>luap</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>luau</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>luau-lsp</code></td></tr>
 <tr><td>mail</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
@@ -1884,7 +1881,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>pem</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>perl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>perlnavigator</code></td></tr>
 <tr><td>pest</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>pest-language-server</code></td></tr>
-<tr><td>php</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>intelephense</code></td></tr>
+<tr><td>php</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>intelephense</code></td></tr>
 <tr><td>php-only</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>pip-requirements</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>pkgbuild</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>termux-language-server</code>, <code>bash-language-server</code></td></tr>
@@ -1912,7 +1909,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>rmarkdown</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>R</code></td></tr>
 <tr><td>robot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>robotframework_ls</code></td></tr>
 <tr><td>robots.txt</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td></td></tr>
-<tr><td>ron</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>ron</td><td>✓</td><td></td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>rst</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>ruby</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>ruby-lsp</code>, <code>solargraph</code></td></tr>
 <tr><td>rust</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>rust-analyzer</code></td></tr>
@@ -1941,6 +1938,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>sway</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>forc</code></td></tr>
 <tr><td>swift</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>sourcekit-lsp</code></td></tr>
 <tr><td>systemd</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>systemd-lsp</code></td></tr>
+<tr><td>systemverilog</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>t32</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>tablegen</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>tact</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1955,7 +1953,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>tlaplus</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>todotxt</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>toml</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>taplo</code>, <code>tombi</code></td></tr>
-<tr><td>tsq</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ts_query_ls</code></td></tr>
+<tr><td>tsq</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td><code>ts_query_ls</code></td></tr>
 <tr><td>tsx</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>twig</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>typescript</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
@@ -1977,7 +1975,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>webc</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>werk</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>wesl</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>wgsl</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>wgsl-analyzer</code></td></tr>
+<tr><td>wgsl</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>wgsl-analyzer</code></td></tr>
 <tr><td>wit</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>wren</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>xit</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -2013,6 +2011,8 @@ single width selection.</p>
 <tr><td><a href="https://code.visualstudio.com/">Visual Studio Code</a></td><td><a href="https://marketplace.visualstudio.com/items?itemName=jasew.vscode-helix-emulation">Helix for VS Code</a> extension</td><td></td></tr>
 <tr><td><a href="https://zed.dev/">Zed</a></td><td>native via keybindings (<a href="https://github.com/zed-industries/zed/issues/4642">Bug</a>)</td><td></td></tr>
 <tr><td><a href="https://codemirror.net/">CodeMirror</a></td><td><a href="https://gitlab.com/_rvidal/codemirror-helix">codemirror-helix</a></td><td></td></tr>
+<tr><td><a href="https://lite-xl.com/">Lite XL</a></td><td><a href="https://codeberg.org/Mandarancio/lite-modal-hx">lite-modal-hx</a></td><td></td></tr>
+<tr><td><a href="https://lap.dev/lapce/">Lapce</a></td><td></td><td>Requested: https://github.com/lapce/lapce/issues/281</td></tr>
 </tbody></table>
 </div>
 <h2 id="shells"><a class="header" href="#shells">Shells</a></h2>
