@@ -10,7 +10,6 @@
 (atx_heading (atx_h6_marker) @markup.heading.marker) @markup.heading.6
 
 [
-  (indented_code_block)
   (fenced_code_block)
 ] @markup.raw.block
 
