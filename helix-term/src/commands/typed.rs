@@ -1434,14 +1434,35 @@ fn get_character_info(
     Ok(())
 }
 
-/// Reload the [`Document`] from its source file.
+// Reload the [`Document`] from its source file, if no changes were made.
 fn reload(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+    reload_impl(cx, _args, event, false)
+}
+
+// Force reload the [`Document`] from its source file.
+fn force_reload(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    reload_impl(cx, _args, event, true)
+}
+
+fn reload_impl(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+    force: bool,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
 
     let scrolloff = cx.editor.config().scrolloff;
     let (view, doc) = current!(cx.editor);
+    if !force && doc.is_modified() {
+        bail!("Cannot reload unsaved buffer");
+    }
     doc.reload(view, &cx.editor.diff_providers).map(|_| {
         view.ensure_cursor_in_view(doc, scrolloff);
     })?;
@@ -1455,6 +1476,23 @@ fn reload(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyh
 }
 
 fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+    reload_all_impl(cx, _args, event, false)
+}
+
+fn force_reload_all(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    reload_all_impl(cx, _args, event, true)
+}
+
+fn reload_all_impl(
+    cx: &mut compositor::Context,
+    _args: Args,
+    event: PromptEvent,
+    force: bool,
+) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
     }
@@ -1477,8 +1515,13 @@ fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> 
         })
         .collect();
 
+    let mut unsaved_buffer_count = 0;
     for (doc_id, view_ids) in docs_view_ids {
         let doc = doc_mut!(cx.editor, &doc_id);
+        if !force && doc.is_modified() {
+            unsaved_buffer_count += 1;
+            continue;
+        }
 
         // Every doc is guaranteed to have at least 1 view at this point.
         let view = view_mut!(cx.editor, view_ids[0]);
@@ -1504,6 +1547,13 @@ fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> 
                 view.ensure_cursor_in_view(doc, scrolloff);
             }
         }
+    }
+
+    if !force && unsaved_buffer_count > 0 {
+        bail!(
+            "{} unsaved buffer(s) remaining, all saved buffers reloaded",
+            unsaved_buffer_count
+        );
     }
 
     Ok(())
@@ -3283,8 +3333,19 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     TypableCommand {
         name: "reload",
         aliases: &["rl"],
-        doc: "Discard changes and reload from the source file.",
+        doc: "Reload from the source file, if no changes were made.",
         fun: reload,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "reload!",
+        aliases: &["rl!"],
+        doc: "Discard changes and reload from the source file.",
+        fun: force_reload,
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
@@ -3294,8 +3355,19 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     TypableCommand {
         name: "reload-all",
         aliases: &["rla"],
-        doc: "Discard changes and reload all documents from the source files.",
+        doc: "Reload all documents from the source files, if no changes were made.",
         fun: reload_all,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, Some(0)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "reload-all!",
+        aliases: &["rla!"],
+        doc: "Discard changes and reload all documents from the source files.",
+        fun: force_reload_all,
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
