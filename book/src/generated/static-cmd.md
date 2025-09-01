@@ -65,6 +65,7 @@
 | `page_cursor_half_up` | Move page and cursor half up | normal: `` <C-u> ``, `` Z<C-u> ``, `` z<C-u> ``, `` Z<backspace> ``, `` z<backspace> ``, select: `` <C-u> ``, `` Z<C-u> ``, `` z<C-u> ``, `` Z<backspace> ``, `` z<backspace> `` |
 | `page_cursor_half_down` | Move page and cursor half down | normal: `` <C-d> ``, `` Z<C-d> ``, `` z<C-d> ``, `` Z<space> ``, `` z<space> ``, select: `` <C-d> ``, `` Z<C-d> ``, `` z<C-d> ``, `` Z<space> ``, `` z<space> `` |
 | `select_all` | Select whole document | normal: `` % ``, select: `` % `` |
+| `select_first_and_last_chars` | Select first and last characters of each selection | normal: `` <A-S> ``, select: `` <A-S> `` |
 | `select_regex` | Select all regex matches inside selections | normal: `` s ``, select: `` s `` |
 | `select_character` | Select all matches of character you next press |  |
 | `split_selection` | Split selections on regex matches | normal: `` S ``, select: `` S `` |
