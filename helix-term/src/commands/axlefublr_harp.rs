@@ -80,15 +80,13 @@ fn harp_view(
     relativity: HarpRelativity,
     title_width: usize,
     section: &str,
-    mut width_figurouter: impl FnMut(&Vec<String>) -> usize,
+    width_figurouter: impl FnMut(&Vec<String>) -> usize,
     mut transformer: impl FnMut(&Vec<String>, HarpRelativity, usize) -> Option<String>,
 ) -> Vec<(String, String)> {
     let Some(map) = connection.section_ref(section) else {
         return Vec::new();
     };
-    let max_width = map.values().map(|values| width_figurouter(values))
-        .max()
-        .unwrap_or(0);
+    let max_width = map.values().map(width_figurouter).max().unwrap_or(0);
     let mut the = map
         .iter()
         .filter_map(|(key, values)| {
