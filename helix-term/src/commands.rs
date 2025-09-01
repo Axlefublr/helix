@@ -7053,6 +7053,14 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                         'e' => textobject_treesitter("entry", range),
                         'x' => textobject_treesitter("xml-element", range),
                         'p' => textobject::textobject_paragraph(text, range, objtype, count),
+                        'i' => textobject::textobject_indentation_level(
+                            text,
+                            range,
+                            objtype,
+                            count,
+                            doc.indent_width(),
+                            doc.tab_width(),
+                        ),
                         'm' => textobject::textobject_pair_surround_closest(
                             doc.syntax(),
                             text,
@@ -7095,6 +7103,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
         ("T", "Test (tree-sitter)"),
         ("e", "Data structure entry (tree-sitter)"),
         ("m", "Closest surrounding pair (tree-sitter)"),
+        ("i", "Indentation"),
         ("g", "Change"),
         ("x", "(X)HTML element (tree-sitter)"),
         (" ", "... or any character acting as a pair"),
