@@ -218,9 +218,16 @@ pub fn find_matching_bracket_plaintext(doc: RopeSlice, cursor_pos: usize) -> Opt
 pub fn get_pair(ch: char) -> (char, char) {
     PAIRS
         .iter()
-        .find(|(open, close)| *open == ch || *close == ch)
+        .find(|(open, _)| *open == ch)
         .copied()
-        .unwrap_or((ch, ch))
+        .unwrap_or_else(|| {
+            PAIRS
+                .iter()
+                .find(|(_, close)| *close == ch)
+                .copied()
+                .map(|(open, close)| (close, open))
+                .unwrap_or((ch, ch))
+        })
 }
 
 pub fn is_open_bracket(ch: char) -> bool {
