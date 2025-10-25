@@ -222,7 +222,7 @@ To set up Helix:</p>
 <h2 id="linux"><a class="header" href="#linux">Linux</a></h2>
 <p>The following third party repositories are available:</p>
 <h3 id="ubuntudebian"><a class="header" href="#ubuntudebian">Ubuntu/Debian</a></h3>
-<p>Install the Debian package from the release page.</p>
+<p>Install the Debian package <a href="https://github.com/helix-editor/helix/releases/latest">from the release page</a>.</p>
 <p>If you are running a system older than Ubuntu 22.04, Mint 21, or Debian 12, you can build the <code>.deb</code> file locally
 <a href="./building-from-source.html#building-the-debian-package">from source</a>.</p>
 <h3 id="fedorarhel"><a class="header" href="#fedorarhel">Fedora/RHEL</a></h3>
@@ -339,7 +339,7 @@ cargo install --path helix-term --locked
 <pre><code class="language-sh"># Optimized
 cargo install \
    --profile opt \
-   --config 'build.rustflags="-C target-cpu=native"' \
+   --config 'build.rustflags=["-C", "target-cpu=native"]' \
    --path helix-term \
    --locked
 </code></pre>
@@ -1243,6 +1243,8 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <h2 id="typable-commands"><a class="header" href="#typable-commands">Typable commands</a></h2>
 <p>Typable commands are used from command mode and may take arguments. Command mode can be activated by pressing <code>:</code>. The built-in typable commands are:</p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>:exit</code>, <code>:x</code>, <code>:xit</code></td><td>Write changes to disk if the buffer is modified and then quit. Accepts an optional path (:exit some/path.txt).</td></tr>
+<tr><td><code>:exit!</code>, <code>:x!</code>, <code>:xit!</code></td><td>Force write changes to disk, creating necessary subdirectories, if the buffer is modified and then quit. Accepts an optional path (:exit! some/path.txt).</td></tr>
 <tr><td><code>:quit</code>, <code>:q</code></td><td>Close the current view.</td></tr>
 <tr><td><code>:quit!</code>, <code>:q!</code></td><td>Force close the current view, ignoring unsaved changes.</td></tr>
 <tr><td><code>:open</code>, <code>:o</code>, <code>:edit</code>, <code>:e</code></td><td>Open a file from disk into the current view.</td></tr>
@@ -1264,12 +1266,12 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>:line-ending</code></td><td>Set the document's default line ending. Options: crlf, lf.</td></tr>
 <tr><td><code>:earlier</code>, <code>:ear</code></td><td>Jump back to an earlier point in edit history. Accepts a number of steps or a time span.</td></tr>
 <tr><td><code>:later</code>, <code>:lat</code></td><td>Jump to a later point in edit history. Accepts a number of steps or a time span.</td></tr>
-<tr><td><code>:write-quit</code>, <code>:wq</code>, <code>:x</code></td><td>Write changes to disk and close the current view. Accepts an optional path (:wq some/path.txt)</td></tr>
-<tr><td><code>:write-quit!</code>, <code>:wq!</code>, <code>:x!</code></td><td>Write changes to disk and close the current view forcefully. Accepts an optional path (:wq! some/path.txt)</td></tr>
+<tr><td><code>:write-quit</code>, <code>:wq</code></td><td>Write changes to disk and close the current view. Accepts an optional path (:wq some/path.txt)</td></tr>
+<tr><td><code>:write-quit!</code>, <code>:wq!</code></td><td>Write changes to disk and close the current view forcefully. Accepts an optional path (:wq! some/path.txt)</td></tr>
 <tr><td><code>:write-all</code>, <code>:wa</code></td><td>Write changes from all buffers to disk.</td></tr>
 <tr><td><code>:write-all!</code>, <code>:wa!</code></td><td>Forcefully write changes from all buffers to disk creating necessary subdirectories.</td></tr>
 <tr><td><code>:write-quit-all</code>, <code>:wqa</code>, <code>:xa</code></td><td>Write changes from all buffers to disk and close all views.</td></tr>
-<tr><td><code>:write-quit-all!</code>, <code>:wqa!</code>, <code>:xa!</code></td><td>Write changes from all buffers to disk and close all views forcefully (ignoring unsaved changes).</td></tr>
+<tr><td><code>:write-quit-all!</code>, <code>:wqa!</code>, <code>:xa!</code></td><td>Forcefully write changes from all buffers to disk, creating necessary subdirectories, and close all views (ignoring unsaved changes).</td></tr>
 <tr><td><code>:quit-all</code>, <code>:qa</code></td><td>Close all views.</td></tr>
 <tr><td><code>:quit-all!</code>, <code>:qa!</code></td><td>Force close all views ignoring unsaved changes.</td></tr>
 <tr><td><code>:cquit</code>, <code>:cq</code></td><td>Quit with exit code (default 1). Accepts an optional integer exit code (:cq 2).</td></tr>
@@ -1408,7 +1410,6 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>extend_prev_char</code></td><td>Extend to previous occurrence of char</td><td>select: <code>F</code></td></tr>
 <tr><td><code>repeat_last_motion</code></td><td>Repeat last motion</td><td>normal: <code>&lt;A-.&gt;</code>, select: <code>&lt;A-.&gt;</code></td></tr>
 <tr><td><code>replace</code></td><td>Replace with new char</td><td>normal: <code>r</code>, select: <code>r</code></td></tr>
-<tr><td><code>overtype_mode</code></td><td>Enter overtype mode</td><td>normal: <code>&lt;C-r&gt;</code>, select: <code>&lt;C-r&gt;</code></td></tr>
 <tr><td><code>switch_case</code></td><td>Switch (toggle) case</td><td>normal: <code>~</code>, select: <code>~</code></td></tr>
 <tr><td><code>switch_to_uppercase</code></td><td>Switch to uppercase</td><td>normal: <code>&lt;A-`&gt;</code>, select: <code>&lt;A-`&gt;</code></td></tr>
 <tr><td><code>switch_to_lowercase</code></td><td>Switch to lowercase</td><td>normal: <code>`</code>, select: <code>`</code></td></tr>
@@ -1453,7 +1454,7 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>collapse_selection</code></td><td>Collapse selection into single cursor</td><td>normal: <code>;</code>, select: <code>;</code></td></tr>
 <tr><td><code>flip_selections</code></td><td>Flip selection cursor and anchor</td><td>normal: <code>&lt;A-;&gt;</code>, select: <code>&lt;A-;&gt;</code></td></tr>
 <tr><td><code>ensure_selections_forward</code></td><td>Ensure all selections face forward</td><td>normal: <code>&lt;A-:&gt;</code>, select: <code>&lt;A-:&gt;</code></td></tr>
-<tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, <code>&lt;ins&gt;</code>, select: <code>i</code>, <code>&lt;ins&gt;</code></td></tr>
+<tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, select: <code>i</code></td></tr>
 <tr><td><code>append_mode</code></td><td>Append after selection</td><td>normal: <code>a</code>, select: <code>a</code></td></tr>
 <tr><td><code>append_mode_same_line</code></td><td>Append after selection within the same line only</td><td></td></tr>
 <tr><td><code>command_mode</code></td><td>Enter command mode</td><td>normal: <code>:</code>, select: <code>:</code></td></tr>
@@ -1701,7 +1702,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>amber</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>amber-lsp</code></td></tr>
 <tr><td>astro</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>astro-ls</code></td></tr>
 <tr><td>awk</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>awk-language-server</code></td></tr>
-<tr><td>bash</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>bash-language-server</code></td></tr>
+<tr><td>bash</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>bash-language-server</code></td></tr>
 <tr><td>bass</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>bass</code></td></tr>
 <tr><td>beancount</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>beancount-language-server</code></td></tr>
 <tr><td>bibtex</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>texlab</code></td></tr>
@@ -1731,6 +1732,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>csv</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>cue</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>cuelsp</code></td></tr>
 <tr><td>cylc</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>cython</td><td>✓</td><td></td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>d</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>serve-d</code></td></tr>
 <tr><td>dart</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>dart</code></td></tr>
 <tr><td>dbml</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1739,8 +1741,9 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>dhall</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>dhall-lsp-server</code></td></tr>
 <tr><td>diff</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>djot</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>docker-compose</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>docker-compose-langserver</code>, <code>yaml-language-server</code></td></tr>
-<tr><td>dockerfile</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>docker-langserver</code></td></tr>
+<tr><td>docker-bake</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>docker-language-server</code></td></tr>
+<tr><td>docker-compose</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>docker-compose-langserver</code>, <code>yaml-language-server</code>, <code>docker-language-server</code></td></tr>
+<tr><td>dockerfile</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>docker-langserver</code>, <code>docker-language-server</code></td></tr>
 <tr><td>dot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>dot-language-server</code></td></tr>
 <tr><td>doxyfile</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>dtd</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1749,9 +1752,10 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>earthfile</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>earthlyls</code></td></tr>
 <tr><td>edoc</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>eex</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>eiffel</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>eiffel-language-server</code></td></tr>
 <tr><td>ejs</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>elisp</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
-<tr><td>elixir</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>elixir-ls</code></td></tr>
+<tr><td>elixir</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>elixir-ls</code>, <code>expert</code></td></tr>
 <tr><td>elm</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td><code>elm-language-server</code></td></tr>
 <tr><td>elvish</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>elvish</code></td></tr>
 <tr><td>env</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
@@ -1778,6 +1782,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>git-ignore</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-notes</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-rebase</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>gitlab-ci</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>yaml-language-server</code>, <code>gitlab-ci-ls</code></td></tr>
 <tr><td>gjs</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>typescript-language-server</code>, <code>vscode-eslint-language-server</code>, <code>ember-language-server</code></td></tr>
 <tr><td>gleam</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>gleam</code></td></tr>
 <tr><td>glimmer</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ember-language-server</code></td></tr>
@@ -1798,8 +1803,8 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>haskell</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>haskell-language-server-wrapper</code></td></tr>
 <tr><td>haskell-persistent</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>hcl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>terraform-ls</code></td></tr>
-<tr><td>hdl</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>heex</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>elixir-ls</code></td></tr>
+<tr><td>hdl</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>hdls</code></td></tr>
+<tr><td>heex</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>elixir-ls</code>, <code>expert</code></td></tr>
 <tr><td>helm</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>helm_ls</code></td></tr>
 <tr><td>hocon</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>hoon</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1814,7 +1819,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>ink</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>inko</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>janet</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
-<tr><td>java</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>jdtls</code></td></tr>
+<tr><td>java</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>jdtls</code></td></tr>
 <tr><td>javascript</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>jinja</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>jjconfig</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>taplo</code>, <code>tombi</code></td></tr>
@@ -1831,15 +1836,16 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>jsx</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>julia</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>julia</code></td></tr>
 <tr><td>just</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>just-lsp</code></td></tr>
+<tr><td>kcl</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>kcl-language-server</code></td></tr>
 <tr><td>kconfig</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
-<tr><td>kdl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>kdl</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>koka</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>koka</code></td></tr>
-<tr><td>kotlin</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>kotlin-language-server</code></td></tr>
-<tr><td>koto</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>koto-ls</code></td></tr>
+<tr><td>kotlin</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>kotlin-language-server</code></td></tr>
+<tr><td>koto</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>koto-ls</code></td></tr>
 <tr><td>latex</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>texlab</code></td></tr>
 <tr><td>ld</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>ldif</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>lean</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>lean</code></td></tr>
+<tr><td>lean</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>lake</code></td></tr>
 <tr><td>ledger</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>llvm</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>llvm-mir</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1859,16 +1865,18 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>mermaid</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>meson</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>mesonlsp</code></td></tr>
 <tr><td>mint</td><td></td><td></td><td></td><td></td><td></td><td><code>mint</code></td></tr>
+<tr><td>miseconfig</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>taplo</code>, <code>tombi</code></td></tr>
 <tr><td>mojo</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>pixi</code></td></tr>
 <tr><td>move</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>msbuild</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>nasm</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>asm-lsp</code></td></tr>
+<tr><td>nearley</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
 <tr><td>nestedtext</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>nginx</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>nickel</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>nls</code></td></tr>
 <tr><td>nim</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>nimlangserver</code></td></tr>
 <tr><td>nix</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>nil</code>, <code>nixd</code></td></tr>
-<tr><td>nu</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>nu</code></td></tr>
+<tr><td>nu</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>nu</code></td></tr>
 <tr><td>nunjucks</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>ocaml</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>ocamllsp</code></td></tr>
 <tr><td>ocaml-interface</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ocamllsp</code></td></tr>
@@ -1894,7 +1902,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>prisma</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>prisma-language-server</code></td></tr>
 <tr><td>prolog</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>swipl</code></td></tr>
 <tr><td>properties</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
-<tr><td>protobuf</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>buf</code>, <code>pb</code>, <code>protols</code></td></tr>
+<tr><td>protobuf</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>buf</code>, <code>pb</code>, <code>protols</code></td></tr>
 <tr><td>prql</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>pug</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>purescript</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>purescript-language-server</code></td></tr>
@@ -1918,10 +1926,12 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>rust-format-args-macro</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>sage</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>scala</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>metals</code></td></tr>
-<tr><td>scheme</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
+<tr><td>scheme</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td></tr>
 <tr><td>scss</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td><code>vscode-css-language-server</code></td></tr>
+<tr><td>shellcheckrc</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>slang</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>slangd</code></td></tr>
 <tr><td>slint</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>slint-lsp</code></td></tr>
+<tr><td>slisp</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>smali</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>smithy</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>cs</code></td></tr>
 <tr><td>sml</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1934,6 +1944,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>sshclientconfig</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>starlark</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>starpls</code></td></tr>
 <tr><td>strace</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>strictdoc</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>supercollider</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>svelte</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>svelteserver</code></td></tr>
 <tr><td>sway</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>forc</code></td></tr>
@@ -1977,6 +1988,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>werk</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>wesl</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>wgsl</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>wgsl-analyzer</code></td></tr>
+<tr><td>wikitext</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>wikitext-lsp</code></td></tr>
 <tr><td>wit</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>wren</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>xit</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -2124,9 +2136,10 @@ Its settings will be merged with the configuration directory <code>config.toml</
 <tr><td><code>indent-heuristic</code></td><td>How the indentation for a newly inserted line is computed: <code>simple</code> just copies the indentation level from the previous line, <code>tree-sitter</code> computes the indentation based on the syntax tree and <code>hybrid</code> combines both approaches. If the chosen heuristic is not available, a different one will be used as a fallback (the fallback order being <code>hybrid</code> -&gt; <code>tree-sitter</code> -&gt; <code>simple</code>).</td><td><code>hybrid</code></td></tr>
 <tr><td><code>jump-label-alphabet</code></td><td>The characters that are used to generate two character jump labels. Characters at the start of the alphabet are used first.</td><td><code>"abcdefghijklmnopqrstuvwxyz"</code></td></tr>
 <tr><td><code>end-of-line-diagnostics</code></td><td>Minimum severity of diagnostics to render at the end of the line. Set to <code>disable</code> to disable entirely. Refer to the setting about <code>inline-diagnostics</code> for more details</td><td><code>"hint"</code></td></tr>
-<tr><td><code>clipboard-provider</code></td><td>Which API to use for clipboard interaction. One of <code>pasteboard</code> (MacOS), <code>wayland</code>, <code>x-clip</code>, <code>x-sel</code>, <code>win-32-yank</code>, <code>termux</code>, <code>tmux</code>, <code>windows</code>, <code>termcode</code>, <code>none</code>, or a custom command set.</td><td>Platform and environment specific.</td></tr>
+<tr><td><code>clipboard-provider</code></td><td>Which API to use for clipboard interaction. One of <code>pasteboard</code> (MacOS), <code>wayland</code>, <code>x-clip</code>, <code>x-sel</code>, <code>win32-yank</code>, <code>termux</code>, <code>tmux</code>, <code>windows</code>, <code>termcode</code>, <code>none</code>, or a custom command set.</td><td>Platform and environment specific.</td></tr>
 <tr><td><code>editor-config</code></td><td>Whether to read settings from <a href="https://editorconfig.org">EditorConfig</a> files</td><td><code>true</code></td></tr>
 <tr><td><code>rainbow-brackets</code></td><td>Whether to render rainbow colors for matching brackets. Requires tree-sitter <code>rainbows.scm</code> queries for the language.</td><td><code>false</code></td></tr>
+<tr><td><code>kitty-keyboard-protocol</code></td><td>Whether to enable Kitty Keyboard Protocol. Can be <code>enabled</code>, <code>disabled</code> or <code>auto</code></td><td><code>auto</code></td></tr>
 </tbody></table>
 </div>
 <h3 id="editorclipboard-provider-section"><a class="header" href="#editorclipboard-provider-section"><code>[editor.clipboard-provider]</code> Section</a></h3>
@@ -2261,6 +2274,20 @@ not visible in the Helix file picker and global search.</p>
 !.gitignore
 !.gitattributes
 </code></pre>
+<h3 id="editorfile-explorer-section"><a class="header" href="#editorfile-explorer-section"><code>[editor.file-explorer]</code> Section</a></h3>
+<p>In addition to the options for the file picker and global search, a similar set of options is presented to configure the file explorer separately. However, unlike the file picker, the defaults are set to avoid ignoring most files.</p>
+<p>Note that the ignore files consulted by the file explorer when <code>ignore</code> is set to true are the same ones used by the file picker, including the aforementioned Helix-specific ignore files.</p>
+<div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
+<tr><td><code>hidden</code></td><td>Enables ignoring hidden files</td><td><code>false</code></td></tr>
+<tr><td><code>follow-symlinks</code></td><td>Follow symlinks instead of ignoring them</td><td><code>false</code></td></tr>
+<tr><td><code>parents</code></td><td>Enables reading ignore files from parent directories</td><td><code>false</code></td></tr>
+<tr><td><code>ignore</code></td><td>Enables reading <code>.ignore</code> files</td><td><code>false</code></td></tr>
+<tr><td><code>git-ignore</code></td><td>Enables reading <code>.gitignore</code> files</td><td><code>false</code></td></tr>
+<tr><td><code>git-global</code></td><td>Enables reading global <code>.gitignore</code>, whose path is specified in git's config: <code>core.excludesfile</code> option</td><td><code>false</code></td></tr>
+<tr><td><code>git-exclude</code></td><td>Enables reading <code>.git/info/exclude</code> files</td><td><code>false</code></td></tr>
+<tr><td><code>flatten-dirs</code></td><td>Enables flattening single child directories</td><td><code>true</code></td></tr>
+</tbody></table>
+</div>
 <h3 id="editorauto-pairs-section"><a class="header" href="#editorauto-pairs-section"><code>[editor.auto-pairs]</code> Section</a></h3>
 <p>Enables automatic insertion of pairs to parentheses, brackets, etc. Can be a
 simple boolean value, or a specific mapping of pairs of single characters.</p>
@@ -2465,6 +2492,14 @@ trigger-length = 4
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h2 id="themes"><a class="header" href="#themes">Themes</a></h2>
 <p>To use a theme add <code>theme = "&lt;name&gt;"</code> to the top of your <a href="./configuration.html"><code>config.toml</code></a> file, or select it during runtime using <code>:theme &lt;name&gt;</code>.</p>
+<p>Separate themes can be configured for light and dark modes. On terminals supporting <a href="https://github.com/contour-terminal/contour/blob/master/docs/vt-extensions/color-palette-update-notifications.md">mode 2031 dark/light detection</a>, the theme mode is detected from the terminal.</p>
+<pre><code class="language-toml">[theme]
+dark = "catppuccin_frappe"
+light = "catppuccin_latte"
+## Optional. Used if the terminal doesn't declare a preference.
+## Defaults to the theme set for `dark` if not specified.
+# fallback = "catppuccin_frappe"
+</code></pre>
 <h2 id="creating-a-theme"><a class="header" href="#creating-a-theme">Creating a theme</a></h2>
 <p>Create a file with the name of your theme as the file name (i.e <code>mytheme.toml</code>) and place it in your <code>themes</code> directory (i.e <code>~/.config/helix/themes</code> or <code>%AppData%\helix\themes</code> on Windows). The directory might have to be created beforehand.</p>
 <blockquote>

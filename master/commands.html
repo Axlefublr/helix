@@ -168,6 +168,8 @@
 <h2 id="typable-commands"><a class="header" href="#typable-commands">Typable commands</a></h2>
 <p>Typable commands are used from command mode and may take arguments. Command mode can be activated by pressing <code>:</code>. The built-in typable commands are:</p>
 <div class="table-wrapper"><table><thead><tr><th>Name</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>:exit</code>, <code>:x</code>, <code>:xit</code></td><td>Write changes to disk if the buffer is modified and then quit. Accepts an optional path (:exit some/path.txt).</td></tr>
+<tr><td><code>:exit!</code>, <code>:x!</code>, <code>:xit!</code></td><td>Force write changes to disk, creating necessary subdirectories, if the buffer is modified and then quit. Accepts an optional path (:exit! some/path.txt).</td></tr>
 <tr><td><code>:quit</code>, <code>:q</code></td><td>Close the current view.</td></tr>
 <tr><td><code>:quit!</code>, <code>:q!</code></td><td>Force close the current view, ignoring unsaved changes.</td></tr>
 <tr><td><code>:open</code>, <code>:o</code>, <code>:edit</code>, <code>:e</code></td><td>Open a file from disk into the current view.</td></tr>
@@ -189,12 +191,12 @@
 <tr><td><code>:line-ending</code></td><td>Set the document's default line ending. Options: crlf, lf.</td></tr>
 <tr><td><code>:earlier</code>, <code>:ear</code></td><td>Jump back to an earlier point in edit history. Accepts a number of steps or a time span.</td></tr>
 <tr><td><code>:later</code>, <code>:lat</code></td><td>Jump to a later point in edit history. Accepts a number of steps or a time span.</td></tr>
-<tr><td><code>:write-quit</code>, <code>:wq</code>, <code>:x</code></td><td>Write changes to disk and close the current view. Accepts an optional path (:wq some/path.txt)</td></tr>
-<tr><td><code>:write-quit!</code>, <code>:wq!</code>, <code>:x!</code></td><td>Write changes to disk and close the current view forcefully. Accepts an optional path (:wq! some/path.txt)</td></tr>
+<tr><td><code>:write-quit</code>, <code>:wq</code></td><td>Write changes to disk and close the current view. Accepts an optional path (:wq some/path.txt)</td></tr>
+<tr><td><code>:write-quit!</code>, <code>:wq!</code></td><td>Write changes to disk and close the current view forcefully. Accepts an optional path (:wq! some/path.txt)</td></tr>
 <tr><td><code>:write-all</code>, <code>:wa</code></td><td>Write changes from all buffers to disk.</td></tr>
 <tr><td><code>:write-all!</code>, <code>:wa!</code></td><td>Forcefully write changes from all buffers to disk creating necessary subdirectories.</td></tr>
 <tr><td><code>:write-quit-all</code>, <code>:wqa</code>, <code>:xa</code></td><td>Write changes from all buffers to disk and close all views.</td></tr>
-<tr><td><code>:write-quit-all!</code>, <code>:wqa!</code>, <code>:xa!</code></td><td>Write changes from all buffers to disk and close all views forcefully (ignoring unsaved changes).</td></tr>
+<tr><td><code>:write-quit-all!</code>, <code>:wqa!</code>, <code>:xa!</code></td><td>Forcefully write changes from all buffers to disk, creating necessary subdirectories, and close all views (ignoring unsaved changes).</td></tr>
 <tr><td><code>:quit-all</code>, <code>:qa</code></td><td>Close all views.</td></tr>
 <tr><td><code>:quit-all!</code>, <code>:qa!</code></td><td>Force close all views ignoring unsaved changes.</td></tr>
 <tr><td><code>:cquit</code>, <code>:cq</code></td><td>Quit with exit code (default 1). Accepts an optional integer exit code (:cq 2).</td></tr>
@@ -333,7 +335,6 @@
 <tr><td><code>extend_prev_char</code></td><td>Extend to previous occurrence of char</td><td>select: <code>F</code></td></tr>
 <tr><td><code>repeat_last_motion</code></td><td>Repeat last motion</td><td>normal: <code>&lt;A-.&gt;</code>, select: <code>&lt;A-.&gt;</code></td></tr>
 <tr><td><code>replace</code></td><td>Replace with new char</td><td>normal: <code>r</code>, select: <code>r</code></td></tr>
-<tr><td><code>overtype_mode</code></td><td>Enter overtype mode</td><td>normal: <code>&lt;C-r&gt;</code>, select: <code>&lt;C-r&gt;</code></td></tr>
 <tr><td><code>switch_case</code></td><td>Switch (toggle) case</td><td>normal: <code>~</code>, select: <code>~</code></td></tr>
 <tr><td><code>switch_to_uppercase</code></td><td>Switch to uppercase</td><td>normal: <code>&lt;A-`&gt;</code>, select: <code>&lt;A-`&gt;</code></td></tr>
 <tr><td><code>switch_to_lowercase</code></td><td>Switch to lowercase</td><td>normal: <code>`</code>, select: <code>`</code></td></tr>
@@ -378,7 +379,7 @@
 <tr><td><code>collapse_selection</code></td><td>Collapse selection into single cursor</td><td>normal: <code>;</code>, select: <code>;</code></td></tr>
 <tr><td><code>flip_selections</code></td><td>Flip selection cursor and anchor</td><td>normal: <code>&lt;A-;&gt;</code>, select: <code>&lt;A-;&gt;</code></td></tr>
 <tr><td><code>ensure_selections_forward</code></td><td>Ensure all selections face forward</td><td>normal: <code>&lt;A-:&gt;</code>, select: <code>&lt;A-:&gt;</code></td></tr>
-<tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, <code>&lt;ins&gt;</code>, select: <code>i</code>, <code>&lt;ins&gt;</code></td></tr>
+<tr><td><code>insert_mode</code></td><td>Insert before selection</td><td>normal: <code>i</code>, select: <code>i</code></td></tr>
 <tr><td><code>append_mode</code></td><td>Append after selection</td><td>normal: <code>a</code>, select: <code>a</code></td></tr>
 <tr><td><code>append_mode_same_line</code></td><td>Append after selection within the same line only</td><td></td></tr>
 <tr><td><code>command_mode</code></td><td>Enter command mode</td><td>normal: <code>:</code>, select: <code>:</code></td></tr>
