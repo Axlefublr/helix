@@ -1651,7 +1651,7 @@ impl Component for EditorView {
             surface.set_string(
                 area.x,
                 area.y + area.height.saturating_sub(1),
-                format!("{:<200}", status_msg),
+                &format!("{:<200}", status_msg),
                 style,
             );
         }
