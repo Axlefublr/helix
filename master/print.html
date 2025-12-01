@@ -1676,7 +1676,6 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>goto_prev_tabstop</code></td><td>Goto next snippet placeholder</td><td></td></tr>
 <tr><td><code>rotate_selections_first</code></td><td>Make the first selection your primary one</td><td></td></tr>
 <tr><td><code>rotate_selections_last</code></td><td>Make the last selection your primary one</td><td></td></tr>
-<tr><td><code>count_selections</code></td><td>Print amount of selections to messages</td><td></td></tr>
 <tr><td><code>toggle_line_select</code></td><td>Toggle between trim_selections and extend_to_line_bounds</td><td></td></tr>
 <tr><td><code>surround_add_tag</code></td><td>Surround selections with an html tag</td><td></td></tr>
 <tr><td><code>harp_file</code></td><td>Interact with a file harp</td><td></td></tr>
@@ -2202,6 +2201,7 @@ workspace-diagnostics = ["warning", "error"]
 <tr><td><code>diagnostics</code></td><td>The number of warnings and/or errors</td></tr>
 <tr><td><code>workspace-diagnostics</code></td><td>The number of warnings and/or errors on workspace</td></tr>
 <tr><td><code>selections</code></td><td>The primary selection index out of the number of active selections</td></tr>
+<tr><td><code>search-position</code></td><td>Current search match and total matches in the view <code>[&lt;current&gt;/&lt;total&gt;]</code></td></tr>
 <tr><td><code>primary-selection-length</code></td><td>The number of characters currently in primary selection</td></tr>
 <tr><td><code>position</code></td><td>The cursor position</td></tr>
 <tr><td><code>position-percentage</code></td><td>The cursor position as a percentage of the total number of lines</td></tr>
@@ -2331,6 +2331,7 @@ name = "rust"
 <div class="table-wrapper"><table><thead><tr><th>Key</th><th>Description</th><th>Default</th></tr></thead><tbody>
 <tr><td><code>smart-case</code></td><td>Enable smart case regex searching (case-insensitive unless pattern contains upper case characters)</td><td><code>true</code></td></tr>
 <tr><td><code>wrap-around</code></td><td>Whether the search should wrap after depleting the matches</td><td><code>true</code></td></tr>
+<tr><td><code>max-matches</code></td><td>Maximum number of matches that will be counted for the denominator of <code>search-position</code>. Possible values are integers or <code>"none"</code> for no limit.</td><td><code>100</code></td></tr>
 </tbody></table>
 </div>
 <h3 id="editorwhitespace-section"><a class="header" href="#editorwhitespace-section"><code>[editor.whitespace]</code> Section</a></h3>
