@@ -337,9 +337,21 @@ where
     write(
         context,
         if count == 1 {
-            " 1 sel ".into()
+            "sel: 1".into()
         } else {
-            format!(" {}/{count} sels ", selection.primary_index() + 1).into()
+            format!(
+                "sel:{:>count_len$}/{count}",
+                selection.primary_index() + 1,
+                count_len = {
+                    let the = count.to_string().len();
+                    if the > 2 {
+                        the
+                    } else {
+                        2
+                    }
+                }
+            )
+            .into()
         },
     );
 }
@@ -349,10 +361,7 @@ where
     F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
 {
     let tot_sel = context.doc.selection(context.view.id).primary().len();
-    write(
-        context,
-        format!(" {} char{} ", tot_sel, if tot_sel == 1 { "" } else { "s" }).into(),
-    );
+    write(context, format!("chr:{:^3}", tot_sel).into());
 }
 
 fn get_position(context: &RenderContext) -> Position {
@@ -373,7 +382,7 @@ where
     let position = get_position(context);
     write(
         context,
-        format!(" {}:{} ", position.row + 1, position.col + 1).into(),
+        format!("{:>4}:{:<3}", position.row + 1, position.col + 1).into(),
     );
 }
 
@@ -381,7 +390,7 @@ fn render_total_line_numbers<'a, F>(context: &mut RenderContext<'a>, write: F)
 where
     F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
 {
-    let total_line_numbers = context.doc.text().len_lines();
+    let total_line_numbers = context.doc.text().len_lines().saturating_sub(1);
 
     write(context, format!(" {} ", total_line_numbers).into());
 }
@@ -392,9 +401,16 @@ where
 {
     let position = get_position(context);
     let maxrows = context.doc.text().len_lines();
+    let percentage = ((position.row + 1) as f64 * 100. / maxrows as f64).round() as usize;
     write(
         context,
-        format!("{}%", (position.row + 1) * 100 / maxrows).into(),
+        if percentage == 0 || position.row == 0 {
+            "top".into()
+        } else if percentage == 100 || position.row + 2 == maxrows {
+            "bot".into()
+        } else {
+            format!("{:>2}%", percentage).into()
+        },
     );
 }
 
@@ -590,6 +606,6 @@ where
     F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
 {
     if context.focused && context.doc.code_action_hints(context.view.id) {
-        write(context, " ⋮ ".into())
+        write(context, " 󰌵".into())
     }
 }
