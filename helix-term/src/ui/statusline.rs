@@ -154,6 +154,7 @@ where
         helix_view::editor::StatusLineElement::TotalLineNumbers => render_total_line_numbers,
         helix_view::editor::StatusLineElement::Separator => render_separator,
         helix_view::editor::StatusLineElement::Spacer => render_spacer,
+        helix_view::editor::StatusLineElement::Message => render_message,
         helix_view::editor::StatusLineElement::VersionControl => render_version_control,
         helix_view::editor::StatusLineElement::Register => render_register,
         helix_view::editor::StatusLineElement::CurrentWorkingDirectory => render_cwd,
@@ -607,5 +608,26 @@ where
 {
     if context.focused && context.doc.code_action_hints(context.view.id) {
         write(context, " 󰌵".into())
+    }
+}
+
+fn render_message<'a, F>(context: &mut RenderContext<'a>, write: F)
+where
+    F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
+{
+    if let Some((status_msg, severity)) = &context.editor.status_msg {
+        use helix_view::editor::Severity;
+        let style = if *severity == Severity::Error {
+            context.editor.theme.get("error")
+        } else {
+            context.editor.theme.get("ui.text")
+        };
+        write(
+            context,
+            Span {
+                content: std::borrow::Cow::Borrowed(status_msg),
+                style,
+            },
+        );
     }
 }
