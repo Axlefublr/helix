@@ -4379,23 +4379,8 @@ pub mod insert {
     fn insert_tab_impl(cx: &mut Context, count: usize) {
         let (view, doc) = current!(cx.editor);
 
-        let transaction = Transaction::change(
-            doc.text(),
-            doc.selection(view.id).ranges().iter().map(|range| {
-                let cursor = range.cursor(doc.text().slice(..));
-                let indent = if let IndentStyle::Spaces(indent_width) = doc.indent_style {
-                    let line = range.cursor_line(doc.text().slice(..));
-                    let line_start = doc.text().line_to_char(line);
-                    let offset = (cursor - line_start) % indent_width as usize;
-
-                    Tendril::from(doc.indent_style.as_str().repeat(count)).split_off(offset)
-                } else {
-                    Tendril::from(doc.indent_style.as_str().repeat(count))
-                };
-
-                (cursor, cursor, Some(indent))
-            }),
-        );
+        let indent = Tendril::from("\t".repeat(count));
+        let transaction = Transaction::insert(doc.text(), doc.selection(view.id), indent);
         doc.apply(&transaction, view.id);
     }
 
