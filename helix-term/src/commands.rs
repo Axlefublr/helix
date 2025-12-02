@@ -4228,7 +4228,7 @@ pub mod insert {
         // TODO: round out to nearest indentation level (for example a line with 3 spaces should
         // indent by one to reach 4 spaces).
 
-        let indent = Tendril::from(doc.indent_style.as_str().repeat(count));
+        let indent = Tendril::from("\t".repeat(count));
         let transaction = Transaction::insert(
             doc.text(),
             &doc.selection(view.id).clone().cursors(doc.text().slice(..)),
