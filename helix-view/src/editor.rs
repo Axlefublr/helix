@@ -808,6 +808,9 @@ pub enum StatusLineElement {
     /// A single space
     Spacer,
 
+    /// Diagnostic messages printed by various :commands and else
+    Message,
+
     /// Current version control information
     VersionControl,
 
