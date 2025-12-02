@@ -17,7 +17,7 @@ impl Component for Info {
         let height = self.height + 2; // +2 for border
         let area = viewport.intersection(Rect::new(
             viewport.width.saturating_sub(width),
-            viewport.height.saturating_sub(height + 2), // +2 for statusline
+            viewport.height.saturating_sub(height + 1), // +1 for statusline
             width,
             height,
         ));
