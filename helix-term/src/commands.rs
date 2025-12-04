@@ -529,6 +529,8 @@ impl MappableCommand {
         shrink_selection, "Shrink selection to previously expanded syntax node",
         select_next_sibling, "Select next sibling in the syntax tree",
         select_prev_sibling, "Select previous sibling the in syntax tree",
+        extend_next_sibling, "Extend next sibling in the syntax tree",
+        extend_prev_sibling, "Extend previous sibling the in syntax tree",
         select_all_siblings, "Select all siblings of the current node",
         select_all_children, "Select all children of the current node",
         jump_forward, "Jump forward on jumplist",
@@ -5634,6 +5636,44 @@ fn select_next_sibling(cx: &mut Context) {
 
 fn select_prev_sibling(cx: &mut Context) {
     select_sibling_impl(cx, object::select_prev_sibling)
+}
+
+fn extend_sibling_impl<F>(cx: &mut Context, sibling_fn: F)
+where
+    F: Fn(&helix_core::Syntax, RopeSlice, Selection) -> Selection + 'static,
+{
+    let count = cx.count();
+    let motion = move |editor: &mut Editor| {
+        let (view, doc) = current!(editor);
+
+        if let Some(syntax) = doc.syntax() {
+            let text = doc.text().slice(..);
+            let old_selection = doc.selection(view.id);
+            let old_ranges = old_selection.ranges();
+            let old_primary = old_selection.primary_index();
+
+            let new_selection = sibling_fn(syntax, text, old_selection.clone());
+            let new_ranges = new_selection.ranges();
+            let new_ranges_count = new_ranges.len();
+
+            let mut ranges =
+                SmallVec::with_capacity(old_ranges.len() + new_ranges_count * (count + 1));
+            ranges.extend_from_slice(old_ranges);
+            ranges.extend_from_slice(new_ranges);
+
+            let selection = Selection::new(ranges, old_primary + new_ranges_count);
+            doc.set_selection(view.id, selection);
+        }
+    };
+    cx.editor.apply_motion(motion);
+}
+
+fn extend_next_sibling(cx: &mut Context) {
+    extend_sibling_impl(cx, object::select_next_sibling)
+}
+
+fn extend_prev_sibling(cx: &mut Context) {
+    extend_sibling_impl(cx, object::select_prev_sibling)
 }
 
 fn move_node_bound_impl(cx: &mut Context, dir: Direction, movement: Movement) {
