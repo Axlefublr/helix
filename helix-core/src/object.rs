@@ -41,11 +41,14 @@ pub fn select_next_sibling(syntax: &Syntax, text: RopeSlice, selection: Selectio
         syntax,
         text,
         selection,
-        |cursor| {
+        |cursor| 'outer: loop {
             while !cursor.goto_next_sibling() {
                 if !cursor.goto_parent() {
-                    break;
+                    break 'outer;
                 }
+            }
+            if cursor.node().is_named() {
+                break;
             }
         },
         Some(Direction::Forward),
@@ -94,11 +97,14 @@ pub fn select_prev_sibling(syntax: &Syntax, text: RopeSlice, selection: Selectio
         syntax,
         text,
         selection,
-        |cursor| {
+        |cursor| 'outer: loop {
             while !cursor.goto_previous_sibling() {
                 if !cursor.goto_parent() {
-                    break;
+                    break 'outer;
                 }
+            }
+            if cursor.node().is_named() {
+                break;
             }
         },
         Some(Direction::Backward),
