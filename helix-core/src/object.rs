@@ -29,7 +29,7 @@ pub fn shrink_selection(syntax: &Syntax, text: RopeSlice, selection: Selection) 
         syntax,
         text,
         selection,
-        |cursor| {
+        |cursor, _| {
             cursor.goto_first_child();
         },
         None,
@@ -37,16 +37,21 @@ pub fn shrink_selection(syntax: &Syntax, text: RopeSlice, selection: Selection) 
 }
 
 pub fn select_next_sibling(syntax: &Syntax, text: RopeSlice, selection: Selection) -> Selection {
+    use std::ops::Not;
     select_node_impl(
         syntax,
         text,
         selection,
-        |cursor| {
-            while !cursor.goto_next_sibling() {
-                if !cursor.goto_parent() {
-                    break;
-                }
+        |cursor, needed_adjust| {
+            if needed_adjust && {
+                let node = cursor.node();
+                node.is_named() && node.is_extra().not()
+            } {
+                return;
             }
+            if let Some(node) = any_valid_future_siblings(cursor.node(), Direction::Forward) {
+                cursor.reset_to_byte_range(node.start_byte(), node.end_byte());
+            };
         },
         Some(Direction::Forward),
     )
@@ -90,19 +95,71 @@ fn select_children(cursor: &mut TreeCursor, text: RopeSlice, range: Range) -> Ve
 }
 
 pub fn select_prev_sibling(syntax: &Syntax, text: RopeSlice, selection: Selection) -> Selection {
+    use std::ops::Not;
     select_node_impl(
         syntax,
         text,
         selection,
-        |cursor| {
-            while !cursor.goto_previous_sibling() {
-                if !cursor.goto_parent() {
-                    break;
-                }
+        |cursor, needed_adjust| {
+            if needed_adjust && {
+                let node = cursor.node();
+                node.is_named() && node.is_extra().not()
+            } {
+                return;
             }
+            if let Some(node) = any_valid_future_siblings(cursor.node(), Direction::Backward) {
+                cursor.reset_to_byte_range(node.start_byte(), node.end_byte());
+            };
         },
         Some(Direction::Backward),
     )
+}
+
+fn adjust_malformed_treesitter_range(
+    text: &RopeSlice,
+    direction: Direction,
+    range: Range,
+) -> Option<Range> {
+    use helix_stdx::rope::RopeSliceExt;
+
+    let cursor_from = range.cursor(*text);
+    let cursor_to = crate::graphemes::next_grapheme_boundary(*text, cursor_from);
+
+    let cursor_on_whitespace = text
+        .slice(cursor_from..cursor_to)
+        .bytes()
+        .all(|byte| byte.is_ascii_whitespace());
+    if !cursor_on_whitespace {
+        return Some(Range::point(cursor_from));
+    }
+
+    #[allow(clippy::collapsible_else_if)]
+    if direction == Direction::Forward {
+        text.slice(cursor_to..)
+            .first_non_whitespace_char()
+            .map(|until_land| Range::point(cursor_to + until_land))
+    } else {
+        text.slice(..cursor_from)
+            .last_non_whitespace_char()
+            .map(Range::point)
+    }
+}
+
+fn any_valid_future_siblings(
+    node: tree_house::tree_sitter::Node,
+    direction: Direction,
+) -> Option<tree_house::tree_sitter::Node> {
+    use std::ops::Not;
+    let mut current = node;
+    loop {
+        current = match direction {
+            Direction::Forward => current.next_sibling()?,
+            Direction::Backward => current.prev_sibling()?,
+        };
+        if current.is_named() && current.is_extra().not() {
+            return Some(current);
+        }
+    }
 }
 
 fn select_node_impl<F>(
@@ -113,17 +170,41 @@ fn select_node_impl<F>(
     direction: Option<Direction>,
 ) -> Selection
 where
-    F: Fn(&mut TreeCursor),
+    F: Fn(&mut TreeCursor, bool),
 {
+    use std::ops::Not;
     let cursor = &mut syntax.walk();
 
     selection.transform(|range| {
-        let from = text.char_to_byte(range.from()) as u32;
-        let to = text.char_to_byte(range.to()) as u32;
+        let from = text.char_to_byte(range.from());
+        let to = text.char_to_byte(range.to());
 
-        cursor.reset_to_byte_range(from, to);
+        let is_valid_node = {
+            cursor.reset_to_byte_range(from as u32, to as u32);
+            let node = cursor.node();
+            let node_from = text.byte_to_char(node.start_byte() as usize);
+            let node_to = text.byte_to_char(node.end_byte() as usize);
+            node_from == from && node_to == to
+        };
 
-        motion(cursor);
+        // amtr should check for whitespace only the cursor of the range
+        let adjusted_range = is_valid_node
+            .not()
+            .then(|| {
+                direction.and_then(|direction| {
+                    adjust_malformed_treesitter_range(&text, direction, range)
+                })
+            })
+            .flatten();
+        let needed_adjust = adjusted_range.is_some();
+        let range = adjusted_range.unwrap_or(range);
+
+        let from = text.char_to_byte(range.from());
+        let to = text.char_to_byte(range.to());
+
+        cursor.reset_to_byte_range(from as u32, to as u32);
+
+        motion(cursor, needed_adjust);
 
         let node = cursor.node();
         let from = text.byte_to_char(node.start_byte() as usize);
