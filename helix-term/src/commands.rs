@@ -2375,7 +2375,7 @@ fn search_impl(
     // If we didn't find a match before, lets wrap the search.
     if mat.is_none() {
         if show_warnings {
-            editor.set_status("Wrapped around document");
+            // editor.set_status("Wrapped around document");
         }
 
         let doc = doc!(editor).text().slice(..);
