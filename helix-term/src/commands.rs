@@ -5662,7 +5662,7 @@ fn jump_backward(cx: &mut Context) {
 fn save_selection(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     push_jump(view, doc);
-    cx.editor.set_status("Selection saved to jumplist");
+    // cx.editor.set_status("Selection saved to jumplist");
 }
 
 fn rotate_view(cx: &mut Context) {
