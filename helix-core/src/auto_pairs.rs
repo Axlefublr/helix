@@ -132,6 +132,8 @@ pub fn hook(doc: &Rope, selection: &Selection, ch: char, pairs: &AutoPairs) -> O
             // && char_at pos == close
             return Some(handle_close(doc, selection, pair));
         }
+    } else if ch == ' ' {
+        return Some(handle_space(doc, selection, pairs));
     }
 
     None
@@ -260,6 +262,52 @@ fn get_next_range(doc: &Rope, start_range: &Range, offset: usize, len_inserted: 
     };
 
     Range::new(end_anchor, end_head)
+}
+
+fn handle_space(doc: &Rope, selection: &Selection, pairs: &AutoPairs) -> Transaction {
+    let mut end_ranges = SmallVec::with_capacity(selection.len());
+
+    let mut offs = 0;
+
+    let transaction = Transaction::change_by_selection(doc, selection, |start_range| {
+        let cursor = start_range.cursor(doc.slice(..));
+        let prev_char = doc.get_char(cursor - 1);
+        let next_char = doc.get_char(cursor);
+        let len_inserted;
+
+        let change = match prev_char {
+            Some(prev)
+                if pairs
+                    .0
+                    .get(&prev)
+                    .map(|pair| {
+                        pair.open == prev && next_char.is_some_and(|next| pair.close == next)
+                    })
+                    .unwrap_or(false) =>
+            {
+                // insert open & close
+                let pair_str = Tendril::from_iter([' ', ' ']);
+                len_inserted = 2;
+                (cursor, cursor, Some(pair_str))
+            }
+            _ => {
+                len_inserted = 1;
+                let mut tendril = Tendril::new();
+                tendril.push(' ');
+                (cursor, cursor, Some(tendril))
+            }
+        };
+
+        let next_range = get_next_range(doc, start_range, offs, len_inserted);
+        end_ranges.push(next_range);
+        offs += len_inserted;
+
+        change
+    });
+
+    let t = transaction.with_selection(Selection::new(end_ranges, selection.primary_index()));
+    log::debug!("auto pair transaction: {:#?}", t);
+    t
 }
 
 fn handle_open(doc: &Rope, selection: &Selection, pair: &Pair) -> Transaction {
