@@ -783,7 +783,7 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         let is_scrolloff_truncated = max_scrolloff <= scrolloff;
         let scrolloff = std::cmp::min(scrolloff, max_scrolloff);
 
-        let is_view_len_even = view_len % 2 == 0;
+        let is_view_len_even = view_len.is_multiple_of(2);
 
         // When we have an even amount of items and the scrolloff is half of
         // the picker's view, we want to make sure to scroll on all moves
