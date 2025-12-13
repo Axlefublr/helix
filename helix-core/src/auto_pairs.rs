@@ -341,12 +341,13 @@ fn handle_same(doc: &Rope, selection: &Selection, pair: &Pair) -> Transaction {
     let transaction = Transaction::change_by_selection(doc, selection, |start_range| {
         let cursor = start_range.cursor(doc.slice(..));
         let mut len_inserted = 0;
-        let next_char = doc.get_char(cursor);
+        // let next_char = doc.get_char(cursor);
 
-        let change = if next_char == Some(pair.open) {
-            //  return transaction that moves past close
-            (cursor, cursor, None) // no-op
-        } else {
+        // let change = if next_char == Some(pair.open) {
+        //     //  return transaction that moves past close
+        //     (cursor, cursor, None) // no-op
+        // } else {
+        let change = {
             let mut pair_str = Tendril::new();
             pair_str.push(pair.open);
 
