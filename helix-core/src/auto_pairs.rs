@@ -392,13 +392,9 @@ fn handle_insert_close(doc: &Rope, range: &Range, pair: &Pair) -> Option<(Change
 /// handle cases where open and close is the same, or in triples ("""docstring""")
 fn handle_insert_same(doc: &Rope, range: &Range, pair: &Pair) -> Option<(Change, Range)> {
     let cursor = range.cursor(doc.slice(..));
-    let mut len_inserted = 0;
-    let next_char = doc.get_char(cursor);
+    let len_inserted;
 
-    let change = if next_char == Some(pair.open) {
-        // return transaction that moves past close
-        (cursor, cursor, None) // no-op
-    } else {
+    let change = {
         if !pair.should_close(doc, range) {
             return None;
         }
