@@ -83,6 +83,7 @@ use std::{
     future::Future,
     io::Read,
     num::NonZeroUsize,
+    ops::Not,
 };
 
 use std::{
@@ -627,6 +628,7 @@ impl MappableCommand {
         rotate_selections_last, "Make the last selection your primary one",
         toggle_line_select, "Toggle between trim_selections and extend_to_line_bounds",
         surround_add_tag, "Surround selections with an html tag",
+        local_search_section, "Search for a ----section---- in buffer",
     );
 }
 
@@ -2761,6 +2763,271 @@ fn global_search(cx: &mut Context) {
     cx.push_layer(Box::new(overlaid(picker)));
 }
 
+fn local_search_markdown_section(cx: &mut Context, file_contents: String) {
+    struct AlmostFileResult {
+        line_num: usize,
+        level: usize,
+        parts: Vec<String>,
+    }
+
+    #[derive(Debug)]
+    struct FileResult {
+        line_num: usize,
+        heading: String,
+    }
+
+    let mut heading_stack: [Option<String>; 6] = [None, None, None, None, None, None];
+    let mut max_lengths: [usize; 6] = [0, 0, 0, 0, 0, 0];
+
+    let mut file_results: Vec<AlmostFileResult> = file_contents
+        .lines()
+        .enumerate()
+        .filter_map(|(line_num, line)| {
+            let line = line.trim();
+            if line.is_empty() {
+                return None;
+            }
+            let mut chars = line.chars();
+            let level = chars.by_ref().take_while(|chr| chr == &'#').count();
+            if (1..=6).contains(&level).not() {
+                return None;
+            }
+            let title: String = chars.skip_while(|chr| chr.is_ascii_whitespace()).collect();
+            if title.is_empty() {
+                return None;
+            }
+            max_lengths[level - 1] = max_lengths[level - 1].max(title.chars().count());
+            heading_stack[(level - 1)..].fill(None);
+            heading_stack[level - 1] = Some(title);
+
+            let parts = heading_stack
+                .iter()
+                .take(level)
+                .flatten()
+                .cloned()
+                .collect::<Vec<_>>();
+
+            let result = AlmostFileResult {
+                line_num,
+                level,
+                parts,
+            };
+            Some(result)
+        })
+        .collect();
+
+    file_results.sort_by_key(|the| the.level);
+
+    let file_results = file_results.into_iter().map(|container| {
+        let heading = container
+            .parts
+            .iter()
+            .enumerate()
+            .map(|(index, part)| format!("{part:<padding$}", padding = max_lengths[index]))
+            .collect::<Vec<_>>()
+            .join(" > ");
+        FileResult {
+            line_num: container.line_num,
+            heading,
+        }
+    });
+
+    let columns = [PickerColumn::new("", |item: &FileResult, _| {
+        Cell::from(Spans::from(vec![Span::raw(item.heading.clone())]))
+    })];
+
+    let picker = Picker::new(
+        columns,
+        0, // contents
+        [],
+        (),
+        move |cx, FileResult { line_num, .. }, action| {
+            let doc = doc_mut!(cx.editor);
+            let line_num = *line_num;
+            let view = view_mut!(cx.editor);
+            let text = doc.text();
+            if line_num >= text.len_lines() {
+                cx.editor.set_error(
+                    "The line you jumped to does not exist anymore because the file has changed.",
+                );
+                return;
+            }
+            let start = text.line_to_char(line_num);
+            let end = text.line_to_char((line_num + 1).min(text.len_lines()));
+
+            push_jump(view, doc);
+            doc.set_selection(view.id, Selection::single(start, end));
+            if action.align_view(view, doc.id()) {
+                align_view(doc, view, Align::Center);
+            }
+        },
+    );
+
+    let injector = picker.injector();
+    let timeout = std::time::Instant::now() + std::time::Duration::from_millis(30);
+    for file_result in file_results {
+        if injector.push(file_result).is_err() {
+            break;
+        }
+        if std::time::Instant::now() >= timeout {
+            break;
+        }
+    }
+
+    cx.push_layer(Box::new(overlaid(picker)));
+}
+
+fn local_search_section(cx: &mut Context) {
+    #[derive(Debug)]
+    struct FileResult {
+        document_id: DocumentId,
+        line_num: usize,
+        file_contents_byte_start: usize,
+        file_contents_byte_end: usize,
+    }
+
+    struct LocalSearchData {
+        file_contents: String,
+        longest_title: usize,
+    }
+
+    let doc = doc!(cx.editor);
+    let contents = doc.text().to_string();
+
+    if doc.language_name().is_some_and(|lang| lang == "markdown") {
+        local_search_markdown_section(cx, contents);
+        return;
+    }
+
+    let mut longest_title = 0;
+    let file_results: Vec<FileResult> = contents
+        .lines()
+        .enumerate()
+        .filter_map(|(line_num, line)| {
+            let line = line.trim();
+            if line.is_empty() || line.contains("----").not() {
+                return None;
+            }
+            let mut beg = unsafe { line.as_ptr().byte_offset_from(contents.as_ptr()) } as usize;
+            let mut end = beg + line.len();
+            let mut start_trim = line.chars();
+            for chr in start_trim.by_ref() {
+                if chr == '-' {
+                    break;
+                }
+                beg += 1;
+            }
+            for chr in start_trim {
+                beg += 1;
+                if chr != '-' {
+                    break;
+                }
+            }
+            if beg >= end {
+                return None;
+            }
+            let mut end_trim = line.chars().rev();
+            for chr in end_trim.by_ref() {
+                if chr == '-' {
+                    break;
+                }
+                end -= 1;
+            }
+            for chr in end_trim {
+                end -= 1;
+                if chr != '-' {
+                    break;
+                }
+            }
+            if end <= beg {
+                return None;
+            }
+            longest_title = longest_title.max(end - beg);
+            let result = FileResult {
+                document_id: doc.id(),
+                line_num,
+                file_contents_byte_start: beg,
+                file_contents_byte_end: end,
+            };
+            Some(result)
+        })
+        .collect();
+
+    let config = LocalSearchData {
+        file_contents: contents,
+        longest_title,
+    };
+
+    let columns = [PickerColumn::new(
+        "",
+        |item: &FileResult, config: &LocalSearchData| {
+            // extract line content to be displayed in the picker
+            let longest_title = config.longest_title;
+            let slice = &config.file_contents.as_bytes()
+                [item.file_contents_byte_start..item.file_contents_byte_end];
+            let content = std::str::from_utf8(slice).unwrap();
+            // create column value to be displayed in the picker
+            Cell::from(Spans::from(vec![Span::raw(format!(
+                "{:<longest_title$}",
+                content
+            ))]))
+        },
+    )];
+
+    let picker = Picker::new(
+        columns,
+        0, // contents
+        [],
+        config,
+        move |cx,
+              FileResult {
+                  document_id,
+                  line_num,
+                  ..
+              },
+              action| {
+            let doc = doc_mut!(cx.editor, &document_id);
+            let line_num = *line_num;
+            let view = view_mut!(cx.editor);
+            let text = doc.text();
+            if line_num >= text.len_lines() {
+                cx.editor.set_error(
+                    "The line you jumped to does not exist anymore because the file has changed.",
+                );
+                return;
+            }
+            let start = text.line_to_char(line_num);
+            let end = text.line_to_char((line_num + 1).min(text.len_lines()));
+
+            push_jump(view, doc);
+            doc.set_selection(view.id, Selection::single(start, end));
+            if action.align_view(view, doc.id()) {
+                align_view(doc, view, Align::Center);
+            }
+        },
+    )
+    .with_preview(
+        |_editor,
+         FileResult {
+             document_id,
+             line_num,
+             ..
+         }| { Some(((*document_id).into(), Some((*line_num, *line_num)))) },
+    );
+
+    let injector = picker.injector();
+    let timeout = std::time::Instant::now() + std::time::Duration::from_millis(30);
+    for file_result in file_results {
+        if injector.push(file_result).is_err() {
+            break;
+        }
+        if std::time::Instant::now() >= timeout {
+            break;
+        }
+    }
+
+    cx.push_layer(Box::new(overlaid(picker)));
+}
 
 fn local_search_fuzzy(cx: &mut Context) {
     #[derive(Debug)]
