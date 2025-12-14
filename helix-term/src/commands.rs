@@ -386,6 +386,7 @@ impl MappableCommand {
         search_selection_detect_word_boundaries, "Use current selection as the search pattern, automatically wrapping with `\\b` on word boundaries",
         make_search_word_bounded, "Modify current search to make it word bounded",
         global_search, "Global search in workspace folder",
+        local_search_fuzzy, "Fuzzy local search in buffer",
         extend_line, "Select current line, if already selected, extend to another line based on the anchor",
         extend_line_below, "Select current line, if already selected, extend to next line",
         extend_line_above, "Select current line, if already selected, extend to previous line",
@@ -2684,6 +2685,144 @@ fn global_search(cx: &mut Context) {
     })
     .with_history_register(Some(reg))
     .with_dynamic_query(get_files, Some(275));
+
+    cx.push_layer(Box::new(overlaid(picker)));
+}
+
+
+fn local_search_fuzzy(cx: &mut Context) {
+    #[derive(Debug)]
+    struct FileResult {
+        document_id: DocumentId,
+        line_num: usize,
+        file_contents_byte_start: usize,
+        file_contents_byte_end: usize,
+    }
+
+    struct LocalSearchData {
+        file_contents: String,
+    }
+
+    let doc = doc!(cx.editor);
+    let contents = doc.text().to_string();
+
+    let file_results: Vec<FileResult> = contents
+        .lines()
+        .enumerate()
+        .filter_map(|(line_num, line)| {
+            let line = line.trim();
+            if line.is_empty() {
+                return None;
+            }
+            // SAFETY: The offsets will be used to index back into the original `file_contents` String
+            // as a byte slice. Since the `file_contents` will be moved into the `Picker` as part of
+            // `editor_data`, we know that the `Picker` will take ownership of the underlying String,
+            // so it will be valid for displaying the `Span` as long as the user uses the `Picker`
+            // (the `Picker` gets dropped only when a new `Picker` is created). Furthermore, the
+            // process of reconstructing a `&str` back requires that we have access to the original
+            // `String` anyways so we can index into it, as is the case when we construct the `Span`
+            // when creating the `PickerColumn`s, so we know that we are returning the correct
+            // substring from the original `file_contents`.
+            // In fact, since we only store offsets, and accessing them from safe rust, there is
+            // no risk of memory safety (like our &str not living long enough). The only real
+            // bug would be moving out the original underlying `String` (which we obviously
+            // don't do). This would lead to an out of bounds crash in the `PickerColumn` function
+            // call, or a crash when we recreate back the &str if the new underlying `String`
+            // makes it so that our byte offsets index into the middle of a Unicode grapheme cluster.
+            // Last but not least, it could make it so that we do display the lines correctly,
+            // but these are from a different underlying `String` than the original, which would be
+            // different from the lines in the current buffer.
+            let beg = unsafe { line.as_ptr().byte_offset_from(contents.as_ptr()) } as usize;
+            let end = beg + line.len();
+            let result = FileResult {
+                document_id: doc.id(),
+                line_num,
+                file_contents_byte_start: beg,
+                file_contents_byte_end: end,
+            };
+            Some(result)
+        })
+        .collect();
+
+    let config = LocalSearchData {
+        file_contents: contents,
+    };
+
+    let columns = [PickerColumn::new(
+        "",
+        |item: &FileResult, config: &LocalSearchData| {
+            // extract line content to be displayed in the picker
+            let slice = &config.file_contents.as_bytes()
+                [item.file_contents_byte_start..item.file_contents_byte_end];
+            let content = std::str::from_utf8(slice).unwrap();
+            // create column value to be displayed in the picker
+            Cell::from(Spans::from(vec![Span::raw(content)]))
+        },
+    )];
+
+    let reg = cx.register.unwrap_or('/');
+    cx.editor.registers.last_search_register = reg;
+
+    let picker = Picker::new(
+        columns,
+        0, // contents
+        [],
+        config,
+        move |cx,
+              FileResult {
+                  document_id,
+                  line_num,
+                  ..
+              },
+              action| {
+            let doc = doc_mut!(cx.editor, &document_id);
+            // let doc = match cx.editor.open(path, action) {
+            //     Ok(id) => doc_mut!(cx.editor, &id),
+            //     Err(e) => {
+            //         cx.editor
+            //             .set_error(format!("Failed to open file '{}': {}", path.display(), e));
+            //         return;
+            //     }
+            // };
+
+            let line_num = *line_num;
+            let view = view_mut!(cx.editor);
+            let text = doc.text();
+            if line_num >= text.len_lines() {
+                cx.editor.set_error(
+                    "The line you jumped to does not exist anymore because the file has changed.",
+                );
+                return;
+            }
+            let start = text.line_to_char(line_num);
+            let end = text.line_to_char((line_num + 1).min(text.len_lines()));
+
+            doc.set_selection(view.id, Selection::single(start, end));
+            if action.align_view(view, doc.id()) {
+                align_view(doc, view, Align::Center);
+            }
+        },
+    )
+    .with_preview(
+        |_editor,
+         FileResult {
+             document_id,
+             line_num,
+             ..
+         }| { Some(((*document_id).into(), Some((*line_num, *line_num)))) },
+    )
+    .with_history_register(Some(reg));
+
+    let injector = picker.injector();
+    let timeout = std::time::Instant::now() + std::time::Duration::from_millis(30);
+    for file_result in file_results {
+        if injector.push(file_result).is_err() {
+            break;
+        }
+        if std::time::Instant::now() >= timeout {
+            break;
+        }
+    }
 
     cx.push_layer(Box::new(overlaid(picker)));
 }
