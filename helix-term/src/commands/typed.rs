@@ -2516,6 +2516,31 @@ fn run_shell_command(
     Ok(())
 }
 
+fn run_shell_command_quiet(
+    cx: &mut compositor::Context,
+    args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let shell = cx.editor.config().shell.clone();
+    let args = args.join(" ");
+
+    let callback = async move {
+        let _ = shell_impl_async(&shell, &args, None).await?;
+        let call: job::Callback =
+            Callback::EditorCompositor(Box::new(move |editor: &mut Editor, _| {
+                editor.set_status("Command run");
+            }));
+        Ok(call)
+    };
+    cx.jobs.callback(callback);
+
+    Ok(())
+}
+
 fn reset_diff_change(
     cx: &mut compositor::Context,
     _args: Args,
@@ -3716,6 +3741,14 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         aliases: &["sh", "!"],
         doc: "Run a shell command",
         fun: run_shell_command,
+        completer: SHELL_COMPLETER,
+        signature: SHELL_SIGNATURE,
+    },
+    TypableCommand {
+        name: "run-shell-command-quiet",
+        aliases: &["shq", "?"],
+        doc: "Run a shell command without showing its output",
+        fun: run_shell_command_quiet,
         completer: SHELL_COMPLETER,
         signature: SHELL_SIGNATURE,
     },
