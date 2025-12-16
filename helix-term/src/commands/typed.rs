@@ -1,6 +1,7 @@
 mod axlefublr_buffer_nth;
 mod axlefublr_custom_formatter;
 mod axlefublr_echopy;
+mod axlefublr_oil;
 mod axlefublr_random;
 
 use std::fmt::Write;
@@ -3879,6 +3880,17 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
                     ..Flag::DEFAULT
                 },
             ],
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "oil",
+        aliases: &[],
+        doc: "Oil.hx",
+        fun: axlefublr_oil::oil,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
             ..Signature::DEFAULT
         },
     },
