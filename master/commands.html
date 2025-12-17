@@ -228,6 +228,7 @@
 <tr><td><code>:lsp-stop</code></td><td>Stops the given language servers, or all language servers that are used by the current file if no arguments are supplied</td></tr>
 <tr><td><code>:tree-sitter-scopes</code></td><td>Display tree sitter scopes, primarily for theming and development.</td></tr>
 <tr><td><code>:tree-sitter-highlight-name</code></td><td>Display name of tree-sitter highlight scope under the cursor.</td></tr>
+<tr><td><code>:tree-sitter-layers</code></td><td>Display language names of tree-sitter injection layers under the cursor.</td></tr>
 <tr><td><code>:debug-start</code>, <code>:dbg</code></td><td>Start a debug session from a given template with given parameters.</td></tr>
 <tr><td><code>:debug-remote</code>, <code>:dbg-tcp</code></td><td>Connect to a debug adapter by TCP address and start a debugging session from a given template with given parameters.</td></tr>
 <tr><td><code>:debug-eval</code></td><td>Evaluate expression in current debug context.</td></tr>
@@ -253,6 +254,7 @@
 <tr><td><code>:pipe</code>, <code>:|</code></td><td>Pipe each selection to the shell command.</td></tr>
 <tr><td><code>:pipe-to</code></td><td>Pipe each selection to the shell command, ignoring output.</td></tr>
 <tr><td><code>:run-shell-command</code>, <code>:sh</code>, <code>:!</code></td><td>Run a shell command</td></tr>
+<tr><td><code>:run-shell-command-quiet</code>, <code>:shq</code>, <code>:?</code></td><td>Run a shell command without showing its output</td></tr>
 <tr><td><code>:reset-diff-change</code>, <code>:diffget</code>, <code>:diffg</code></td><td>Reset the diff change at the cursor position.</td></tr>
 <tr><td><code>:clear-register</code></td><td>Clear given register. If no argument is provided, clear all registers.</td></tr>
 <tr><td><code>:redraw</code></td><td>Clear and re-render the whole UI</td></tr>
@@ -362,6 +364,7 @@
 <tr><td><code>search_selection_detect_word_boundaries</code></td><td>Use current selection as the search pattern, automatically wrapping with <code>\b</code> on word boundaries</td><td>normal: <code>*</code>, select: <code>*</code></td></tr>
 <tr><td><code>make_search_word_bounded</code></td><td>Modify current search to make it word bounded</td><td></td></tr>
 <tr><td><code>global_search</code></td><td>Global search in workspace folder</td><td>normal: <code>&lt;space&gt;/</code>, select: <code>&lt;space&gt;/</code></td></tr>
+<tr><td><code>local_search_fuzzy</code></td><td>Fuzzy local search in buffer</td><td></td></tr>
 <tr><td><code>extend_line</code></td><td>Select current line, if already selected, extend to another line based on the anchor</td><td></td></tr>
 <tr><td><code>extend_line_below</code></td><td>Select current line, if already selected, extend to next line</td><td>normal: <code>x</code>, select: <code>x</code></td></tr>
 <tr><td><code>extend_line_above</code></td><td>Select current line, if already selected, extend to previous line</td><td></td></tr>
