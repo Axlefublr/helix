@@ -6853,19 +6853,17 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
     };
     let help_text = [
         ("w", "Word"),
-        ("W", "WORD"),
-        ("p", "Paragraph"),
-        ("t", "Type definition (tree-sitter)"),
-        ("f", "Function (tree-sitter)"),
-        ("a", "Argument/parameter (tree-sitter)"),
-        ("c", "Comment (tree-sitter)"),
-        ("T", "Test (tree-sitter)"),
-        ("e", "Data structure entry (tree-sitter)"),
-        ("m", "Closest surrounding pair (tree-sitter)"),
-        ("i", "Indentation"),
+        ("o", "WORD"),
+        ("l", "Paragraph"),
         ("g", "Change"),
-        ("x", "(X)HTML element (tree-sitter)"),
-        (" ", "... or any character acting as a pair"),
+        ("m", "Pair 󰌪"),
+        ("a", "Argument 󰌪"),
+        ("e", "Entry 󰌪"),
+        ("f", "Function 󰌪"),
+        ("d", "Type 󰌪"),
+        ("t", "Test 󰌪"),
+        ("c", "Comment 󰌪"),
+        ("x", "Tag 󰌪"),
     ];
 
     // if cx.editor.config().whichkey {
