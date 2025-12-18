@@ -580,6 +580,15 @@ fn new_file(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> an
     Ok(())
 }
 
+fn amnesia(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+    let doc = doc_mut!(cx.editor);
+    doc.reset_modified();
+    Ok(())
+}
+
 fn format(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
@@ -3871,6 +3880,17 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
                     ..Flag::DEFAULT
                 },
             ],
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "amnesia",
+        aliases: &[],
+        doc: "Make the document forget it was modified.",
+        fun: amnesia,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
             ..Signature::DEFAULT
         },
     },
