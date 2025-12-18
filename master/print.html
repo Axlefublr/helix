@@ -1348,6 +1348,7 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>:echopy</code>, <code>:cc</code></td><td>Put string into clipboard</td></tr>
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections.</td></tr>
 <tr><td><code>:buffer-nth</code>, <code>:bi</code></td><td>Switch to the nth buffer, out of those you have open.</td></tr>
+<tr><td><code>:amnesia</code></td><td>Make the document forget it was modified.</td></tr>
 </tbody></table>
 </div>
 <h2 id="static-commands"><a class="header" href="#static-commands">Static Commands</a></h2>
@@ -1680,6 +1681,14 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>replay_macro</code></td><td>Replay macro</td><td>normal: <code>q</code>, select: <code>q</code></td></tr>
 <tr><td><code>command_palette</code></td><td>Open command palette</td><td>normal: <code>&lt;space&gt;?</code>, select: <code>&lt;space&gt;?</code></td></tr>
 <tr><td><code>goto_word</code></td><td>Jump to a two-character label</td><td>normal: <code>gw</code></td></tr>
+<tr><td><code>flash_forward</code></td><td>Jump forward with a flash</td><td></td></tr>
+<tr><td><code>extend_flash_forward</code></td><td>Extend forward with a flash</td><td></td></tr>
+<tr><td><code>flash_backward</code></td><td>Jump backward with a flash</td><td></td></tr>
+<tr><td><code>extend_flash_backward</code></td><td>Extend backward with a flash</td><td></td></tr>
+<tr><td><code>flash_forward_till</code></td><td>Jump forward with a flash</td><td></td></tr>
+<tr><td><code>extend_flash_forward_till</code></td><td>Extend forward with a flash</td><td></td></tr>
+<tr><td><code>flash_backward_till</code></td><td>Jump backward with a flash</td><td></td></tr>
+<tr><td><code>extend_flash_backward_till</code></td><td>Extend backward with a flash</td><td></td></tr>
 <tr><td><code>extend_to_word</code></td><td>Extend to a two-character label</td><td>select: <code>gw</code></td></tr>
 <tr><td><code>goto_next_tabstop</code></td><td>Goto next snippet placeholder</td><td></td></tr>
 <tr><td><code>goto_prev_tabstop</code></td><td>Goto next snippet placeholder</td><td></td></tr>
