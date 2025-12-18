@@ -96,3 +96,4 @@
 | `:echopy`, `:cc` | Put string into clipboard |
 | `:random`, `:rng`, `:rnd` | Randomize your selections. |
 | `:buffer-nth`, `:bi` | Switch to the nth buffer, out of those you have open. |
+| `:amnesia` | Make the document forget it was modified. |
