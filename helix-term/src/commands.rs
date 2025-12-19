@@ -560,6 +560,8 @@ impl MappableCommand {
         select_register, "Select register",
         insert_register, "Insert register",
         copy_between_registers, "Copy between two registers",
+        copy_register_to_yank, "Copy from some register into the default yank register",
+        copy_yank_to_register, "Copy the default yank register into some other register",
         align_view_middle, "Align view middle",
         align_view_top, "Align view top",
         align_view_center, "Align view center",
@@ -5964,6 +5966,66 @@ fn copy_between_registers(cx: &mut Context) {
                 Err(err) => cx.editor.set_error(err.to_string()),
             }
         });
+    });
+}
+
+fn copy_yank_to_register(cx: &mut Context) {
+    let source = cx.editor.config().default_yank_register;
+    let Some(values) = cx.editor.registers.read(source, cx.editor) else {
+        cx.editor.set_error(format!("register {source} is empty"));
+        return;
+    };
+    let values: Vec<_> = values.map(|value| value.to_string()).collect();
+
+    cx.editor.autoinfo = Some(Info::from_registers(
+        "Copy into register",
+        &cx.editor.registers,
+    ));
+    cx.on_next_key(move |cx, event| {
+        cx.editor.autoinfo = None;
+
+        let Some(dest) = event.char() else {
+            return;
+        };
+
+        let n_values = values.len();
+        match cx.editor.registers.write(dest, values) {
+            Ok(_) => cx.editor.set_status(format!(
+                "yanked {n_values} value{} from register {source} to {dest}",
+                if n_values == 1 { "" } else { "s" }
+            )),
+            Err(err) => cx.editor.set_error(err.to_string()),
+        }
+    });
+}
+
+fn copy_register_to_yank(cx: &mut Context) {
+    cx.editor.autoinfo = Some(Info::from_registers(
+        "Copy from register",
+        &cx.editor.registers,
+    ));
+    cx.on_next_key(move |cx, event| {
+        cx.editor.autoinfo = None;
+
+        let Some(source) = event.char() else {
+            return;
+        };
+
+        let Some(values) = cx.editor.registers.read(source, cx.editor) else {
+            cx.editor.set_error(format!("register {source} is empty"));
+            return;
+        };
+        let values: Vec<_> = values.map(|value| value.to_string()).collect();
+        let n_values = values.len();
+
+        let dest = cx.editor.config().default_yank_register;
+        match cx.editor.registers.write(dest, values) {
+            Ok(_) => cx.editor.set_status(format!(
+                "yanked {n_values} value{} from register {source} to {dest}",
+                if n_values == 1 { "" } else { "s" }
+            )),
+            Err(err) => cx.editor.set_error(err.to_string()),
+        }
     });
 }
 
