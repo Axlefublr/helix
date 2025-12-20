@@ -1463,10 +1463,12 @@ fn reload(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyh
         view.ensure_cursor_in_view(doc, scrolloff);
     })?;
     if let Some(path) = doc.path() {
-        cx.editor
-            .language_servers
-            .file_event_handler
-            .file_changed(path.clone());
+        if !cx.editor.file_watcher.is_watching(path) {
+            cx.editor
+                .language_servers
+                .file_event_handler
+                .file_changed(path.clone());
+        }
     }
     Ok(())
 }
@@ -1509,10 +1511,12 @@ fn reload_all(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> 
         }
 
         if let Some(path) = doc.path() {
-            cx.editor
-                .language_servers
-                .file_event_handler
-                .file_changed(path.clone());
+            if !cx.editor.file_watcher.is_watching(path) {
+                cx.editor
+                    .language_servers
+                    .file_event_handler
+                    .file_changed(path.clone());
+            }
         }
 
         for view_id in view_ids {
