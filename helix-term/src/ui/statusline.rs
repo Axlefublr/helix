@@ -134,6 +134,7 @@ where
         helix_view::editor::StatusLineElement::Spinner => render_lsp_spinner,
         helix_view::editor::StatusLineElement::FileBaseName => render_file_base_name,
         helix_view::editor::StatusLineElement::FileName => render_file_name,
+        helix_view::editor::StatusLineElement::SmartPath => render_smart_path,
         helix_view::editor::StatusLineElement::FileAbsolutePath => render_file_absolute_path,
         helix_view::editor::StatusLineElement::FileModificationIndicator => {
             render_file_modification_indicator
@@ -469,6 +470,48 @@ where
             .map(|p| p.to_string_lossy())
             .unwrap_or_else(|| SCRATCH_BUFFER_NAME.into());
         format!(" {} ", path)
+    };
+
+    write(context, title.into());
+}
+
+fn render_smart_path<'a, F>(context: &mut RenderContext<'a>, write: F)
+where
+    F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
+{
+    let title = {
+        let path = context.doc.path();
+        let cwd = helix_stdx::path::fold_home_dir(helix_stdx::env::current_working_dir());
+        path.as_ref()
+            .map(|path| {
+                let path = helix_stdx::path::fold_home_dir(*path);
+                if let Ok(relative) = path.strip_prefix(&cwd) {
+                    let cwd_base = cwd
+                        .file_name()
+                        .expect("full path to cwd should never end in a ..")
+                        .to_string_lossy();
+                    relative
+                        .parent()
+                        .map(|the| {
+                            let relative_parent = the.to_string_lossy();
+                            if relative_parent.is_empty() {
+                                format!(" {cwd_base} ")
+                            } else {
+                                format!(" {cwd_base}/{relative_parent} ")
+                            }
+                        })
+                        .unwrap_or_default()
+                } else if let Some(parent) = path.parent() {
+                    let folded_parent = helix_stdx::path::fold_home_dir(parent);
+                    format!(
+                        " {folded_parent} ",
+                        folded_parent = folded_parent.to_string_lossy()
+                    )
+                } else {
+                    Default::default()
+                }
+            })
+            .unwrap_or_default()
     };
 
     write(context, title.into());
