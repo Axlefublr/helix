@@ -674,6 +674,8 @@ pub enum StatusLineElement {
     /// The relative file path
     FileName,
 
+    SmartPath,
+
     /// The file absolute path
     FileAbsolutePath,
 
