@@ -6,7 +6,6 @@ use helix_lsp::{
     util::lsp_range_to_range,
     LanguageServerId, LspProgressMap,
 };
-use helix_stdx::path::get_relative_path;
 use helix_view::{
     align_view,
     document::{DocumentOpenError, DocumentSavedEventResult},
@@ -638,10 +637,10 @@ impl Application {
         self.editor
             .set_doc_path(doc_save_event.doc_id, &doc_save_event.path);
         // TODO: fix being overwritten by lsp
-        self.editor.set_status(format!(
-            "'{}' written, {lines}L {size}",
-            get_relative_path(&doc_save_event.path).to_string_lossy(),
-        ));
+        // self.editor.set_status(format!(
+        //     "'{}' written, {lines}L {size}",
+        //     get_relative_path(&doc_save_event.path).to_string_lossy(),
+        // ));
     }
 
     #[inline(always)]
