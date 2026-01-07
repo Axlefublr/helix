@@ -54,19 +54,19 @@ pub enum Variable {
 
 impl Variable {
     pub const VARIANTS: &'static [Self] = &[
-        Self::CursorLine,
-        Self::CursorColumn,
-        Self::BufferName,
         Self::FullPath,
-        Self::LineEnding,
+        Self::RelativePath,
+        Self::BufferName,
+        Self::BufferParent,
         Self::WorkingDirectory,
         Self::WorkspaceDirectory,
-        Self::Language,
+        Self::CursorLine,
+        Self::CursorColumn,
         Self::Selection,
         Self::SelectionLineStart,
         Self::SelectionLineEnd,
-        Self::RelativePath,
-        Self::BufferParent,
+        Self::Language,
+        Self::LineEnding,
     ];
 
     pub const fn as_str(&self) -> &'static str {
