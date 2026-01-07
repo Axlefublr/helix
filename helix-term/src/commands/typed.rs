@@ -1248,10 +1248,10 @@ fn apply_directory_change(cx: &mut compositor::Context, dir: &Path) -> anyhow::R
         )
     })?;
 
-    cx.editor.set_status(format!(
-        "Current working directory is now {}",
-        helix_stdx::env::current_working_dir().display()
-    ));
+    // cx.editor.set_status(format!(
+    //     "Current working directory is now {}",
+    //     helix_stdx::env::current_working_dir().display()
+    // ));
 
     Ok(())
 }
