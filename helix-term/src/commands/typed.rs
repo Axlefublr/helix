@@ -1254,10 +1254,10 @@ fn change_current_directory(
         )
     })?;
 
-    cx.editor.set_status(format!(
-        "Current working directory is now {}",
-        helix_stdx::env::current_working_dir().display()
-    ));
+    // cx.editor.set_status(format!(
+    //     "Current working directory is now {}",
+    //     helix_stdx::env::current_working_dir().display()
+    // ));
 
     Ok(())
 }
