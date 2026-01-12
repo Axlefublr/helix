@@ -470,10 +470,10 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
 
         match direction {
             Direction::Forward => {
-                self.cursor = self.cursor.saturating_add(amount) % len;
+                self.cursor = self.cursor.saturating_add(amount).min(len - 1);
             }
             Direction::Backward => {
-                self.cursor = self.cursor.saturating_add(len).saturating_sub(amount) % len;
+                self.cursor = self.cursor.saturating_sub(amount);
             }
         }
     }
