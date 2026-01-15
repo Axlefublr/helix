@@ -100,6 +100,7 @@
 | `:echo` | Prints the given arguments to the statusline. |
 | `:echopy`, `:cc` | Put string into clipboard |
 | `:random`, `:rng`, `:rnd` | Randomize your selections. |
+| `:uniq` | Deduplicate selections with repeated content |
 | `:noop` | Does nothing. |
 | `:workspace-trust` | Add current workspace to the list of trusted workspaces. |
 | `:workspace-untrust` | Remove current workspace from the list of trusted workspaces. |
