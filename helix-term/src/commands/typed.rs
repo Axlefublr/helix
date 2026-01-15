@@ -2276,6 +2276,46 @@ fn language(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> any
     Ok(())
 }
 
+fn uniq(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+    let scrolloff = cx.editor.config().scrolloff;
+    let (view, doc) = current!(cx.editor);
+    let text = doc.text().slice(..);
+
+    let mut happened: HashSet<String> = HashSet::new();
+    let ranges: SmallVec<[Range; 1]> = doc
+        .selection(view.id)
+        .iter()
+        .filter_map(|range| {
+            let range_text = range.slice(text).chunks();
+            let range_text = if args.has_flag("insensitive") {
+                range_text.map(|chunk| chunk.to_lowercase()).collect()
+            } else {
+                range_text.collect()
+            };
+            // `ranges` can never end up empty due to here, so we don't gotta check SHIT afterwards: there will always be at least one valid selection, and we can act on just a single selection without any surprises either
+            // there being at least one selection at all times (for this `filter_map` to happen in the first place) is upheld by the rest of the editor I think
+            if happened.contains(&range_text) {
+                None
+            } else {
+                happened.insert(range_text);
+                Some(*range)
+            }
+        })
+        .collect();
+
+    let primary = doc.selection(view.id).primary();
+    let idx = ranges
+        .iter()
+        .position(|range| range.overlaps(&primary))
+        .unwrap_or(ranges.len() - 1);
+    doc.set_selection(view.id, Selection::new(ranges, idx));
+    view.ensure_cursor_in_view(doc, scrolloff);
+    Ok(())
+}
+
 fn sort(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow::Result<()> {
     if event != PromptEvent::Validate {
         return Ok(());
@@ -3891,6 +3931,25 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, None),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "uniq",
+        aliases: &[],
+        doc: "Deduplicate selections with repeated content",
+        fun: uniq,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (0, None),
+            flags: &[
+                Flag {
+                    name: "insensitive",
+                    alias: Some('i'),
+                    doc: "sort the ranges case-insensitively",
+                    ..Flag::DEFAULT
+                },
+            ],
             ..Signature::DEFAULT
         },
     },
