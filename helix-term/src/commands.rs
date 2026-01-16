@@ -640,6 +640,7 @@ impl MappableCommand {
         harp_register, "Interact with a register harp",
         harp_command, "Interact with a command harp",
         harp_mark, "Interact with a mark harp",
+        retain_column, "Keep only this column of selections",
     );
 }
 
@@ -1048,6 +1049,47 @@ fn goto_first_nonwhitespace_impl(view: &mut View, doc: &mut Document, movement: 
         }
     });
     doc.set_selection(view.id, selection);
+}
+
+fn retain_column(cx: &mut Context) {
+    ui::prompt(
+        cx,
+        "columns:".into(),
+        None,
+        ui::completers::none,
+        move |cx, input, event| {
+            if event != PromptEvent::Validate || input.is_empty() {
+                return;
+            }
+            let Ok(columns) = input.parse::<usize>() else {
+                cx.editor.set_error("not a valid integer");
+                return;
+            };
+            let (view, doc) = current!(cx.editor);
+            let selection = doc.selection(view.id);
+            let primary_index = selection.primary_index();
+            let keep_column = primary_index % columns;
+            let ranges: SmallVec<[Range; 1]> = selection
+                .iter()
+                .enumerate()
+                .filter(|(index, _)| index % columns == keep_column)
+                .map(|(_, range)| range.to_owned())
+                .collect();
+
+            if ranges.is_empty() {
+                cx.editor.set_error("action would destroy all selections");
+                return;
+            }
+
+            let primary = selection.primary();
+            let idx = ranges
+                .iter()
+                .position(|range| range.overlaps(&primary))
+                .unwrap_or(ranges.len() - 1);
+            push_jump(view, doc);
+            doc.set_selection(view.id, Selection::new(ranges, idx));
+        },
+    );
 }
 
 fn trim_selections(cx: &mut Context) {
