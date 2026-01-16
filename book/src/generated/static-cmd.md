@@ -330,3 +330,4 @@
 | `harp_register` | Interact with a register harp |  |
 | `harp_command` | Interact with a command harp |  |
 | `harp_mark` | Interact with a mark harp |  |
+| `retain_column` | Keep only this column of selections |  |
