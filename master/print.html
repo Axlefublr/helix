@@ -1259,6 +1259,10 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>:buffer-close!</code>, <code>:bc!</code>, <code>:bclose!</code></td><td>Close the current buffer forcefully, ignoring unsaved changes.</td></tr>
 <tr><td><code>:buffer-close-others</code>, <code>:bco</code>, <code>:bcloseother</code></td><td>Close all buffers but the currently focused one.</td></tr>
 <tr><td><code>:buffer-close-others!</code>, <code>:bco!</code>, <code>:bcloseother!</code></td><td>Force close all buffers but the currently focused one.</td></tr>
+<tr><td><code>:buffer-close-next</code>, <code>:bcn</code>, <code>:bclosenext</code></td><td>Close all buffers after the currently focused one.</td></tr>
+<tr><td><code>:buffer-close-next!</code>, <code>:bcn!</code>, <code>:bclosenext!</code></td><td>Force close all buffers after the currently focused one.</td></tr>
+<tr><td><code>:buffer-close-previous</code>, <code>:bcp</code>, <code>:bcloseprevious</code></td><td>Close all buffers before the currently focused one.</td></tr>
+<tr><td><code>:buffer-close-previous!</code>, <code>:bcp!</code>, <code>:bcloseprevious!</code></td><td>Force close all buffers before the currently focused one.</td></tr>
 <tr><td><code>:buffer-close-all</code>, <code>:bca</code>, <code>:bcloseall</code></td><td>Close all buffers without quitting.</td></tr>
 <tr><td><code>:buffer-close-all!</code>, <code>:bca!</code>, <code>:bcloseall!</code></td><td>Force close all buffers ignoring unsaved changes without quitting.</td></tr>
 <tr><td><code>:buffer-next</code>, <code>:bn</code>, <code>:bnext</code></td><td>Goto next buffer.</td></tr>
@@ -1431,6 +1435,7 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>select_all</code></td><td>Select whole document</td><td>normal: <code>%</code>, select: <code>%</code></td></tr>
 <tr><td><code>select_first_and_last_chars</code></td><td>Select first and last characters of each selection</td><td>normal: <code>&lt;A-S&gt;</code>, select: <code>&lt;A-S&gt;</code></td></tr>
 <tr><td><code>select_regex</code></td><td>Select all regex matches inside selections</td><td>normal: <code>s</code>, select: <code>s</code></td></tr>
+<tr><td><code>select_character</code></td><td>Select all matches of character you next press</td><td></td></tr>
 <tr><td><code>split_selection</code></td><td>Split selections on regex matches</td><td>normal: <code>S</code>, select: <code>S</code></td></tr>
 <tr><td><code>split_selection_on_newline</code></td><td>Split selection on newlines</td><td>normal: <code>&lt;A-s&gt;</code>, select: <code>&lt;A-s&gt;</code></td></tr>
 <tr><td><code>merge_selections</code></td><td>Merge selections</td><td>normal: <code>&lt;A-minus&gt;</code>, select: <code>&lt;A-minus&gt;</code></td></tr>
