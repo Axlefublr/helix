@@ -819,7 +819,7 @@ pub fn write_all_impl(
     cx: &mut compositor::Context,
     options: WriteAllOptions,
 ) -> anyhow::Result<()> {
-    let mut errors: Vec<&'static str> = Vec::new();
+    let errors: Vec<&'static str> = Vec::new();
     let config = cx.editor.config();
     let jobs = &mut cx.jobs;
     let saves: Vec<_> = cx
@@ -834,12 +834,7 @@ pub fn write_all_impl(
             if !doc.is_modified() {
                 return None;
             }
-            if doc.path().is_none() {
-                if options.write_scratch {
-                    errors.push("cannot write a buffer without a filename");
-                }
-                return None;
-            }
+            doc.path()?;
 
             // Look for a view to apply the formatting change to.
             let target_view = cx.editor.get_synced_view_id(doc.id());
