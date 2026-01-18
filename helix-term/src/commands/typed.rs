@@ -880,7 +880,7 @@ pub fn write_all_impl(
     cx: &mut compositor::Context,
     options: WriteAllOptions,
 ) -> anyhow::Result<()> {
-    let mut errors: Vec<&'static str> = Vec::new();
+    let errors: Vec<&'static str> = Vec::new();
     let config = cx.editor.config();
     let saves: Vec<_> = cx
         .editor
@@ -891,13 +891,7 @@ pub fn write_all_impl(
         .into_iter()
         .filter_map(|id| {
             let doc = doc!(cx.editor, &id);
-            if !doc.is_modified() {
-                return None;
-            }
-            if doc.path().is_none() {
-                if options.write_scratch {
-                    errors.push("cannot write a buffer without a filename");
-                }
+            if !(doc.is_modified() || options.unmodified && !doc.forsure_formatted) {
                 return None;
             }
 
