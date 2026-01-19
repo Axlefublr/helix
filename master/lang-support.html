@@ -259,11 +259,12 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>git-ignore</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-notes</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-rebase</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>github-action</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>actions-languageserver</code>, <code>yaml-language-server</code></td></tr>
 <tr><td>gitlab-ci</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>yaml-language-server</code>, <code>gitlab-ci-ls</code></td></tr>
 <tr><td>gjs</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>typescript-language-server</code>, <code>vscode-eslint-language-server</code>, <code>ember-language-server</code></td></tr>
 <tr><td>gleam</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>gleam</code></td></tr>
 <tr><td>glimmer</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ember-language-server</code></td></tr>
-<tr><td>glsl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>glsl_analyzer</code></td></tr>
+<tr><td>glsl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>glsl_analyzer</code>, <code>glsld</code></td></tr>
 <tr><td>gn</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>go</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>gopls</code>, <code>golangci-lint-langserver</code></td></tr>
 <tr><td>go-format-string</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
@@ -319,6 +320,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>kcl</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>kcl-language-server</code></td></tr>
 <tr><td>kconfig</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>kdl</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
+<tr><td>klog</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>koka</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>koka</code></td></tr>
 <tr><td>kotlin</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td><code>kotlin-language-server</code></td></tr>
 <tr><td>koto</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>koto-ls</code></td></tr>
@@ -333,6 +335,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>log</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>lpf</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>lua</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>lua-language-server</code></td></tr>
+<tr><td>lua-format-string</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>luap</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>luau</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>luau-lsp</code></td></tr>
 <tr><td>mail</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
@@ -356,7 +359,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>nickel</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>nls</code></td></tr>
 <tr><td>nim</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>nimlangserver</code></td></tr>
 <tr><td>nix</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>nil</code>, <code>nixd</code></td></tr>
-<tr><td>nu</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>nu</code></td></tr>
+<tr><td>nu</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>nu</code>, <code>nu-lint</code></td></tr>
 <tr><td>nunjucks</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>ocaml</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>ocamllsp</code></td></tr>
 <tr><td>ocaml-interface</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ocamllsp</code></td></tr>
@@ -388,6 +391,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>purescript</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>purescript-language-server</code></td></tr>
 <tr><td>python</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>ty</code>, <code>ruff</code>, <code>jedi-language-server</code>, <code>pylsp</code></td></tr>
 <tr><td>qml</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>qmlls</code></td></tr>
+<tr><td>qmv</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>quarto</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>quint</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>quint-language-server</code></td></tr>
 <tr><td>r</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>R</code></td></tr>
@@ -395,7 +399,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>regex</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
 <tr><td>rego</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>regols</code></td></tr>
 <tr><td>rescript</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>rescript-language-server</code></td></tr>
-<tr><td>ripple</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ripple-language-server</code></td></tr>
+<tr><td>ripple</td><td>✓</td><td></td><td></td><td>✓</td><td>✓</td><td><code>ripple-language-server</code></td></tr>
 <tr><td>rmarkdown</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>R</code></td></tr>
 <tr><td>robot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>robotframework_ls</code></td></tr>
 <tr><td>robots.txt</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td></td></tr>
@@ -434,7 +438,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>sway</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>forc</code></td></tr>
 <tr><td>swift</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>sourcekit-lsp</code></td></tr>
 <tr><td>systemd</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>systemd-lsp</code></td></tr>
-<tr><td>systemverilog</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>verible-verilog-ls</code></td></tr>
+<tr><td>systemverilog</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>svlangserver</code>, <code>verible-verilog-ls</code></td></tr>
 <tr><td>t32</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>tablegen</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>tact</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -461,7 +465,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>v</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>v-analyzer</code></td></tr>
 <tr><td>vala</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>vala-language-server</code></td></tr>
 <tr><td>vento</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>verilog</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>svlangserver</code></td></tr>
+<tr><td>verilog</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>verible-verilog-ls</code></td></tr>
 <tr><td>vhdl</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>vhdl_ls</code></td></tr>
 <tr><td>vhs</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>vim</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
