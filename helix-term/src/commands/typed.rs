@@ -444,7 +444,9 @@ fn write_impl(
                     );
                     Job::with_callback(call).wait_before_exiting()
                 });
-            if fmt_job.is_none() {
+            // we don't want to save scratch buffers, but we *do* if we provide a name to save them under
+            // all I'm doing here is avoiding an annoying error message (that doesn't actually stop me in any way, notably)
+            if fmt_job.is_none() && (doc.path().is_some() || path.is_some()) {
                 if let Err(err) = editor.save(doc_id, path, force) {
                     editor.set_error(format!("Error saving: {}", err));
                 }
@@ -829,7 +831,7 @@ fn force_write_quit(
 pub(super) fn buffers_remaining_impl(editor: &mut Editor) -> anyhow::Result<()> {
     let modified_ids: Vec<_> = editor
         .documents()
-        .filter(|doc| doc.is_modified())
+        .filter(|doc| doc.is_modified() && doc.path().is_some())
         .map(|doc| doc.id())
         .collect();
 
