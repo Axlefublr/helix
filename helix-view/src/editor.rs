@@ -1954,7 +1954,7 @@ impl Editor {
             Some(doc) => doc,
             None => return Err(CloseError::DoesNotExist),
         };
-        if !force && doc.is_modified() {
+        if !force && doc.path().is_some() && doc.is_modified() {
             return Err(CloseError::BufferModified(doc.display_name().into_owned()));
         }
 

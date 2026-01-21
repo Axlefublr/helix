@@ -422,7 +422,9 @@ fn write_impl(
 
     if fmt.is_none() {
         let id = doc.id();
-        cx.editor.save(id, path, options.force)?;
+        if doc.path().is_some() {
+            cx.editor.save(id, path, options.force)?;
+        }
     }
 
     Ok(())
@@ -781,7 +783,7 @@ fn force_write_quit(
 pub(super) fn buffers_remaining_impl(editor: &mut Editor) -> anyhow::Result<()> {
     let modified_ids: Vec<_> = editor
         .documents()
-        .filter(|doc| doc.is_modified())
+        .filter(|doc| doc.is_modified() && doc.path().is_some())
         .map(|doc| doc.id())
         .collect();
 
