@@ -2164,7 +2164,7 @@ impl Editor {
             Some(doc) => doc,
             None => return Err(CloseError::DoesNotExist),
         };
-        if !force && doc.is_modified() {
+        if !force && doc.path().is_some() && doc.is_modified() {
             return Err(CloseError::BufferModified(doc.display_name().into_owned()));
         }
 
@@ -2266,7 +2266,10 @@ impl Editor {
 
         let path = path.map(|path| path.into());
         let doc = doc_mut!(self, &doc_id);
-        let doc_save_future = doc.save(path, force)?;
+        let doc_save_future = match doc.save(path, force) {
+            Some(result) => result?,
+            None => return Ok(()),
+        };
 
         // When a file is written to, notify the file event handler.
         // Note: This can be removed once proper file watching is implemented.
