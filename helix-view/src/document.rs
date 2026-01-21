@@ -983,12 +983,17 @@ impl Document {
         &mut self,
         path: Option<P>,
         force: bool,
-    ) -> Result<
-        impl Future<Output = Result<DocumentSavedEvent, anyhow::Error>> + 'static + Send,
-        anyhow::Error,
+    ) -> Option<
+        Result<
+            impl Future<Output = Result<DocumentSavedEvent, anyhow::Error>> + 'static + Send,
+            anyhow::Error,
+        >,
     > {
         let path = path.map(|path| path.into());
-        self.save_impl(path, force)
+        if path.is_none() && self.path.is_none() {
+            return None;
+        }
+        Some(self.save_impl(path, force))
 
         // futures_util::future::Ready<_>,
     }
