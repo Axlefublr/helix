@@ -231,6 +231,10 @@ impl<T, D> Column<T, D> {
         let text: String = self.format(item, data).content.into();
         text.into()
     }
+
+    pub fn name(&self) -> Arc<str> {
+        self.name.clone()
+    }
 }
 
 /// Returns a new list of options to replace the contents of the picker
@@ -510,6 +514,22 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
             .get(&self.columns[self.primary_column].name)
             .cloned()
             .unwrap_or_else(|| "".into())
+    }
+
+    /// Name of the next *not* primary column
+    /// Will return `bindings` in `command_palette` for instance
+    pub fn next_column_name(&self) -> Option<Arc<str>> {
+        self.columns
+            .iter()
+            .enumerate()
+            .filter_map(|(index, the)| {
+                if index != self.primary_column {
+                    Some(the.name())
+                } else {
+                    None
+                }
+            })
+            .next()
     }
 
     fn header_height(&self) -> u16 {
@@ -1142,6 +1162,12 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
             }
             ctrl!('t') => {
                 self.toggle_preview();
+            }
+            alt!('m') => {
+                if let Some(name) = self.next_column_name() {
+                    self.prompt.insert_str(&format!(" %{name} "), ctx.editor);
+                    self.handle_prompt_change(true);
+                }
             }
             _ => {
                 self.prompt_handle_event(event, ctx);
