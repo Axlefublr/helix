@@ -690,11 +690,12 @@ impl EditorView {
         // Build buffer entries: " filename[+] " with is_active flag
         let entries: Vec<(String, bool)> = editor
             .documents()
-            .map(|doc| {
+            .enumerate()
+            .map(|(index, doc)| {
                 let filename = Self::make_document_name(doc, editor);
 
                 let modified = if doc.is_modified() { "[+]" } else { "" };
-                let label = format!("{filename}{modified}  ");
+                let label = format!("{} {filename}{modified}  ", index + 1);
                 (label, doc.id() == current_doc)
             })
             .collect();
