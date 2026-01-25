@@ -632,7 +632,7 @@ impl EditorView {
                 let filename = Self::make_document_name(doc, editor);
 
                 let modified = if doc.is_modified() { "[+]" } else { "" };
-                let label = format!(" {filename}{modified} ");
+                let label = format!("{filename}{modified}  ");
                 (label, doc.id() == current_doc)
             })
             .collect();
