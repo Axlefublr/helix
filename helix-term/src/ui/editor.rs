@@ -631,7 +631,11 @@ impl EditorView {
             .map(|doc| {
                 let filename = Self::make_document_name(doc, editor);
 
-                let modified = if doc.is_modified() { "[+]" } else { "" };
+                let modified = if doc.is_modified() && doc.path().is_some() {
+                    "[+]"
+                } else {
+                    ""
+                };
                 let label = format!("{filename}{modified}  ");
                 (label, doc.id() == current_doc)
             })
