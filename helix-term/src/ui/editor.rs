@@ -30,7 +30,13 @@ use helix_view::{
     keyboard::{KeyCode, KeyModifiers},
     Document, Editor, Theme, View,
 };
-use std::{mem::take, num::NonZeroUsize, ops, path::PathBuf, rc::Rc};
+use std::{
+    mem::take,
+    num::NonZeroUsize,
+    ops,
+    path::{PathBuf, MAIN_SEPARATOR, MAIN_SEPARATOR_STR},
+    rc::Rc,
+};
 
 use tui::{buffer::Buffer as Surface, text::Span};
 
@@ -600,7 +606,6 @@ impl EditorView {
 
     /// Render bufferline at the top
     pub fn render_bufferline(editor: &Editor, viewport: Rect, surface: &mut Surface) {
-        let scratch = PathBuf::from(SCRATCH_BUFFER_NAME); // default filename to use for scratch buffer
         surface.clear_with(
             viewport,
             editor
@@ -624,12 +629,7 @@ impl EditorView {
         let entries: Vec<(String, bool)> = editor
             .documents()
             .map(|doc| {
-                let filename = doc
-                    .path()
-                    .unwrap_or(&scratch)
-                    .file_name()
-                    .and_then(|s| s.to_str())
-                    .unwrap_or("scratch");
+                let filename = Self::make_document_name(doc, editor);
 
                 let modified = if doc.is_modified() { "[+]" } else { "" };
                 let label = format!(" {filename}{modified} ");
@@ -637,7 +637,7 @@ impl EditorView {
             })
             .collect();
 
-        let total_width: u16 = entries.iter().map(|(label, _)| label.width() as u16).sum();
+        let total_width: u16 = entries.iter().map(|(label, _)| label.len() as u16).sum();
 
         // No scrolling when all buffers fit
         if total_width <= viewport.width {
@@ -660,7 +660,7 @@ impl EditorView {
         let mut offset_before_active = 0;
 
         for (label, is_active) in &entries {
-            let w = label.width() as u16;
+            let w = label.len() as u16;
             if *is_active {
                 break;
             }
@@ -677,7 +677,7 @@ impl EditorView {
         let mut pos = 0;
 
         for (label, is_active) in entries {
-            let label_width = label.width() as u16;
+            let label_width = label.len() as u16;
 
             // Skip entries completely left of viewport
             if pos + label_width <= scroll {
@@ -703,6 +703,67 @@ impl EditorView {
         }
 
         surface.set_spans(viewport.x, viewport.y, &spans.into(), viewport.width);
+    }
+
+    fn make_document_name(doc: &Document, editor: &Editor) -> String {
+        if doc.path().is_none() {
+            return SCRATCH_BUFFER_NAME.to_owned();
+        }
+
+        let scratch = PathBuf::from(SCRATCH_BUFFER_NAME); // default filename to use for scratch buffer
+
+        let paths: Vec<String> = editor
+            .documents()
+            .map(|d| {
+                d.path()
+                    .unwrap_or(&scratch)
+                    .to_str()
+                    .unwrap_or_default()
+                    .to_string()
+            })
+            .collect();
+
+        let components: Vec<Vec<String>> = paths
+            .iter()
+            .map(|p| p.split(MAIN_SEPARATOR).map(String::from).collect())
+            .collect();
+
+        let doc_path = doc
+            .path()
+            .unwrap_or(&scratch)
+            .to_str()
+            .unwrap_or_default()
+            .to_string();
+
+        let doc_index = paths.iter().position(|p| p == &doc_path).unwrap();
+        let doc_components_len = components[doc_index].len();
+
+        let mut k = 1;
+
+        loop {
+            let start = doc_components_len.saturating_sub(k);
+            let curr_doc: Vec<&str> = components[doc_index][start..]
+                .iter()
+                .map(|s| s.as_str())
+                .collect();
+
+            let count = components
+                .iter()
+                .enumerate()
+                .filter(|&(index, _)| index != doc_index)
+                .filter(|&(_, parts)| {
+                    let len = parts.len();
+                    let start = len.saturating_sub(k);
+                    parts[start..] == curr_doc
+                })
+                .count();
+
+            if count == 0 {
+                return curr_doc.join(MAIN_SEPARATOR_STR);
+            }
+
+            k += 1;
+        }
     }
 
     pub fn render_gutter<'d>(
