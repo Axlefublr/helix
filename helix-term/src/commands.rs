@@ -5568,8 +5568,15 @@ fn paste_impl(
                     .unwrap_or_default();
                 let anchor = offset + pos;
 
-                let new_range =
-                    Range::new(anchor, anchor + value_len).with_direction(range.direction());
+                let new_range = Range::new(
+                    anchor,
+                    anchor + value_len + if mode == Mode::Insert { 1 } else { 0 },
+                )
+                .with_direction(if mode == Mode::Insert {
+                    Direction::Forward
+                } else {
+                    range.direction()
+                });
                 ranges.push(new_range);
                 offset += value_len;
                 value
@@ -5579,7 +5586,7 @@ fn paste_impl(
         (pos, pos, value)
     });
 
-    if mode == Mode::Normal {
+    if mode == Mode::Normal || mode == Mode::Insert {
         transaction = transaction.with_selection(Selection::new(ranges, selection.primary_index()));
     }
 
