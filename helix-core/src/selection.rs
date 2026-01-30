@@ -51,7 +51,7 @@ use std::{borrow::Cow, iter, slice};
 /// single grapheme inward from the range's edge.  There are a
 /// variety of helper methods on `Range` for working in terms of
 /// that block cursor, all of which have `cursor` in their name.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Range {
     /// The anchor of the range: the side that doesn't move when extending.
     pub anchor: usize,

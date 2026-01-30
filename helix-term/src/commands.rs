@@ -547,6 +547,9 @@ impl MappableCommand {
         select_all_children, "Select all children of the current node",
         jump_forward, "Jump forward on jumplist",
         jump_backward, "Jump backward on jumplist",
+        mark_add, "Add current selections to the mark list",
+        mark_replace, "Replace mark list with current selections",
+        mark_apply, "Replace current selections with the mark list",
         save_selection, "Save current selection to jumplist",
         jump_view_right, "Jump to right split",
         jump_view_left, "Jump to left split",
@@ -6378,6 +6381,43 @@ fn save_selection(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     push_jump(view, doc);
     // cx.editor.set_status("Selection saved to jumplist");
+}
+
+fn mark_replace(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    doc.marks.clear();
+    let ranges: SmallVec<[Range; 1]> = doc.selection(view.id).ranges().into();
+    for range in ranges {
+        doc.marks.insert(range);
+    }
+    cx.editor.set_status("mark replace");
+}
+
+fn mark_add(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let ranges: SmallVec<[Range; 1]> = doc.selection(view.id).ranges().into();
+    for range in ranges {
+        doc.marks.insert(range);
+    }
+    cx.editor.set_status("mark add");
+}
+
+fn mark_apply(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    push_jump(view, doc);
+    let text_length = doc.text().len_chars();
+    let mut selection = SmallVec::with_capacity(doc.marks.len());
+    for range in doc.marks.iter() {
+        if range.head > text_length || range.anchor > text_length {
+            continue;
+        }
+        selection.push(*range);
+    }
+    if selection.is_empty() {
+        cx.editor.set_error("all marks are out of range");
+        return;
+    }
+    doc.set_selection(view.id, Selection::new(selection, 0));
 }
 
 fn rotate_view(cx: &mut Context) {
