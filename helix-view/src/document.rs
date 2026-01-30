@@ -22,7 +22,6 @@ use thiserror;
 use ::parking_lot::Mutex;
 use serde::de::{self, Deserialize, Deserializer};
 use serde::Serialize;
-use std::borrow::Cow;
 use std::cell::Cell;
 use std::collections::HashMap;
 use std::fmt::Display;
@@ -32,6 +31,7 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use std::sync::{Arc, Weak};
 use std::time::SystemTime;
+use std::{borrow::Cow, collections::HashSet};
 
 use helix_core::{
     editor_config::EditorConfig,
@@ -144,6 +144,7 @@ pub struct Document {
     selections: HashMap<ViewId, Selection>,
     view_data: HashMap<ViewId, ViewData>,
     pub active_snippet: Option<ActiveSnippet>,
+    pub marks: HashSet<Range>,
 
     /// Inlay hints annotations for the document, by view.
     ///
@@ -697,6 +698,7 @@ impl Document {
         Self {
             id: DocumentId::default(),
             active_snippet: None,
+            marks: Default::default(),
             path: None,
             relative_path: OnceCell::new(),
             encoding,
