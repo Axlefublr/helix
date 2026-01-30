@@ -181,15 +181,9 @@ impl<T: Item> Menu<T> {
     fn adjust_scroll(&mut self) {
         let win_height = self.size.1 as usize;
         if let Some(cursor) = self.cursor {
-            let mut scroll = self.scroll;
-            if cursor > (win_height + scroll).saturating_sub(1) {
-                // scroll down
-                scroll += cursor - (win_height + scroll).saturating_sub(1)
-            } else if cursor < scroll {
-                // scroll up
-                scroll = cursor
-            }
-            self.scroll = scroll;
+            self.scroll = cursor
+                .saturating_sub(win_height / 2)
+                .min(self.len() - win_height);
         }
     }
 
