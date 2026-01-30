@@ -160,6 +160,7 @@ pub struct Document {
     pub active_snippet: Option<ActiveSnippet>,
     /// Current search information.
     last_search_match: HashMap<ViewId, SearchMatch>,
+    pub marks: HashSet<Range>,
 
     /// Inlay hints annotations for the document, by view.
     ///
@@ -749,6 +750,7 @@ impl Document {
         Self {
             id: DocumentId::default(),
             active_snippet: None,
+            marks: Default::default(),
             path: None,
             relative_path: OnceCell::new(),
             workspace_root: OnceCell::new(),
