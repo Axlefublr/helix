@@ -97,9 +97,7 @@ impl<T: Item> Menu<T> {
     }
 
     pub fn move_up(&mut self) {
-        let len = self.matches.len();
-        let max_index = len.saturating_sub(1);
-        let pos = self.cursor.map_or(max_index, |i| (i + max_index) % len) % len;
+        let pos = self.cursor.map_or(0, |i| i.saturating_sub(1));
         self.cursor = Some(pos);
         self.adjust_scroll();
     }
@@ -114,7 +112,11 @@ impl<T: Item> Menu<T> {
 
     pub fn move_down(&mut self) {
         let len = self.matches.len();
-        let pos = self.cursor.map_or(0, |i| i + 1) % len;
+        let max_index = len.saturating_sub(1);
+        let pos = self
+            .cursor
+            .map_or(0, |i| i.saturating_add(1))
+            .min(max_index);
         self.cursor = Some(pos);
         self.adjust_scroll();
     }
