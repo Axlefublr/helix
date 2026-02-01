@@ -187,6 +187,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>bovex</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
 <tr><td>c</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>clangd</code></td></tr>
 <tr><td>c-sharp</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td><code>OmniSharp</code>, <code>csharp-ls</code></td></tr>
+<tr><td>c3</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>c3-lsp</code></td></tr>
 <tr><td>cabal</td><td></td><td></td><td></td><td></td><td></td><td><code>haskell-language-server-wrapper</code></td></tr>
 <tr><td>caddyfile</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>cairo</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>cairo-language-server</code></td></tr>
@@ -266,6 +267,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>glimmer</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>ember-language-server</code></td></tr>
 <tr><td>glsl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>glsl_analyzer</code>, <code>glsld</code></td></tr>
 <tr><td>gn</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>gnuplot</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>go</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>gopls</code>, <code>golangci-lint-langserver</code></td></tr>
 <tr><td>go-format-string</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
 <tr><td>godot-resource</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
@@ -329,6 +331,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>ldif</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>lean</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>lake</code></td></tr>
 <tr><td>ledger</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>less</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td><code>vscode-css-language-server</code></td></tr>
 <tr><td>llvm</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>llvm-mir</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>llvm-mir-yaml</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
@@ -371,10 +374,12 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>pascal</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>pasls</code></td></tr>
 <tr><td>passwd</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>pem</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>penrose</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>perl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>perlnavigator</code></td></tr>
 <tr><td>pest</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>pest-language-server</code></td></tr>
 <tr><td>php</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>intelephense</code></td></tr>
 <tr><td>php-only</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
+<tr><td>picat</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>pip-requirements</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>pkgbuild</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>termux-language-server</code>, <code>bash-language-server</code></td></tr>
 <tr><td>pkl</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>pkl-lsp</code></td></tr>
@@ -401,12 +406,12 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>rescript</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>rescript-language-server</code></td></tr>
 <tr><td>ripple</td><td>✓</td><td></td><td></td><td>✓</td><td>✓</td><td><code>ripple-language-server</code></td></tr>
 <tr><td>rmarkdown</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>R</code></td></tr>
-<tr><td>robot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>robotframework_ls</code></td></tr>
+<tr><td>robot</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>robotcode</code>, <code>robotframework_ls</code></td></tr>
 <tr><td>robots.txt</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>ron</td><td>✓</td><td></td><td>✓</td><td>✓</td><td>✓</td><td><code>ron-lsp</code></td></tr>
 <tr><td>rpmspec</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>rshtml</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>rshtml-analyzer</code>, <code>vscode-html-language-server</code>, <code>superhtml</code></td></tr>
-<tr><td>rst</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>rst</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>ruby</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>ruby-lsp</code>, <code>solargraph</code></td></tr>
 <tr><td>rust</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>rust-analyzer</code></td></tr>
 <tr><td>rust-format-args</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -414,13 +419,13 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>sage</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>scala</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>metals</code></td></tr>
 <tr><td>scfg</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>scheme</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td></tr>
+<tr><td>scheme</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td></tr>
 <tr><td>scss</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td><code>vscode-css-language-server</code></td></tr>
 <tr><td>shellcheckrc</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
 <tr><td>slang</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>slangd</code></td></tr>
 <tr><td>slint</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>slint-lsp</code></td></tr>
 <tr><td>slisp</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
-<tr><td>smali</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td></td></tr>
+<tr><td>smali</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>smalisp</code></td></tr>
 <tr><td>smithy</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>cs</code></td></tr>
 <tr><td>sml</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>snakemake</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>pylsp</code></td></tr>
@@ -450,9 +455,10 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>textproto</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>tfvars</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>terraform-ls</code></td></tr>
 <tr><td>thrift</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>tilt</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>tilt</code></td></tr>
 <tr><td>tlaplus</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>todotxt</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>toml</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>taplo</code>, <code>tombi</code></td></tr>
+<tr><td>toml</td><td>✓</td><td>✓</td><td></td><td>✓</td><td>✓</td><td><code>taplo</code>, <code>tombi</code></td></tr>
 <tr><td>tsq</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td><code>ts_query_ls</code></td></tr>
 <tr><td>tsx</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>twig</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
