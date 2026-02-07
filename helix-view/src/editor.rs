@@ -2152,6 +2152,7 @@ impl Editor {
         }
         self.tree.remove(id);
         self._refresh();
+        let _ = self.registers.intract();
     }
 
     pub fn close_document(&mut self, doc_id: DocumentId, force: bool) -> Result<(), CloseError> {
