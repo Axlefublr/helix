@@ -1,4 +1,9 @@
-use std::{borrow::Cow, collections::HashMap, iter};
+use std::{
+    borrow::Cow,
+    collections::HashMap,
+    io::{Read, Seek, Write},
+    iter,
+};
 
 use anyhow::Result;
 use arc_swap::access::DynAccess;
@@ -34,10 +39,55 @@ pub struct Registers {
 impl Registers {
     pub fn new(clipboard_provider: Box<dyn DynAccess<ClipboardProvider>>) -> Self {
         Self {
-            inner: Default::default(),
+            inner: Self::extract().unwrap_or_default(),
             clipboard_provider,
             last_search_register: '/',
         }
+    }
+
+    fn extract() -> Result<HashMap<char, Vec<String>>> {
+        const HOME: &str = std::env!("HOME");
+        let mut path = std::path::PathBuf::from(HOME);
+        path.push(".cache");
+        path.push("helix-register-persistence.json");
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .read(true)
+            .truncate(false)
+            .create(true)
+            .open(path)?;
+        let mut buf = String::new();
+        file.read_to_string(&mut buf)?;
+        if buf.is_empty() {
+            buf.push_str("{}");
+        }
+        let inner: HashMap<char, Vec<String>> = serde_json::from_str(&buf)?;
+        Ok(inner)
+    }
+
+    pub fn intract(&self) -> Result<()> {
+        const HOME: &str = std::env!("HOME");
+        let mut path = std::path::PathBuf::from(HOME);
+        path.push(".cache");
+        path.push("helix-register-persistence.json");
+        let mut file = std::fs::OpenOptions::new()
+            .write(true)
+            .read(true)
+            .truncate(false)
+            .create(true)
+            .open(path)?;
+        let mut buf = String::new();
+        file.read_to_string(&mut buf)?;
+        if buf.is_empty() {
+            buf.push_str("{}");
+        }
+        let mut stored_registers: HashMap<char, Vec<String>> = serde_json::from_str(&buf)?;
+        stored_registers.extend(self.inner.clone());
+        file.set_len(0)?;
+        file.rewind()?;
+        let json = serde_json::to_string(&stored_registers)?;
+        file.write_all(json.as_bytes())?;
+        Ok(())
     }
 
     pub fn read<'a>(&'a self, name: char, editor: &'a Editor) -> Option<RegisterValues<'a>> {
