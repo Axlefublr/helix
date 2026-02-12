@@ -163,11 +163,25 @@ pub fn expand_shell<'a>(editor: &Editor, content: Cow<'a, str>) -> Result<Cow<'a
     let content = expand_inner(editor, content)?;
 
     let config = editor.config();
-    let shell = &config.shell;
+    let mut chrs = content.chars();
+    let Some(first_char) = chrs.next() else {
+        bail!("Empty shell expansion");
+    };
+    let (cmd, shell) = if let Some(shell) = config.shellmap.get(&first_char) {
+        let Some((cmd_start, _char)) = content.char_indices().nth(1) else {
+            bail!("Empty shellmap command");
+        };
+        (
+            Cow::Borrowed(content.get(cmd_start..).unwrap_or_default()),
+            shell,
+        )
+    } else {
+        (content, &config.shell)
+    };
     let mut process = Command::new(&shell[0]);
     process
         .args(&shell[1..])
-        .arg(content.as_ref())
+        .arg(cmd.as_ref())
         .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
@@ -187,7 +201,7 @@ pub fn expand_shell<'a>(editor: &Editor, content: Cow<'a, str>) -> Result<Cow<'a
 
     if !output.stderr.is_empty() {
         log::warn!(
-            "Shell expansion command `{content}` failed: {}",
+            "Shell expansion command `{cmd}` failed: {}",
             String::from_utf8_lossy(&output.stderr)
         );
     }

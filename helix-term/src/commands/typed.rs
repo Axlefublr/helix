@@ -2486,8 +2486,21 @@ fn run_shell_command(
         return Ok(());
     }
 
-    let shell = cx.editor.config().shell.clone();
-    let args = args.join(" ");
+    let cmd = args.join(" ");
+    let config = cx.editor.config();
+    let mut chrs = cmd.chars();
+    let Some(first_char) = chrs.next() else {
+        return Ok(());
+    };
+    let (cmd, shell) = if let Some(shell) = config.shellmap.get(&first_char) {
+        let Some((cmd_start, _char)) = cmd.char_indices().nth(1) else {
+            return Ok(());
+        };
+        (cmd.get(cmd_start..).unwrap_or_default(), shell.clone())
+    } else {
+        (cmd.as_str(), config.shell.clone())
+    };
+    let args = cmd.to_owned();
 
     let callback = async move {
         let output = shell_impl_async(&shell, &args, None).await?;
