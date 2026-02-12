@@ -318,6 +318,7 @@ pub struct Config {
     pub mouse_yank_register: char,
     /// Shell to use for shell commands. Defaults to ["cmd", "/C"] on Windows and ["sh", "-c"] otherwise.
     pub shell: Vec<String>,
+    pub shellmap: HashMap<char, Vec<String>>,
     /// Line number mode.
     pub line_number: LineNumber,
     /// Highlight the lines cursors are currently on. Defaults to false.
@@ -1134,6 +1135,7 @@ impl Default for Config {
             } else {
                 vec!["sh".to_owned(), "-c".to_owned()]
             },
+            shellmap: Default::default(),
             line_number: LineNumber::Absolute,
             cursorline: false,
             cursorcolumn: false,
