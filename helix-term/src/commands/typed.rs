@@ -2743,8 +2743,11 @@ fn run_shell_command(
         return Ok(());
     }
 
-    let shell = cx.editor.config().shell.clone();
-    let args = args.join(" ");
+    let cmd = args.join(" ");
+    let Some((cmd, shell)) = shellmap(&*cx, &cmd) else {
+        return Ok(());
+    };
+    let args = cmd.to_owned();
 
     let callback = async move {
         let output = shell_impl_async(&shell, &args, None).await?;
