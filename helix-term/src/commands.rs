@@ -6371,7 +6371,20 @@ fn shell_append_output(cx: &mut Context) {
 
 fn shell_keep_pipe(cx: &mut Context) {
     shell_prompt(cx, "keep-pipe:".into(), |cx, args| {
-        let shell = &cx.editor.config().shell;
+        let cmd = args.join(" ");
+        let config = cx.editor.config();
+        let mut chrs = cmd.chars();
+        let Some(first_char) = chrs.next() else {
+            return;
+        };
+        let (cmd, shell) = if let Some(shell) = config.shellmap.get(&first_char) {
+            let Some((cmd_start, _char)) = cmd.char_indices().nth(1) else {
+                return;
+            };
+            (cmd.get(cmd_start..).unwrap_or_default(), shell)
+        } else {
+            (cmd.as_str(), &config.shell)
+        };
         let (view, doc) = current!(cx.editor);
         let selection = doc.selection(view.id);
 
@@ -6382,7 +6395,7 @@ fn shell_keep_pipe(cx: &mut Context) {
 
         for (i, range) in selection.ranges().iter().enumerate() {
             let fragment = range.slice(text);
-            if let Err(err) = shell_impl(shell, args.join(" ").as_str(), Some(fragment.into())) {
+            if let Err(err) = shell_impl(shell, cmd, Some(fragment.into())) {
                 log::debug!("Shell command failed: {}", err);
             } else {
                 ranges.push(*range);
@@ -6480,7 +6493,18 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     };
 
     let config = cx.editor.config();
-    let shell = &config.shell;
+    let mut chrs = cmd.chars();
+    let Some(first_char) = chrs.next() else {
+        return;
+    };
+    let (cmd, shell) = if let Some(shell) = config.shellmap.get(&first_char) {
+        let Some((cmd_start, _char)) = cmd.char_indices().nth(1) else {
+            return;
+        };
+        (cmd.get(cmd_start..).unwrap_or_default(), shell)
+    } else {
+        (cmd, &config.shell)
+    };
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id);
 
