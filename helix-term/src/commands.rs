@@ -6734,7 +6734,10 @@ fn shell_append_output(cx: &mut Context) {
 
 fn shell_keep_pipe(cx: &mut Context) {
     shell_prompt(cx, "keep-pipe:".into(), |cx, args| {
-        let shell = &cx.editor.config().shell;
+        let cmd = args.join(" ");
+        let Some((cmd, shell)) = shellmap(&*cx, &cmd) else {
+            return;
+        };
         let (view, doc) = current!(cx.editor);
         let selection = doc.selection(view.id);
 
@@ -6745,7 +6748,7 @@ fn shell_keep_pipe(cx: &mut Context) {
 
         for (i, range) in selection.ranges().iter().enumerate() {
             let fragment = range.slice(text);
-            if let Err(err) = shell_impl(shell, args.join(" ").as_str(), Some(fragment.into())) {
+            if let Err(err) = shell_impl(&shell, &cmd, Some(fragment.into())) {
                 log::debug!("Shell command failed: {}", err);
             } else {
                 ranges.push(*range);
@@ -6763,6 +6766,17 @@ fn shell_keep_pipe(cx: &mut Context) {
         let index = index.unwrap_or_else(|| ranges.len() - 1);
         doc.set_selection(view.id, Selection::new(ranges, index));
     });
+}
+
+fn shellmap(cx: &compositor::Context, cmd: &str) -> Option<(String, Vec<String>)> {
+    let mut chrs = cmd.chars();
+    let first_char = chrs.next()?;
+    if let Some(shell) = cx.editor.config().shellmap.get(&first_char) {
+        let (cmd_start, _char) = cmd.char_indices().nth(1)?;
+        Some((cmd.get(cmd_start..)?.to_owned(), shell.to_owned()))
+    } else {
+        Some((cmd.to_owned(), cx.editor.config().shell.to_owned()))
+    }
 }
 
 fn shell_impl(shell: &[String], cmd: &str, input: Option<Rope>) -> anyhow::Result<Tendril> {
@@ -6843,7 +6857,9 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     };
 
     let config = cx.editor.config();
-    let shell = &config.shell;
+    let Some((cmd, shell)) = shellmap(&*cx, cmd) else {
+        return;
+    };
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id);
 
@@ -6858,7 +6874,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             output.clone()
         } else {
             let input = range.slice(text);
-            match shell_impl(shell, cmd, pipe.then(|| input.into())) {
+            match shell_impl(&shell, &cmd, pipe.then(|| input.into())) {
                 Ok(mut output) => {
                     if !input.ends_with("\n") && output.ends_with('\n') {
                         output.pop();
