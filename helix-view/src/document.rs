@@ -161,6 +161,7 @@ pub struct Document {
     /// Current search information.
     last_search_match: HashMap<ViewId, SearchMatch>,
     pub marks: HashSet<Range>,
+    pub last_insert_location: Option<Selection>,
 
     /// Inlay hints annotations for the document, by view.
     ///
@@ -715,6 +716,7 @@ impl Document {
             id: DocumentId::default(),
             active_snippet: None,
             marks: Default::default(),
+            last_insert_location: None,
             path: None,
             relative_path: OnceCell::new(),
             encoding,
