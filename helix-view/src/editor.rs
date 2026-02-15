@@ -2517,6 +2517,7 @@ impl Editor {
             return;
         }
 
+        let was_insert = self.mode == Mode::Insert;
         self.mode = Mode::Normal;
         let (view, doc) = current!(self);
 
@@ -2533,9 +2534,14 @@ impl Editor {
 
                 Range::new(range.from(), head)
             });
+            if was_insert {
+                doc.last_insert_location = Some(selection.clone());
+            }
 
             doc.set_selection(view.id, selection);
             doc.restore_cursor = false;
+        } else if was_insert {
+            doc.last_insert_location = Some(doc.selection(view.id).clone())
         }
     }
 

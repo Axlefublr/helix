@@ -434,6 +434,7 @@ impl MappableCommand {
         open_below, "Open new line below selection",
         open_above, "Open new line above selection",
         normal_mode, "Enter normal mode",
+        continue_last_insert, "Insert at the spot you were last inserting",
         select_mode, "Enter selection extend mode",
         exit_select_mode, "Exit selection mode",
         goto_definition, "Goto definition",
@@ -4375,6 +4376,20 @@ fn open_above(cx: &mut Context) {
 
 fn normal_mode(cx: &mut Context) {
     cx.editor.enter_normal_mode();
+}
+
+fn continue_last_insert(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    if let Some(selection) = doc.last_insert_location.clone() {
+        push_jump(view, doc);
+        let direction = selection.primary().direction();
+        doc.set_selection(view.id, selection);
+        if direction == Direction::Backward {
+            insert_mode(cx);
+        } else {
+            append_mode_same_line(cx);
+        }
+    }
 }
 
 // Store a jump on the jumplist.
