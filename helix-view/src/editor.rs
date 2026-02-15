@@ -27,7 +27,7 @@ use std::{
     cell::Cell,
     collections::{BTreeMap, HashMap, HashSet},
     fs,
-    io::{self, stdin},
+    io::{self, stdin, Read, Seek, Write},
     num::{NonZeroU8, NonZeroUsize},
     path::{Path, PathBuf},
     pin::Pin,
@@ -1952,15 +1952,64 @@ impl Editor {
         };
 
         self.switch(id, action);
+        let (view, doc) = current!(self);
+        let cache_directory = PathBuf::from(env!("HOME")).join(".cache").join("helix");
+        let _ = std::fs::create_dir_all(&cache_directory);
+        let stored_selections_path = cache_directory.join("selections.json");
+        let json = std::fs::read_to_string(stored_selections_path).unwrap_or_default();
+        let stored_selections: HashMap<String, Vec<Vec<usize>>> =
+            serde_json::from_str(&json).unwrap_or_default();
+        if let Some(selections) = stored_selections.get(&path.display().to_string()) {
+            let doc_size = doc.text().len_chars();
+            let stored_selection = selections.iter().filter_map(|selection| {
+                if selection.len() != 2 {
+                    return None;
+                }
+                if selection[0] > doc_size || selection[1] > doc_size {
+                    return None;
+                }
+                Some(Range::new(selection[0], selection[1]))
+            });
+            if stored_selection.clone().count() != 0 {
+                doc.set_selection(view.id, Selection::from_iter(stored_selection));
+            }
+        }
 
         Ok(id)
     }
 
     pub fn close(&mut self, id: ViewId) {
         // Remove selections for the closed view on all documents.
+        let cache_directory = PathBuf::from(env!("HOME")).join(".cache").join("helix");
+        let _ = std::fs::create_dir_all(&cache_directory);
+        let stored_selections_path = cache_directory.join("selections.json");
+        let mut file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .truncate(false)
+            .create(true)
+            .open(stored_selections_path)
+            .unwrap();
+        let mut json = String::new();
+        file.read_to_string(&mut json).unwrap();
+        let mut stored_selections: HashMap<String, Vec<Vec<usize>>> =
+            serde_json::from_str(&json).unwrap_or_default();
         for doc in self.documents_mut() {
+            if let Some(doc_path) = doc.path() {
+                let ranges = doc
+                    .selection(id)
+                    .ranges()
+                    .iter()
+                    .map(|range| vec![range.anchor, range.head])
+                    .collect::<Vec<_>>();
+                stored_selections.insert(doc_path.display().to_string(), ranges);
+            }
             doc.remove_view(id);
         }
+        let json = serde_json::to_string(&stored_selections).unwrap();
+        file.set_len(0).unwrap();
+        file.rewind().unwrap();
+        file.write_all(json.as_bytes()).unwrap();
         self.tree.remove(id);
         self._refresh();
     }
@@ -1982,10 +2031,34 @@ impl Editor {
             ReplaceDoc(ViewId, DocumentId),
         }
 
+        let cache_directory = PathBuf::from(env!("HOME")).join(".cache").join("helix");
+        let _ = std::fs::create_dir_all(&cache_directory);
+        let stored_selections_path = cache_directory.join("selections.json");
+        let mut file = std::fs::OpenOptions::new()
+            .read(true)
+            .write(true)
+            .truncate(false)
+            .create(true)
+            .open(stored_selections_path)
+            .unwrap();
+        let mut json = String::new();
+        file.read_to_string(&mut json).unwrap();
+        let mut stored_selections: HashMap<String, Vec<Vec<usize>>> =
+            serde_json::from_str(&json).unwrap_or_default();
+
         let actions: Vec<Action> = self
             .tree
             .views_mut()
             .filter_map(|(view, _focus)| {
+                if let Some(doc_path) = doc.path() {
+                    let ranges = doc
+                        .selection(view.id)
+                        .ranges()
+                        .iter()
+                        .map(|range| vec![range.anchor, range.head])
+                        .collect::<Vec<_>>();
+                    stored_selections.insert(doc_path.display().to_string(), ranges);
+                }
                 view.remove_document(&doc_id);
 
                 if view.doc == doc_id {
@@ -2001,6 +2074,11 @@ impl Editor {
                 }
             })
             .collect();
+
+        let json = serde_json::to_string(&stored_selections).unwrap();
+        file.set_len(0).unwrap();
+        file.rewind().unwrap();
+        file.write_all(json.as_bytes()).unwrap();
 
         for action in actions {
             match action {
