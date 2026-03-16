@@ -202,6 +202,7 @@ To set up Helix:</p>
 <li><a href="package-managers.html#flatpak">Flatpak</a></li>
 <li><a href="package-managers.html#snap">Snap</a></li>
 <li><a href="package-managers.html#appimage">AppImage</a></li>
+<li><a href="package-managers.html#linux-homebrew-core">Linux Homebrew Core</a></li>
 </ul>
 </li>
 <li><a href="package-managers.html#macos">macOS</a>
@@ -279,9 +280,15 @@ Download the official Helix AppImage from the <a href="https://github.com/helix-
 mv helix-*.AppImage "$HOME/.local/bin/hx"
 </code></pre>
 <p>and make sure <code>~/.local/bin</code> is in your <code>PATH</code>.</p>
+<h3 id="linux-homebrew-core"><a class="header" href="#linux-homebrew-core">Linux Homebrew Core</a></h3>
+<p>Checkout the <a href="package-managers.html#homebrew-core">macOS</a> instructions below.</p>
 <h2 id="macos"><a class="header" href="#macos">macOS</a></h2>
 <h3 id="homebrew-core"><a class="header" href="#homebrew-core">Homebrew Core</a></h3>
+<p>Install the latest release:</p>
 <pre><code class="language-sh">brew install helix
+</code></pre>
+<p>Or, install the latest nightly version:</p>
+<pre><code class="language-sh">brew install --HEAD helix
 </code></pre>
 <h3 id="macports"><a class="header" href="#macports">MacPorts</a></h3>
 <pre><code class="language-sh">sudo port install helix
@@ -1344,6 +1351,7 @@ space.B = ":echo %sh{git blame -L %{cursor_line},+1 %{buffer_name}}"
 <tr><td><code>:set-register</code></td><td>Set contents of the given register.</td></tr>
 <tr><td><code>:redraw</code></td><td>Clear and re-render the whole UI</td></tr>
 <tr><td><code>:move</code>, <code>:mv</code></td><td>Move the current buffer and its corresponding file to a different path</td></tr>
+<tr><td><code>:move!</code>, <code>:mv!</code></td><td>Move the current buffer and its corresponding file to a different path creating necessary subdirectories</td></tr>
 <tr><td><code>:yank-diagnostic</code></td><td>Yank diagnostic(s) under primary cursor to register, or clipboard by default</td></tr>
 <tr><td><code>:read</code>, <code>:r</code></td><td>Load a file into buffer</td></tr>
 <tr><td><code>:echo</code></td><td>Prints the given arguments to the statusline.</td></tr>
@@ -1742,9 +1750,9 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>bitbake</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>bitbake-language-server</code></td></tr>
 <tr><td>blade</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td></td></tr>
 <tr><td>blueprint</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>blueprint-compiler</code></td></tr>
-<tr><td>bovex</td><td>✓</td><td></td><td></td><td></td><td>✓</td><td></td></tr>
+<tr><td>bovex</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>c</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>clangd</code></td></tr>
-<tr><td>c-sharp</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td><code>OmniSharp</code>, <code>csharp-ls</code></td></tr>
+<tr><td>c-sharp</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td><code>roslyn-language-server</code>, <code>OmniSharp</code>, <code>csharp-ls</code></td></tr>
 <tr><td>c3</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>c3-lsp</code></td></tr>
 <tr><td>cabal</td><td></td><td></td><td></td><td></td><td></td><td><code>haskell-language-server-wrapper</code></td></tr>
 <tr><td>caddyfile</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -1814,7 +1822,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>git-attributes</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-cliff-config</td><td>✓</td><td>✓</td><td></td><td></td><td>✓</td><td><code>taplo</code>, <code>tombi</code></td></tr>
 <tr><td>git-commit</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>commit-lsp</code></td></tr>
-<tr><td>git-config</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td></td></tr>
+<tr><td>git-config</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>git-ignore</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-notes</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>git-rebase</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
@@ -1853,10 +1861,10 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>htmldjango</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>djlsp</code>, <code>vscode-html-language-server</code>, <code>superhtml</code></td></tr>
 <tr><td>hurl</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
 <tr><td>hy</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>hyuga</code></td></tr>
-<tr><td>hyprlang</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>hyprls</code></td></tr>
+<tr><td>hyprlang</td><td>✓</td><td></td><td>✓</td><td>✓</td><td></td><td><code>hyprls</code></td></tr>
 <tr><td>idris</td><td></td><td></td><td></td><td></td><td></td><td><code>idris2-lsp</code></td></tr>
 <tr><td>iex</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>ini</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
+<tr><td>ini</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td></td></tr>
 <tr><td>ink</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>inko</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td></tr>
 <tr><td>janet</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td></td></tr>
@@ -1870,9 +1878,9 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>jq</td><td>✓</td><td>✓</td><td></td><td></td><td></td><td><code>jq-lsp</code></td></tr>
 <tr><td>jsdoc</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>json</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>vscode-json-language-server</code></td></tr>
-<tr><td>json-ld</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>vscode-json-language-server</code></td></tr>
-<tr><td>json5</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
-<tr><td>jsonc</td><td>✓</td><td></td><td>✓</td><td></td><td>✓</td><td><code>vscode-json-language-server</code></td></tr>
+<tr><td>json-ld</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>vscode-json-language-server</code></td></tr>
+<tr><td>json5</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td></td></tr>
+<tr><td>jsonc</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>vscode-json-language-server</code></td></tr>
 <tr><td>jsonnet</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>jsonnet-language-server</code></td></tr>
 <tr><td>jsx</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td><code>typescript-language-server</code></td></tr>
 <tr><td>julia</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>julia</code></td></tr>
@@ -2000,7 +2008,7 @@ Languages</a> guide for more language configuration information.</p>
 <tr><td>svelte</td><td>✓</td><td></td><td>✓</td><td></td><td></td><td><code>svelteserver</code></td></tr>
 <tr><td>sway</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td><code>forc</code></td></tr>
 <tr><td>swift</td><td>✓</td><td>✓</td><td>✓</td><td></td><td>✓</td><td><code>sourcekit-lsp</code></td></tr>
-<tr><td>systemd</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>systemd-lsp</code></td></tr>
+<tr><td>systemd</td><td>✓</td><td></td><td></td><td>✓</td><td></td><td><code>systemd-lsp</code></td></tr>
 <tr><td>systemverilog</td><td>✓</td><td></td><td></td><td></td><td></td><td><code>svlangserver</code>, <code>verible-verilog-ls</code></td></tr>
 <tr><td>t32</td><td>✓</td><td></td><td></td><td></td><td></td><td></td></tr>
 <tr><td>tablegen</td><td>✓</td><td>✓</td><td>✓</td><td></td><td></td><td></td></tr>
@@ -3958,6 +3966,7 @@ testing.</p>
 <tr><td><code>definition.interface</code></td></tr>
 <tr><td><code>definition.macro</code></td></tr>
 <tr><td><code>definition.module</code></td></tr>
+<tr><td><code>definition.section</code></td></tr>
 <tr><td><code>definition.struct</code></td></tr>
 <tr><td><code>definition.type</code></td></tr>
 </tbody></table>
