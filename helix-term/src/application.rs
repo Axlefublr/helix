@@ -25,10 +25,11 @@ use crate::{
     handlers,
     job::Jobs,
     keymap::Keymaps,
-    ui::{self, overlay::overlaid},
+    ui::{self},
 };
 
 use log::{debug, error, info, warn};
+use std::path::PathBuf;
 use std::{
     io::{stdin, IsTerminal},
     path::Path,
@@ -78,6 +79,7 @@ pub struct Application {
     lsp_progress: LspProgressMap,
 
     theme_mode: Option<theme::Mode>,
+    startup_ripgrep: Option<PathBuf>,
 }
 
 #[cfg(feature = "integration")]
@@ -134,6 +136,8 @@ impl Application {
 
         let jobs = Jobs::new();
 
+        let mut startup_ripgrep = None;
+
         if args.load_tutor {
             let path = helix_loader::runtime_file(Path::new("tutor"));
             editor.open(&path, Action::VerticalSplit)?;
@@ -144,8 +148,7 @@ impl Application {
 
             // If the first file is a directory, skip it and open a picker
             if let Some((first, _)) = files_it.next_if(|(p, _)| p.is_dir()) {
-                let picker = ui::file_picker(&editor, first);
-                compositor.push(Box::new(overlaid(picker)));
+                startup_ripgrep = Some(first);
             }
 
             // If there are any more files specified, open them
@@ -246,6 +249,7 @@ impl Application {
             jobs,
             lsp_progress: LspProgressMap::new(),
             theme_mode,
+            startup_ripgrep,
         };
 
         Ok(app)
@@ -289,6 +293,29 @@ impl Application {
         S: Stream<Item = std::io::Result<TerminalEvent>> + Unpin,
     {
         self.render().await;
+
+        if let Some(dir) = self.startup_ripgrep.take() {
+            let mut cx = crate::commands::Context {
+                register: None,
+                count: None,
+                editor: &mut self.editor,
+                jobs: &mut self.jobs,
+                callback: Vec::new(),
+                on_next_key_callback: None,
+            };
+
+            crate::commands::global_search_impl(&mut cx, dir);
+
+            for callback in cx.callback {
+                let mut comp_cx = crate::compositor::Context {
+                    editor: &mut self.editor,
+                    jobs: &mut self.jobs,
+                    scroll: None,
+                };
+
+                callback(&mut self.compositor, &mut comp_cx);
+            }
+        }
 
         loop {
             if !self.event_loop_until_idle(input_stream).await {
