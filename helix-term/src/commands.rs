@@ -2562,6 +2562,14 @@ fn make_search_word_bounded(cx: &mut Context) {
 }
 
 fn global_search(cx: &mut Context) {
+    global_search_impl(cx, helix_stdx::env::current_working_dir());
+}
+
+pub(crate) fn global_search_picker(
+    editor: &mut Editor,
+    search_root: PathBuf,
+    reg: char,
+) -> impl Component {
     #[derive(Debug)]
     struct FileResult<'a> {
         path: Cow<'a, Path>,
@@ -2585,13 +2593,15 @@ fn global_search(cx: &mut Context) {
         smart_case: bool,
         file_picker_config: helix_view::editor::FilePickerConfig,
         style: PathStyleConfig,
+        working_directory: PathBuf,
     }
 
-    let config = cx.editor.config();
+    let config = editor.config();
     let config = GlobalSearchConfig {
         smart_case: config.search.smart_case,
         file_picker_config: config.file_picker.clone(),
-        style: PathStyleConfig::new(&cx.editor.theme),
+        style: PathStyleConfig::new(&editor.theme),
+        working_directory: search_root,
     };
 
     let columns = [
@@ -2611,7 +2621,7 @@ fn global_search(cx: &mut Context) {
             return async { Ok(()) }.boxed();
         }
 
-        let search_root = helix_stdx::env::current_working_dir();
+        let search_root = config.working_directory.clone();
         if !search_root.exists() {
             return async { Err(anyhow::anyhow!("Current working directory does not exist")) }
                 .boxed();
@@ -2730,10 +2740,9 @@ fn global_search(cx: &mut Context) {
         .boxed()
     };
 
-    let reg = cx.register.unwrap_or('/');
-    cx.editor.registers.last_search_register = reg;
+    editor.registers.last_search_register = reg;
 
-    let picker = Picker::new(
+    Picker::new(
         columns,
         1, // contents
         [],
@@ -2784,8 +2793,12 @@ fn global_search(cx: &mut Context) {
          }| { Some((path.as_ref().into(), Some((*line_start, *line_end)))) },
     )
     .with_history_register(Some(reg))
-    .with_dynamic_query(get_files, Some(275));
+    .with_dynamic_query(get_files, Some(275))
+}
 
+pub(crate) fn global_search_impl(cx: &mut Context, search_root: PathBuf) {
+    let reg = cx.register.unwrap_or('/');
+    let picker = global_search_picker(cx.editor, search_root, reg);
     cx.push_layer(Box::new(overlaid(picker)));
 }
 
