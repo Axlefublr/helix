@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "colibri";
             const default_dark_theme = "colibri";
-            window.path_to_searchindex_js = "searchindex-e225d94c.js";
+            window.path_to_searchindex_js = "searchindex-25ad3735.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-c2fa7ea4.js"></script>
@@ -210,6 +210,7 @@
 <li><a href="#editorsmart-tab-section"><code>[editor.smart-tab]</code> Section</a></li>
 <li><a href="#editorinline-diagnostics-section"><code>[editor.inline-diagnostics]</code> Section</a></li>
 <li><a href="#editorword-completion-section"><code>[editor.word-completion]</code> Section</a></li>
+<li><a href="#editorsession-section"><code>[editor.session]</code> Section</a></li>
 </ul>
 <h3 id="editor-section"><a class="header" href="#editor-section"><code>[editor]</code> Section</a></h3>
 <div class="table-wrapper">
@@ -723,6 +724,29 @@ S-tab = "extend_parent_node_start"
 enable = true
 # Set the trigger length lower so that words are completed more often
 trigger-length = 4
+</code></pre>
+<h3 id="editorsession-section"><a class="header" href="#editorsession-section"><code>[editor.session]</code> Section</a></h3>
+<p>Options for controlling session state persistence and garbage collection.</p>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr><th>Key</th><th>Description</th><th>Default</th></tr>
+</thead>
+<tbody>
+<tr><td><code>restore-cursor</code></td><td>Restore cursor position when reopening files</td><td><code>false</code></td></tr>
+<tr><td><code>gc-max-age</code></td><td>Maximum age in days for session entries before garbage collection removes them. Set to <code>0</code> to disable GC</td><td><code>90</code></td></tr>
+</tbody>
+</table>
+</div>
+<p>Session state is stored in <code>~/.cache/helix/sessions.json</code> and tracks cursor
+positions for previously opened files. Garbage collection runs at most once per
+day on startup and removes entries that haven’t been visited within <code>gc-max-age</code>
+days. GC only runs when <code>restore-cursor</code> is enabled.</p>
+<p>Example:</p>
+<pre><code class="language-toml">[editor.session]
+restore-cursor = true
+# Keep session entries for up to 180 days
+gc-max-age = 180
 </code></pre>
 <hr>
 <ol class="footnote-definition">
