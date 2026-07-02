@@ -1,0 +1,9 @@
+**.nix
+**.md
+book/
+docs/
+tests/
+xtask/
+contrib/
+runtime/
+.github/
