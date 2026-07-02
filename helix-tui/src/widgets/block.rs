@@ -74,6 +74,12 @@ impl<'a> Block<'a> {
         block
     }
 
+    pub const fn border_left() -> Self {
+        let mut block = Self::new();
+        block.borders = Borders::LEFT;
+        block
+    }
+
     pub fn title<T>(mut self, title: T) -> Block<'a>
     where
         T: Into<Spans<'a>>,
