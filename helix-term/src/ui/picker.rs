@@ -46,7 +46,7 @@ use helix_core::{
 };
 use helix_view::{
     editor::Action,
-    graphics::{CursorKind, Margin, Modifier, Rect},
+    graphics::{CursorKind, Modifier, Rect},
     theme::Style,
     view::ViewPosition,
     Document, DocumentId, Editor,
@@ -721,7 +721,7 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         let background = cx.editor.theme.get("ui.background");
         surface.clear_with(area, background);
 
-        const BLOCK: Block<'_> = Block::bordered();
+        const BLOCK: Block<'_> = Block::new();
 
         // calculate the inner area inside the box
         let inner = BLOCK.inner(area);
@@ -741,14 +741,14 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
             snapshot.item_count(),
         );
 
-        let area = inner.clip_left(1).with_height(1);
-        let line_area = area.clip_right(count.len() as u16 + 1);
+        let area = inner.with_height(1);
+        let line_area = area.clip_right(count.len() as u16);
 
         // render the prompt first since it will clear its background
         self.prompt.render(line_area, surface, cx);
 
         surface.set_stringn(
-            (area.x + area.width).saturating_sub(count.len() as u16 + 1),
+            (area.x + area.width).saturating_sub(count.len() as u16),
             area.y,
             &count,
             (count.len()).min(area.width as usize),
@@ -900,7 +900,7 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         let mut table = Table::new(options)
             .style(text_style)
             .highlight_style(selected)
-            .highlight_symbol(" > ")
+            // .highlight_symbol(" > ")
             .column_spacing(1)
             .widths(&self.widths);
 
@@ -950,13 +950,11 @@ impl<T: 'static + Send + Sync, D: 'static + Send + Sync> Picker<T, D> {
         let directory = cx.editor.theme.get("ui.text.directory");
         surface.clear_with(area, background);
 
-        const BLOCK: Block<'_> = Block::bordered();
+        const BLOCK: Block<'_> = Block::border_left();
 
         // calculate the inner area inside the box
         let inner = BLOCK.inner(area);
         // 1 column gap on either side
-        let margin = Margin::horizontal(1);
-        let inner = inner.inner(margin);
         BLOCK.render(area, surface);
 
         if let Some((preview, range)) = self.get_preview(cx.editor) {
@@ -1239,9 +1237,9 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
     }
 
     fn cursor(&self, area: Rect, editor: &Editor) -> (Option<Position>, CursorKind) {
-        let block = Block::bordered();
+        // let block = Block::bordered();
         // calculate the inner area inside the box
-        let inner = block.inner(area);
+        let inner = area;
 
         // prompt area
         let render_preview =
@@ -1252,7 +1250,7 @@ impl<I: 'static + Send + Sync, D: 'static + Send + Sync> Component for Picker<I,
         } else {
             area.width
         };
-        let area = inner.clip_left(1).with_height(1).with_width(picker_width);
+        let area = inner.with_height(1).with_width(picker_width);
 
         self.prompt.cursor(area, editor)
     }
