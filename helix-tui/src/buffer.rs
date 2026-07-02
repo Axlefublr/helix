@@ -564,9 +564,14 @@ impl Buffer {
         }
 
         let mut x_offset = x as usize;
-        let max_offset = min(self.area.right(), width.saturating_add(x));
+        let max_offset = min(
+            self.area.right().saturating_sub(1),
+            width.saturating_add(x).saturating_sub(1),
+        );
         let mut start_index = self.index_of(x, y);
-        let mut index = self.index_of(max_offset, y);
+        let mut index = self.index_of(max_offset, y) + 1;
+        // ↑ we use `index` as an exclusive boundary in this function, yet index_of expects *inclusive* points
+        // without this subtract one add one dance, helix crashes on trying to remove the preview; possibly because helix upstream expects borders and/or padding to exist, where it didn't discover this bug?
 
         let content_width = spans.width();
         let truncated = content_width > width as usize;
