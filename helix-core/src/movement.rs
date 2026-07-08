@@ -533,25 +533,37 @@ pub fn move_next_paragraph(
     behavior: Movement,
 ) -> Range {
     let mut line = range.cursor_line(slice);
-    let last_char =
+    let cursor_on_newline =
         prev_grapheme_boundary(slice, slice.line_to_char(line + 1)) == range.cursor(slice);
-    let curr_line_empty = rope_is_line_ending(slice.line(line));
-    let next_line_empty =
-        rope_is_line_ending(slice.line(slice.len_lines().saturating_sub(1).min(line + 1)));
-    let curr_empty_to_line = curr_line_empty && !next_line_empty;
+    // let curr_line_empty = rope_is_line_ending(slice.line(line));
+    // let next_line_empty =
+    //     rope_is_line_ending(slice.line(slice.len_lines().saturating_sub(1).min(line + 1)));
+    // let curr_empty_but_next_filled = curr_line_empty && !next_line_empty;
 
-    // skip character after paragraph boundary
-    if curr_empty_to_line && last_char {
-        line += 1;
-    }
     let mut lines = slice.lines_at(line).map(rope_is_line_ending).peekable();
     let mut last_line = line;
+    let mut continued_to_next_paragraph = false;
     for _ in 0..count {
-        while lines.next_if(|&e| !e).is_some() {
+        // if lines.next_if(|&empty| !empty).is_some() {
+        //     line += 1;
+        // }
+        while lines.next_if(|&empty| empty).is_some() {
             line += 1;
         }
-        while lines.next_if(|&e| e).is_some() {
+        while lines.next_if(|&empty| !empty).is_some() {
             line += 1;
+        }
+        if line - last_line == 1 && cursor_on_newline {
+            continued_to_next_paragraph = true;
+            if lines.next_if(|&empty| !empty).is_some() {
+                line += 1;
+            }
+            while lines.next_if(|&empty| empty).is_some() {
+                line += 1;
+            }
+            while lines.next_if(|&empty| !empty).is_some() {
+                line += 1;
+            }
         }
         if line == last_line {
             break;
@@ -560,7 +572,7 @@ pub fn move_next_paragraph(
     }
     let head = slice.line_to_char(line);
     let anchor = if behavior == Movement::Move {
-        if curr_empty_to_line && last_char {
+        if continued_to_next_paragraph {
             range.head
         } else {
             range.cursor(slice)
