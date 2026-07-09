@@ -1503,11 +1503,17 @@ fn goto_file_impl(cx: &mut Context, action: Action) {
 
         let path = path::expand(&sel);
         let path = &rel_path.join(path);
+        let (path, pos) = crate::args::parse_file(path.to_str().unwrap());
         if path.is_dir() {
-            let picker = ui::file_picker(cx.editor, path.into());
+            let picker = ui::file_picker(cx.editor, path);
             cx.push_layer(Box::new(overlaid(picker)));
-        } else if let Err(e) = cx.editor.open(path, action) {
+        } else if let Err(e) = cx.editor.open(&path, action) {
             cx.editor.set_error(format!("Open file failed: {:?}", e));
+        } else if !pos.is_zero() {
+            let (view, doc) = current!(cx.editor);
+            let pos = Selection::point(pos_at_coords(doc.text().slice(..), pos, true));
+            doc.set_selection(view.id, pos);
+            align_view(doc, view, Align::Center);
         }
     }
 }
