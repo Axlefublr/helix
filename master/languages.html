@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="custom-a1acbc99.css">
+        <link rel="stylesheet" href="custom-10faeed5.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "colibri";
             const default_dark_theme = "colibri";
-            window.path_to_searchindex_js = "searchindex-25ad3735.js";
+            window.path_to_searchindex_js = "searchindex-28c75cc0.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-c2fa7ea4.js"></script>
@@ -257,6 +257,7 @@ language-servers = [ "mylang-lsp" ]
 <tr><td><code>workspace-lsp-roots</code></td><td>Directories (relative to the workspace root) that stop the upward root search early. Meant for project-specific hard overrides in a local <code>.helix/config.toml</code>;</td></tr>
 <tr><td><code>persistent-diagnostic-sources</code></td><td>An array of LSP diagnostic sources assumed unchanged when the language server resends the same set of diagnostics. Helix can track the position for these diagnostics internally instead. Useful for diagnostics that are recomputed on save.</td></tr>
 <tr><td><code>rainbow-brackets</code></td><td>Overrides the <code>editor.rainbow-brackets</code> config key for the language</td></tr>
+<tr><td><code>code-actions-on-save</code></td><td>List of LSP code actions to be run in order on save, for example <code>["source.organizeImports"]</code></td></tr>
 </tbody>
 </table>
 </div>
@@ -313,6 +314,25 @@ config matches files like <code>Cargo.toml</code> or <code>languages.toml</code>
 of the formatter command. In particular, the <code>%{buffer_name}</code> variable can be passed as
 argument to the formatter:</p>
 <pre><code class="language-toml">formatter = { command = "mylang-formatter" , args = ["--stdin", "--stdin-filename", "%{buffer_name}"] }
+</code></pre>
+<h3 id="configuring-code-actions-on-save"><a class="header" href="#configuring-code-actions-on-save">Configuring code actions on save</a></h3>
+<p>The <code>code-actions-on-save</code> key lists LSP code actions to run (in order) when
+the buffer is saved. The available actions depend on available language servers,
+below are common examples and may need adjusting for your setup.</p>
+<pre><code class="language-toml"># Python with ruff
+[[language]]
+name = "python"
+code-actions-on-save = ["source.organizeImports", "source.fixAll"]
+
+# TS/JS with tsserver
+[[language]]
+name = "typescript"
+code-actions-on-save = ["source.addMissingImports.ts"]
+
+# TS/JS with eslint
+[[language]]
+name = "javascript"
+code-actions-on-save = ["source.fixAll.eslint", "source.organizeImports"]
 </code></pre>
 <h2 id="language-server-configuration"><a class="header" href="#language-server-configuration">Language Server configuration</a></h2>
 <p>Language servers are configured separately in the table <code>language-server</code> in the same file as the languages <code>languages.toml</code></p>
@@ -495,6 +515,7 @@ use-grammars = { except = [ "yaml", "json" ] }
 
         <!-- Custom JS scripts -->
         <script src="ts-query-56018970.js"></script>
+        <script src="version-3313557a.js"></script>
 
         <script src="book-c22b7243.js"></script>
 

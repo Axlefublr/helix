@@ -28,7 +28,7 @@
         <link rel="stylesheet" id="mdbook-ayu-highlight-css" href="ayu-highlight-3fdfc3ac.css">
 
         <!-- Custom theme stylesheets -->
-        <link rel="stylesheet" href="custom-a1acbc99.css">
+        <link rel="stylesheet" href="custom-10faeed5.css">
 
 
         <!-- Provide site root and default themes to javascript -->
@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "colibri";
             const default_dark_theme = "colibri";
-            window.path_to_searchindex_js = "searchindex-25ad3735.js";
+            window.path_to_searchindex_js = "searchindex-28c75cc0.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-c2fa7ea4.js"></script>
@@ -301,8 +301,9 @@
 <tr><td><code>:random</code>, <code>:rng</code>, <code>:rnd</code></td><td>Randomize your selections.</td></tr>
 <tr><td><code>:uniq</code></td><td>Deduplicate selections with repeated content</td></tr>
 <tr><td><code>:noop</code></td><td>Does nothing.</td></tr>
-<tr><td><code>:workspace-trust</code></td><td>Add current workspace to the list of trusted workspaces.</td></tr>
-<tr><td><code>:workspace-untrust</code></td><td>Remove current workspace from the list of trusted workspaces.</td></tr>
+<tr><td><code>:workspace-trust</code></td><td>Allow language servers and local config for the current workspace.</td></tr>
+<tr><td><code>:workspace-untrust</code></td><td>Revoke the current workspace’s trust grant or exclusion.</td></tr>
+<tr><td><code>:workspace-exclude</code></td><td>Mark the current workspace as never-prompt. Never prompts for trust again.</td></tr>
 </tbody>
 </table>
 </div>
@@ -730,6 +731,7 @@
 
         <!-- Custom JS scripts -->
         <script src="ts-query-56018970.js"></script>
+        <script src="version-3313557a.js"></script>
 
         <script src="book-c22b7243.js"></script>
 
