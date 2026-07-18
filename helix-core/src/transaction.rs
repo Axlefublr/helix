@@ -869,6 +869,14 @@ impl Transaction {
         })
     }
 
+    /// Insert text at each selection head.
+    pub fn insert_at_cursor(doc: &Rope, selection: &Selection, text: Tendril) -> Self {
+        Self::change_by_selection(doc, selection, |range| {
+            let cursor = range.cursor(doc.slice(..));
+            (cursor, cursor, Some(text.clone()))
+        })
+    }
+
     pub fn changes_iter(&self) -> ChangeIterator<'_> {
         self.changes.changes_iter()
     }
