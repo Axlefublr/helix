@@ -1,3 +1,6 @@
+[build]
+rustflags = ["-C", "target-cpu=native"]
+
 # we use tokio_unstable to enable runtime::Handle::id so we can separate
 # globals from multiple parallel tests. If that function ever does get removed
 # its possible to replace (with some additional overhead and effort)
@@ -14,4 +17,3 @@ rustflags = ["--cfg", "tokio_unstable", "-C", "target-feature=-crt-static"]
 [alias]
 xtask = "run --package xtask --"
 integration-test = "test --features integration --profile integration --workspace --test integration"
-
