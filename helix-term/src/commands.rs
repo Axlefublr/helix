@@ -528,6 +528,8 @@ impl MappableCommand {
         keep_primary_selection, "Keep primary selection",
         remove_primary_selection, "Remove primary selection",
         completion, "Invoke completion popup",
+        steal_char_above, "Type the character above you",
+        steal_char_below, "Type the character below you",
         hover, "Show docs for item under cursor",
         goto_hover, "Show docs for item under cursor in a buffer",
         toggle_comments, "Comment/uncomment selections",
@@ -6193,6 +6195,67 @@ pub fn completion(cx: &mut Context) {
     cx.editor
         .handlers
         .trigger_completions(cursor, doc.id(), view.id);
+}
+
+fn steal_char_impl(cx: &mut Context, above: bool) {
+    let (view, doc) = current!(cx.editor);
+    let view_id = view.id;
+    let text = doc.text();
+    let last_real_line_index = text.len_lines().saturating_sub(2);
+    let selection = doc.selection(view_id);
+    let primary_position = selection.primary().cursor(text.slice(..));
+    let Position {
+        row: line,
+        col: column,
+    } = helix_core::coords_at_pos(text.slice(..), primary_position);
+
+    if line == 0 && above || line >= last_real_line_index && !above {
+        return;
+    }
+    let target_line = if above { line - 1 } else { line + 1 };
+
+    let mut offset: isize = 0;
+    for whitespace in text
+        .line(line)
+        .chars()
+        .take_while(|the| the.is_ascii_whitespace())
+    {
+        if [' ', '\t'].contains(&whitespace) {
+            offset -= 1_isize;
+        } else {
+            break;
+        }
+    }
+    for whitespace in text
+        .line(target_line)
+        .chars()
+        .take_while(|the| the.is_ascii_whitespace())
+    {
+        if [' ', '\t'].contains(&whitespace) {
+            offset += 1_isize;
+        } else {
+            break;
+        }
+    }
+    let column = column.saturating_add_signed(offset);
+    let target_position =
+        helix_core::pos_at_coords(text.slice(..), Position::new(target_line, column), true);
+    let target_char = text.char(target_position);
+    if target_char == '\n' {
+        return;
+    }
+    doc.apply(
+        &Transaction::insert_at_cursor(text, selection, Tendril::from(target_char.to_string())),
+        view_id,
+    );
+}
+
+pub fn steal_char_above(cx: &mut Context) {
+    steal_char_impl(cx, true);
+}
+
+pub fn steal_char_below(cx: &mut Context) {
+    steal_char_impl(cx, false);
 }
 
 // comments
