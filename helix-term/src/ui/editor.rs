@@ -1515,7 +1515,7 @@ impl Component for EditorView {
                                         consumed = true;
                                         Some(callback)
                                     } else if let EventResult::Consumed(callback) =
-                                        completion.handle_event(&Event::Key(key!(Enter)), &mut cx)
+                                        completion.handle_event(&Event::Key(key!(Esc)), &mut cx)
                                     {
                                         Some(callback)
                                     } else {
