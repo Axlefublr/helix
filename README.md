@@ -64,7 +64,6 @@ Be careful though, as hard resetting might lose you features you like, that I en
 |@useche      |[11700](https://github.com/helix-editor/helix/pull/11700)|Add per view search location and total matches to statusline|
 |@rotmh       |[14093](https://github.com/helix-editor/helix/pull/14093)|Scrolling instead of paging in pickers|
 |@yerlaser    |[14844](https://github.com/helix-editor/helix/pull/14844)|Find char with leap/easyMotion/flash style|
-<!-- |@pascalkuthe |[14544](https://github.com/helix-editor/helix/pull/14544)|Implement file-watching based on filesentry| -->
 |@kfatyuip    |[14072](https://github.com/helix-editor/helix/pull/14072)|Implement auto-scrolling bufferline|
 |@atomicptr   |[13113](https://github.com/helix-editor/helix/pull/13113)|Differentiate buffers with same name by progressively adding prior path components|
 |@maxsz       |[15100](https://github.com/helix-editor/helix/pull/15100)|Add buffer-close-next/previous commands|
@@ -76,7 +75,7 @@ Be careful though, as hard resetting might lose you features you like, that I en
 |me✌️         |[15266](https://github.com/helix-editor/helix/pull/15266)|Better ↑↓ history handling in prompts|
 |me✌️         |[15271](https://github.com/helix-editor/helix/pull/15271)|Prompt history deduplication|
 |@jamel       |[15309](https://github.com/helix-editor/helix/pull/15309)|Add cursor position persistence across sessions|
-
+<!-- |@pascalkuthe |[14544](https://github.com/helix-editor/helix/pull/14544)|Implement file-watching based on filesentry| -->
 Big shoutout to these people!
 
 I will not be explaining the additions / changes of these PRs at all; I expect you to click the links and read on your own, if you're interested.
