@@ -2273,15 +2273,25 @@ fn search_impl(
 
     // Get the right side of the primary block cursor for forward search, or the
     // grapheme before the start of the selection for reverse search.
-    let start = match direction {
-        Direction::Forward => text.char_to_byte(graphemes::ensure_grapheme_boundary_next(
-            text,
-            selection.primary().to(),
-        )),
-        Direction::Backward => text.char_to_byte(graphemes::ensure_grapheme_boundary_prev(
-            text,
-            selection.primary().from(),
-        )),
+    let start = if movement == Movement::Extend {
+        match direction {
+            Direction::Forward => text.char_to_byte(graphemes::ensure_grapheme_boundary_next(
+                text,
+                selection.primary().to(),
+            )),
+            Direction::Backward => text.char_to_byte(graphemes::ensure_grapheme_boundary_prev(
+                text,
+                selection.primary().from(),
+            )),
+        }
+    } else {
+        match direction {
+            Direction::Forward => text.char_to_byte(graphemes::ensure_grapheme_boundary_next(
+                text,
+                selection.primary().cursor(text),
+            )),
+            Direction::Backward => text.char_to_byte(selection.primary().cursor(text)),
+        }
     };
 
     // A regex::Match returns byte-positions in the str. In the case where we
