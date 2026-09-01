@@ -66,7 +66,6 @@ Be careful though, as hard resetting might lose you features you like, that I en
 |@omentic     |[14121](https://github.com/helix-editor/helix/pull/14121)|Add support for moving selected lines up and down|
 |@useche      |[11700](https://github.com/helix-editor/helix/pull/11700)|Add per view search location and total matches to statusline|
 |@rotmh       |[14093](https://github.com/helix-editor/helix/pull/14093)|Scrolling instead of paging in pickers|
-|@yerlaser    |[14844](https://github.com/helix-editor/helix/pull/14844)|Find char with leap/easyMotion/flash style|
 |@kfatyuip    |[14072](https://github.com/helix-editor/helix/pull/14072)|Implement auto-scrolling bufferline|
 |@atomicptr   |[13113](https://github.com/helix-editor/helix/pull/13113)|Differentiate buffers with same name by progressively adding prior path components|
 |@maxsz       |[15100](https://github.com/helix-editor/helix/pull/15100)|Add buffer-close-next/previous commands|
