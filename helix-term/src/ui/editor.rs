@@ -912,7 +912,7 @@ impl EditorView {
 
         surface.clear_with(viewport, style);
 
-        let mut x = viewport.x.saturating_add(1);
+        let mut x = viewport.x;
 
         let separator = " > ";
         let separator_style = editor.theme.get("ui.breadcrumb.separator");
