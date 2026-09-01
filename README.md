@@ -158,9 +158,7 @@ If you're not sure how this can be useful to you, but are excited about the poss
 Normal formatters also care about language-specific configuration — whether you enable or disable autoformatting for a given language.
 This global formatter feature doesn't care about that.
 
-² If that output is different from the input text. If the input and output are the same, the document doesn't get touched. \
-**Unless** the document is "too large". Don't ask me! I don't know either! This optimization comes from the issue of doing a nothing burger write on scratch / empty buffers; if it happens to help other cases that's cool too but ultimately not the main goal. \
-But if you're genuinely interested in the implementation detail, "too large" happens when the string of the document isn't laid out in contiguous memory. Which I can't imagine being practically applicable information 👍
+² If that output is different from the input text. If the input and output are the same, the document doesn't get touched.
 
 ## Autopairs
 
