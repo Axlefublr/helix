@@ -103,7 +103,7 @@ impl EditorView {
         let text_annotations = view.text_annotations(doc, Some(theme));
         let mut decorations = DecorationManager::default();
 
-        if config.breadcrumb.enable {
+        if config.breadcrumb.enable && doc.path().is_some() {
             Self::render_breadcrumb(editor, doc, view, area.with_height(1), surface);
         }
 
@@ -923,7 +923,7 @@ impl EditorView {
                 }
             } else {
                 // Handle `[scratch]`
-                x = draw_element(surface, viewport, x, SCRATCH_BUFFER_NAME, style);
+                // x = draw_element(surface, viewport, x, SCRATCH_BUFFER_NAME, style);
             }
         }
 
