@@ -881,7 +881,7 @@ impl EditorView {
 
         let mut x = viewport.x;
 
-        let separator = " > ";
+        let separator = "/";
         let separator_style = editor.theme.get("ui.breadcrumb.separator");
         let mut draw_separator = false;
 
