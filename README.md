@@ -269,7 +269,7 @@ Dot repeat is disabled. I make this change in source rather than my config becau
 
 Opening a *directory* rather than a file, either by passing it on the commandline or with `:open`, will run `global_search` on that directory instead of a file picker.
 
-The `goto_file` action now also understands the `:line:col` syntax
+The `goto_file` action now also understands the `:line:col` syntax.
 
 ## Picker
 
