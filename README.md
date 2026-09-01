@@ -350,6 +350,8 @@ Textobject alias keys (the originals are kept too)
 |<kbd>,</kbd>|`<`¹|
 |<kbd>.</kbd>|`>`¹|
 
+¹ Also works in `surround_…` series of actions.
+
 *Changed* textobject keys (the defaults are destroyed / changed)
 
 |Key|Means|
