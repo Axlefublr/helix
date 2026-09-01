@@ -592,7 +592,7 @@ fn render_cwd<'a, F>(context: &mut RenderContext<'a>, write: F)
 where
     F: Fn(&mut RenderContext<'a>, Span<'a>) + Copy,
 {
-    let cwd = helix_stdx::env::current_working_dir();
+    let cwd = helix_stdx::path::fold_home_dir(helix_stdx::env::current_working_dir());
     let cwd = cwd
         .file_name()
         .unwrap_or_default()
