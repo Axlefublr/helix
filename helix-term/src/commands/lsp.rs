@@ -34,7 +34,6 @@ use crate::{
 };
 
 use std::{
-    cmp::Ordering,
     collections::{HashSet, VecDeque},
     fmt::Display,
     future::Future,
