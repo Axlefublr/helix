@@ -245,7 +245,7 @@ impl View {
     }
 
     pub fn breadcrumb_offset(&self, doc: &Document) -> u16 {
-        u16::from(doc.config.load().breadcrumb.enable)
+        u16::from(doc.config.load().breadcrumb.enable && doc.path().is_some())
     }
 
     pub fn offset_coords_to_in_view(
