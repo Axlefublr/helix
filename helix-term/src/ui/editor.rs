@@ -910,6 +910,10 @@ impl EditorView {
                         draw_separator = true;
                     }
 
+                    if component == std::path::Component::RootDir {
+                        continue;
+                    }
+
                     let segment = component.as_os_str().to_string_lossy();
                     let is_directory = components.peek().is_some();
 
