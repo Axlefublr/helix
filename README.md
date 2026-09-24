@@ -349,6 +349,7 @@ Textobject alias keys (the originals are kept too)
 |<kbd>i</kbd>|`*`¹|
 |<kbd>,</kbd>|`<`¹|
 |<kbd>.</kbd>|`>`¹|
+|<kbd>o</kbd>|` `¹ (space)|
 
 ¹ Also works in `surround_…` series of actions.
 
