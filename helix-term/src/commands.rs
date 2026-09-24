@@ -7362,6 +7362,7 @@ fn textobject_shortcut(ch: char) -> char {
         'i' => '*',
         ',' => '<',
         '.' => '>',
+        'o' => ' ',
         other => other,
     }
 }
