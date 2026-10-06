@@ -1630,8 +1630,6 @@ fn get_character_info(
                 unicode.push(' ');
             }
 
-            unicode.push_str("U+");
-
             let codepoint: u32 = if char.is_ascii() {
                 char.into()
             } else {
