@@ -207,8 +207,7 @@ where
                     .get(srv.id())
                     .and_then(|spinner| spinner.frame())
             })
-            // Even if there's no spinner; reserve its space to avoid elements frequently shifting.
-            .unwrap_or(" ")
+            .unwrap_or("")
             .into(),
     );
 }
