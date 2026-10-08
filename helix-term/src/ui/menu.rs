@@ -299,6 +299,14 @@ impl<T: Item + 'static> Component for Menu<T> {
                     return EventResult::Ignored(close_fn);
                 }
             }
+            key!(' ') | key!(End) | key!(Right) | key!(',') => {
+                if let Some(selection) = self.selection() {
+                    (self.callback_fn)(cx.editor, Some(selection), MenuEvent::Validate);
+                    return EventResult::Ignored(close_fn);
+                } else {
+                    return EventResult::Ignored(close_fn);
+                }
+            }
             // KeyEvent {
             //     code: KeyCode::Char(c),
             //     modifiers: KeyModifiers::NONE,
