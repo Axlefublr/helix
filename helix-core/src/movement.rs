@@ -610,7 +610,7 @@ pub fn goto_treesitter_object(
         let len = slice.len_bytes();
         let start_byte = node.start_byte();
         let end_byte = node.end_byte();
-        if start_byte >= len || end_byte >= len {
+        if start_byte >= len || end_byte > len {
             return None;
         }
 
