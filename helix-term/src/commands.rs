@@ -6264,12 +6264,25 @@ fn select_textobject_inner(cx: &mut Context) {
     select_textobject(cx, textobject::TextObject::Inside);
 }
 
+fn textobject_shortcut(ch: char) -> char {
+    match ch {
+        'j' => '`',
+        'k' => '_',
+        'i' => '*',
+        ',' => '<',
+        '.' => '>',
+        'o' => ' ',
+        other => other,
+    }
+}
+
 fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
     let count = cx.count();
 
     cx.on_next_key(move |cx, event| {
         cx.editor.autoinfo = None;
         if let Some(ch) = event.char() {
+            let ch = textobject_shortcut(ch);
             let textobject = move |editor: &mut Editor| {
                 let (view, doc) = current!(editor);
                 let loader = editor.syn_loader.load();
@@ -6430,6 +6443,7 @@ fn surround_add(cx: &mut Context) {
         // surround_len is the number of new characters being added.
         let (open, close, surround_len) = match event.char() {
             Some(ch) => {
+                let ch = textobject_shortcut(ch);
                 let (o, c) = match_brackets::get_pair(ch);
                 let mut open = Tendril::new();
                 open.push(o);
@@ -6480,7 +6494,7 @@ fn surround_replace(cx: &mut Context) {
         cx.editor.autoinfo = None;
         let surround_ch = match event.char() {
             Some('m') => None, // m selects the closest surround pair
-            Some(ch) => Some(ch),
+            Some(ch) => Some(textobject_shortcut(ch)),
             None => return,
         };
         let (view, doc) = current!(cx.editor);
@@ -6507,7 +6521,7 @@ fn surround_replace(cx: &mut Context) {
             cx.editor.autoinfo = None;
             let (view, doc) = current!(cx.editor);
             let to = match event.char() {
-                Some(to) => to,
+                Some(to) => textobject_shortcut(to),
                 None => return doc.set_selection(view.id, selection),
             };
             let (open, close) = match_brackets::get_pair(to);
@@ -6551,7 +6565,7 @@ fn surround_delete(cx: &mut Context) {
         cx.editor.autoinfo = None;
         let surround_ch = match event.char() {
             Some('m') => None, // m selects the closest surround pair
-            Some(ch) => Some(ch),
+            Some(ch) => Some(textobject_shortcut(ch)),
             None => return,
         };
         let (view, doc) = current!(cx.editor);
