@@ -510,6 +510,46 @@ Now, sibling movement NEVER automatically expands you to the parent.
 If going to the next sibling fails, nothing happens.
 
 <details>
+<summary>Implementation detail</summary>
+
+Okay technically you *may* get expanded to the parent, but ONLY if the selection range of that parent is *exactly* the same.
+
+Taking this code,
+```rust
+let sibling = match direction {
+    Direction::Forward => current.next_sibling(),
+    Direction::Backward => current.prev_sibling(),
+};
+```
+And running `:tree-sitter-subtree` on `Direction::Backward => current.prev_sibling(),`, you get this:
+```scheme
+(match_arm
+  pattern: (match_pattern
+    (scoped_identifier
+      path: (identifier) "::"
+      name: (identifier))) "=>"
+  value: (call_expression
+    function: (field_expression
+      value: (identifier) "."
+      field: (field_identifier))
+    arguments: (arguments "(" ")")) ",")
+```
+Running `:tree-sitter-subtree` on `Direction::Backward`, (the highest selection you can get without selecting the entire branch, via using `expand_selection`), is:
+```scheme
+(scoped_identifier
+  path: (identifier) "::"
+  name: (identifier))
+```
+
+The `match_pattern` is a sibling to `call_expression`, but `scoped_identifier` is *not* a sibling to `call_expression`. \
+So if we try to `select_next_sibling`, that would normally fail.
+
+They are different nodes, but the actual *selection range* of both `match_pattern` and `scoped_identifier` is exactly the same!
+That's why parent expansion *can* happen automatically, but only when it doesn't change the selection range.
+
+</details>
+
+<details>
 <summary>Reasoning</summary>
 
 As I already eluded to, upstream sibling movement often leads you to overselecting.
