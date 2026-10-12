@@ -7466,14 +7466,14 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                             doc.indent_width(),
                             doc.tab_width(),
                         ),
-                        'M' => textobject::textobject_pair_surround_closest(
+                        'm' => textobject::textobject_pair_surround_closest(
                             doc.syntax(),
                             text,
                             range,
                             objtype,
                             count,
                         ),
-                        'G' => textobject_change(range),
+                        'g' => textobject_change(range),
                         // TODO: cancel new ranges if inconsistent surround matches across lines
                         ch if !ch.is_ascii_alphanumeric() => textobject::textobject_pair_surround(
                             doc.syntax(),
@@ -7491,7 +7491,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                     || matches!(
                         ch,
                         // all except word, WORD, paragraph, (git) change
-                        'C' | 'F' | 'A' | 'V' | 'R' | 'E' | 'X' | 'D' | 'M'
+                        'C' | 'F' | 'A' | 'V' | 'R' | 'E' | 'X' | 'D' | 'm'
                     );
                 let canon_selection = doc.selection(view.id);
 
