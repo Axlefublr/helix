@@ -151,13 +151,30 @@ fn any_valid_future_siblings(
 ) -> Option<tree_house::tree_sitter::Node> {
     use std::ops::Not;
     let mut current = node;
+    let mut skipped_undesired = false;
     loop {
-        current = match direction {
-            Direction::Forward => current.next_sibling()?,
-            Direction::Backward => current.prev_sibling()?,
+        let sibling = match direction {
+            Direction::Forward => current.next_sibling(),
+            Direction::Backward => current.prev_sibling(),
         };
-        if current.is_named() && current.is_extra().not() {
-            return Some(current);
+        match sibling {
+            Some(sibling) if sibling.is_named() && sibling.is_extra().not() => {
+                return Some(sibling)
+            }
+            Some(sibling) => {
+                skipped_undesired = true;
+                current = sibling;
+            }
+            None if skipped_undesired => return None,
+            None => {
+                let parent = current.parent()?;
+                if current.start_byte() != parent.start_byte()
+                    || current.end_byte() != parent.end_byte()
+                {
+                    return None;
+                }
+                current = parent
+            }
         }
     }
 }
