@@ -45,7 +45,7 @@ pub fn select_next_sibling(syntax: &Syntax, text: RopeSlice, selection: Selectio
         |cursor, needed_adjust| {
             if needed_adjust && {
                 let node = cursor.node();
-                node.is_named() && node.is_extra().not()
+                node.is_named() && node.is_extra().not() && node.is_missing().not()
             } {
                 return;
             }
@@ -103,7 +103,7 @@ pub fn select_prev_sibling(syntax: &Syntax, text: RopeSlice, selection: Selectio
         |cursor, needed_adjust| {
             if needed_adjust && {
                 let node = cursor.node();
-                node.is_named() && node.is_extra().not()
+                node.is_named() && node.is_extra().not() && node.is_missing().not()
             } {
                 return;
             }
