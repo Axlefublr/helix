@@ -6307,17 +6307,17 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
 
                 let transform_closure = |range| {
                     match ch {
-                        'w' => textobject::textobject_word(text, range, objtype, count, false),
-                        'W' => textobject::textobject_word(text, range, objtype, count, true),
-                        't' => textobject_treesitter("class", range),
-                        'f' => textobject_treesitter("function", range),
-                        'a' => textobject_treesitter("parameter", range),
-                        'c' => textobject_treesitter("comment", range),
-                        'T' => textobject_treesitter("test", range),
-                        'e' => textobject_treesitter("entry", range),
-                        'x' => textobject_treesitter("xml-element", range),
-                        'p' => textobject::textobject_paragraph(text, range, objtype, count),
-                        'i' => textobject::textobject_indentation_level(
+                        'W' => textobject::textobject_word(text, range, objtype, count, false),
+                        'Q' => textobject::textobject_word(text, range, objtype, count, true),
+                        'C' => textobject_treesitter("class", range),
+                        'F' => textobject_treesitter("function", range),
+                        'A' => textobject_treesitter("parameter", range),
+                        'V' => textobject_treesitter("comment", range),
+                        'R' => textobject_treesitter("test", range),
+                        'E' => textobject_treesitter("entry", range),
+                        'X' => textobject_treesitter("xml-element", range),
+                        'S' => textobject::textobject_paragraph(text, range, objtype, count),
+                        'D' => textobject::textobject_indentation_level(
                             text,
                             range,
                             objtype,
@@ -6325,14 +6325,14 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                             doc.indent_width(),
                             doc.tab_width(),
                         ),
-                        'm' => textobject::textobject_pair_surround_closest(
+                        'M' => textobject::textobject_pair_surround_closest(
                             doc.syntax(),
                             text,
                             range,
                             objtype,
                             count,
                         ),
-                        'g' => textobject_change(range),
+                        'G' => textobject_change(range),
                         // TODO: cancel new ranges if inconsistent surround matches across lines
                         ch if !ch.is_ascii_alphanumeric() => textobject::textobject_pair_surround(
                             doc.syntax(),
@@ -6350,7 +6350,7 @@ fn select_textobject(cx: &mut Context, objtype: textobject::TextObject) {
                     || matches!(
                         ch,
                         // all except word, WORD, paragraph, (git) change
-                        't' | 'f' | 'a' | 'c' | 'T' | 'e' | 'x' | 'i' | 'm'
+                        'C' | 'F' | 'A' | 'V' | 'R' | 'E' | 'X' | 'D' | 'M'
                     );
                 let canon_selection = doc.selection(view.id);
 
