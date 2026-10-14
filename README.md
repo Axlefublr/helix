@@ -500,6 +500,8 @@ All text objects except word, WORD, paragraph force the selection *backwards*, *
 
 ### sibling navigation
 
+Commit semantics: `beh(select_…_sibling)` prefix (literally, `…` is not a placeholder).
+
 `select_next_sibling`, `select_prev_sibling`, `extend_next_sibling`, `extend_prev_sibling` are reworked significantly. In my below explanations I'll always be saying “next”, but read it as “previous or next”.
 
 The behavior of upstream is: try to go to the next sibling.
@@ -626,6 +628,8 @@ With your `expand_selection` hotkey ensuring a backwards selection for you, you 
 </details>
 
 ### shrink_selection
+
+Commit semantics: `beh(shrink_selection)` prefix.
 
 When you `shrink_selection` right after `expand_selection`, you essentially “undo” your selection change, coming back to whatever element you were selecting previously (upstream behavior).
 However when it can't “undo”, or it doesn't make sense to, it will drop you onto the *first* child of your TNS, even if your selection is forward, rather than backward.
