@@ -5784,7 +5784,9 @@ fn shrink_selection(cx: &mut Context) {
         let current_selection = doc.selection(view.id);
         // try to restore previous selection
         if let Some(prev_selection) = view.object_selections.pop() {
-            if current_selection.contains(&prev_selection) {
+            if current_selection.contains(&prev_selection)
+                && editor.mode != helix_view::document::Mode::Select
+            {
                 doc.set_selection(view.id, prev_selection);
                 return;
             } else {
