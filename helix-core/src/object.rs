@@ -190,6 +190,7 @@ where
     let cursor = &mut syntax.walk();
 
     selection.transform(|range| {
+        let old_range_direction = range.direction_strong_bias_backward();
         let from = text.char_to_byte(range.from());
         let to = text.char_to_byte(range.to());
 
@@ -223,6 +224,6 @@ where
         let from = text.byte_to_char(node.start_byte() as usize);
         let to = text.byte_to_char(node.end_byte() as usize);
 
-        Range::new(from, to).with_direction(direction.unwrap_or_else(|| range.direction()))
+        Range::new(from, to).with_direction(old_range_direction)
     })
 }
