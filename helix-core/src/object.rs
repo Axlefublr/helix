@@ -25,12 +25,34 @@ pub fn expand_selection(syntax: &Syntax, text: RopeSlice, selection: Selection) 
 }
 
 pub fn shrink_selection(syntax: &Syntax, text: RopeSlice, selection: Selection) -> Selection {
+    use std::ops::Not;
+    let range = &selection.primary();
+    let direction = if range.head > range.anchor {
+        Direction::Forward
+    } else {
+        Direction::Backward
+    };
+    let reversed_direction = match direction {
+        Direction::Forward => Direction::Backward,
+        Direction::Backward => Direction::Forward,
+    };
     select_node_impl(
         syntax,
         text,
         selection,
         |cursor, _| {
-            cursor.goto_first_child();
+            if direction == Direction::Forward {
+                cursor.goto_last_child();
+            } else {
+                cursor.goto_first_child();
+            }
+            let node = cursor.node();
+            if node.is_named() && node.is_extra().not() && node.is_missing().not() {
+                return;
+            }
+            if let Some(node) = any_valid_future_siblings(cursor.node(), reversed_direction) {
+                cursor.reset_to_byte_range(node.start_byte(), node.end_byte());
+            };
         },
         None,
     )
