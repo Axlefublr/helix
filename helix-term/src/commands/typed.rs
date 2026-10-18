@@ -903,9 +903,6 @@ pub fn write_all_impl(
         .into_iter()
         .filter_map(|id| {
             let doc = doc!(cx.editor, &id);
-            if !doc.is_modified() {
-                return None;
-            }
             doc.path()?;
 
             // Look for a view to apply the formatting change to.
