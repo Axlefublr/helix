@@ -261,8 +261,9 @@ fn buffer_close(
         return Ok(());
     }
 
+    let focus_left = args.has_flag("focus-left");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
 }
 
 fn force_buffer_close(
@@ -274,8 +275,9 @@ fn force_buffer_close(
         return Ok(());
     }
 
+    let focus_left = args.has_flag("focus-left");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, true, false)
+    buffer_close_by_ids_impl(cx, &document_ids, true, focus_left)
 }
 
 fn buffer_gather_others_impl(editor: &mut Editor, skip_visible: bool) -> Vec<DocumentId> {
@@ -633,8 +635,9 @@ fn force_write_buffer_close(
         },
     )?;
 
+    let focus_left = args.has_flag("focus-left");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
 }
 
 fn new_file(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
