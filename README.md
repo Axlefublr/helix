@@ -77,7 +77,6 @@ You may be able to retrieve them from one of the backup branches, but I wouldn't
 |@rotmh       |[14093](https://github.com/helix-editor/helix/pull/14093)|Scrolling instead of paging in pickers|
 |@kfatyuip    |[14072](https://github.com/helix-editor/helix/pull/14072)|Implement auto-scrolling bufferline|
 |@atomicptr   |[13113](https://github.com/helix-editor/helix/pull/13113)|Differentiate buffers with same name by progressively adding prior path components|
-|@maxsz       |[15100](https://github.com/helix-editor/helix/pull/15100)|Add buffer-close-next/previous commands|
 |me✌️         |[13650](https://github.com/helix-editor/helix/pull/13650)|`:buffer-nth` command|
 |me✌️         |[15187](https://github.com/helix-editor/helix/pull/15187)|`goto_hover` action|
 |me✌️         |[15088](https://github.com/helix-editor/helix/pull/15088)|`select_character` action|
