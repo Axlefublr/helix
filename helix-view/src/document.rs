@@ -202,6 +202,7 @@ pub struct Document {
     last_saved_revision: usize,
     version: i32, // should be usize?
     pub(crate) modified_since_accessed: bool,
+    pub forsure_formatted: bool,
 
     pub(crate) diagnostics: Vec<Diagnostic>,
     pub(crate) language_servers: HashMap<LanguageServerName, Arc<Client>>,
@@ -758,6 +759,7 @@ impl Document {
             last_saved_time: SystemTime::now(),
             last_saved_revision: 0,
             modified_since_accessed: false,
+            forsure_formatted: false,
             language_servers: HashMap::new(),
             diff_handle: None,
             config,
@@ -1312,6 +1314,7 @@ impl Document {
         self.apply(&transaction, view.id);
         self.append_changes_to_history(view);
         self.reset_modified();
+        self.forsure_formatted = false;
         self.pickup_last_saved_time();
         self.detect_indent_and_line_ending();
 
@@ -1483,6 +1486,7 @@ impl Document {
         }
 
         self.modified_since_accessed = true;
+        self.forsure_formatted = false;
         self.version += 1;
 
         for selection in self.selections.values_mut() {
