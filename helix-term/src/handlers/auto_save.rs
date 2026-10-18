@@ -92,6 +92,7 @@ fn request_auto_save(editor: &mut Editor) {
         write_scratch: false,
         auto_format: false,
         code_actions: false,
+        unmodified: false,
     };
 
     if let Err(e) = commands::typed::write_all_impl(context, options) {
