@@ -407,6 +407,7 @@ fn write_impl(
         if let Some(trans) = typed::axlefublr_custom_formatter::custom_formatter(doc, view_id) {
             doc.apply(&trans, view_id);
         }
+        doc.forsure_formatted = true;
     }
 
     // Save an undo checkpoint for any outstanding changes.
@@ -876,6 +877,7 @@ pub struct WriteAllOptions {
     pub write_scratch: bool,
     pub auto_format: bool,
     pub code_actions: bool,
+    pub unmodified: bool,
 }
 
 pub fn write_all_impl(
@@ -893,11 +895,10 @@ pub fn write_all_impl(
         .into_iter()
         .filter_map(|id| {
             let doc = doc!(cx.editor, &id);
-            if !doc.is_modified() {
+            doc.path()?;
+            if !(doc.is_modified() || options.unmodified && !doc.forsure_formatted) {
                 return None;
             }
-            doc.path()?;
-
             // Look for a view to apply the formatting change to.
             let target_view = cx.editor.get_synced_view_id(doc.id());
             Some((id, target_view))
@@ -924,6 +925,7 @@ pub fn write_all_impl(
             {
                 doc.apply(&trans, target_view);
             }
+            doc.forsure_formatted = true;
         }
 
         // Save an undo checkpoint for any outstanding changes.
@@ -1001,6 +1003,7 @@ fn write_all(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> an
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )
 }
@@ -1021,6 +1024,7 @@ fn force_write_all(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )
 }
@@ -1040,6 +1044,7 @@ fn write_all_quit(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )?;
     quit_all_impl(cx, false)
@@ -1060,6 +1065,7 @@ fn force_write_all_quit(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     );
     quit_all_impl(cx, true)
@@ -3038,6 +3044,12 @@ const WRITE_NO_CODE_ACTIONS_FLAG: Flag = Flag {
     ..Flag::DEFAULT
 };
 
+const WRITE_UNMODIFIED_FLAG: Flag = Flag {
+    name: "unmodified",
+    doc: "write even buffers with no unmodified changes",
+    ..Flag::DEFAULT
+};
+
 pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     TypableCommand {
         name: "exit",
@@ -3331,7 +3343,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3343,7 +3355,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3355,7 +3367,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3367,7 +3379,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
