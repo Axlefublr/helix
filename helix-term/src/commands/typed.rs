@@ -182,13 +182,16 @@ fn buffer_close_by_ids_impl(
     cx: &mut compositor::Context,
     doc_ids: &[DocumentId],
     force: bool,
+    focus_left: bool,
 ) -> anyhow::Result<()> {
     cx.block_try_flush_writes()?;
 
     let (modified_ids, modified_names): (Vec<_>, Vec<_>) = doc_ids
         .iter()
         .filter_map(|&doc_id| {
-            if let Err(CloseError::BufferModified(name)) = cx.editor.close_document(doc_id, force) {
+            if let Err(CloseError::BufferModified(name)) =
+                cx.editor.close_document(doc_id, force, focus_left)
+            {
                 Some((doc_id, name))
             } else {
                 None
@@ -259,7 +262,7 @@ fn buffer_close(
     }
 
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, false)
 }
 
 fn force_buffer_close(
@@ -272,7 +275,7 @@ fn force_buffer_close(
     }
 
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, true)
+    buffer_close_by_ids_impl(cx, &document_ids, true, false)
 }
 
 fn buffer_gather_others_impl(editor: &mut Editor, skip_visible: bool) -> Vec<DocumentId> {
@@ -307,7 +310,7 @@ fn buffer_close_others(
     }
 
     let document_ids = buffer_gather_others_impl(cx.editor, args.has_flag("skip-visible"));
-    buffer_close_by_ids_impl(cx, &document_ids, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, false)
 }
 
 fn force_buffer_close_others(
@@ -320,7 +323,7 @@ fn force_buffer_close_others(
     }
 
     let document_ids = buffer_gather_others_impl(cx.editor, args.has_flag("skip-visible"));
-    buffer_close_by_ids_impl(cx, &document_ids, true)
+    buffer_close_by_ids_impl(cx, &document_ids, true, false)
 }
 
 fn buffer_gather_all_impl(editor: &mut Editor) -> Vec<DocumentId> {
@@ -337,7 +340,7 @@ fn buffer_close_all(
     }
 
     let document_ids = buffer_gather_all_impl(cx.editor);
-    buffer_close_by_ids_impl(cx, &document_ids, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, false)
 }
 
 fn force_buffer_close_all(
@@ -350,7 +353,7 @@ fn force_buffer_close_all(
     }
 
     let document_ids = buffer_gather_all_impl(cx.editor);
-    buffer_close_by_ids_impl(cx, &document_ids, true)
+    buffer_close_by_ids_impl(cx, &document_ids, true, false)
 }
 
 fn buffer_next(
@@ -606,8 +609,9 @@ fn write_buffer_close(
         },
     )?;
 
+    let focus_left = args.has_flag("focus-left");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
 }
 
 fn force_write_buffer_close(
@@ -630,7 +634,7 @@ fn force_write_buffer_close(
     )?;
 
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false)
+    buffer_close_by_ids_impl(cx, &document_ids, false, false)
 }
 
 fn new_file(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
@@ -3386,7 +3390,11 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::positional(&[completers::filename]),
         signature: Signature {
             positionals: (0, Some(1)),
-            flags: &[WRITE_NO_FORMAT_FLAG,WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG,WRITE_NO_CODE_ACTIONS_FLAG, Flag {
+    name: "focus-left",
+    doc: "switch back onto the left buffer, not most recently accessed",
+    ..Flag::DEFAULT
+}],
             ..Signature::DEFAULT
         },
     },
