@@ -1827,7 +1827,9 @@ impl Component for EditorView {
                 EventResult::Consumed(None)
             }
             Event::FocusLost => {
-                if context.editor.config().auto_save.focus_lost {
+                if context.editor.config().auto_save.focus_lost
+                    && context.editor.mode() != helix_view::document::Mode::Insert
+                {
                     let options = commands::WriteAllOptions {
                         force: false,
                         write_scratch: false,
