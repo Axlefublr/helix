@@ -175,7 +175,7 @@ Commit semantics: `beh(:<command>):` prefix.
 `:write-buffer-close`, `:write-buffer-close!`, `:buffer-close`, `:buffer-close!` have a new `--focus-right` flag.
 With it, instead of activating the most *recently accessed* other buffer after closing the current one, the buffer *directionally on the right* will be focused.
 
-`:write-all`, `:write-all!`, `:write-quit-all`, `:write-quit-all!` make sure to write *every* buffer, not only those with modifications. They become similar to calling `:write` on every buffer that you have open.
+`:write-all`, `:write-all!`, `:write-quit-all`, `:write-quit-all!` have a new flag `--unmodified`, which makes sure to write *every* buffer, not only those with modifications. They become similar to calling `:write` on every buffer that you have open.
 
 <details>
 <summary>Reasoning</summary>
@@ -184,7 +184,7 @@ With autosave enabled, you really don't want the formatters to run.
 Maybe you haven't finished writing that one function or expression, and the formatter “fixing” things for you just because you switched to a different window would be very annoying.
 However with autosave, buffers don't *stay* modified for the formatters to act up on when you finally decide to write them. \
 So what is possible in this position, is that all of your buffers are saved when you run `:write-quit-all`, and files *stay* unformatted even though you expect them to be.
-Making `:write-all` actions always write every buffer makes sure you can't (ish) get in a situation where you push unformatted code.
+Making your `:write-all` hotkeys write every buffer makes sure you can't (ish) get in a situation where you push unformatted code.
 
 </details>
 
