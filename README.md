@@ -133,6 +133,17 @@ No more startup “Loaded n files.” message.
 
 Opening a *directory* rather than a file, either by passing it on the commandline or with `:open`, will run `global_search` on that directory instead of a file picker.
 
+Autosave on focus lost only works if you aren't in insert mode.
+
+<details>
+<summary>Reasoning</summary>
+
+It's very frequent that as I'm writing some text, I leave off with a space at the end of the line; anticipating to write yet another word.
+Then I switch to a different window for one reason or another, switch back to helix, and now need to retype that space again.
+This annoys me *so much* that without this change autosave on focus lost is genuinely unusable to me 😭
+
+</details>
+
 ## Changed behavior of actions
 
 Commit semantics: `beh(<action>):` prefix.
@@ -160,6 +171,22 @@ Offensively, helix went out of its way to prevent you from being able to do so??
 Commit semantics: `beh(:<command>):` prefix.
 
 `:char` renders each codepoint as `1f404` instead of `U+1f404`.
+
+`:write-buffer-close`, `:write-buffer-close!`, `:buffer-close`, `:buffer-close!` have a new `--focus-right` flag.
+With it, instead of activating the most *recently accessed* other buffer after closing the current one, the buffer *directionally on the right* will be focused.
+
+`:write-all`, `:write-all!`, `:write-quit-all`, `:write-quit-all!` make sure to write *every* buffer, not only those with modifications. They become similar to calling `:write` on every buffer that you have open.
+
+<details>
+<summary>Reasoning</summary>
+
+With autosave enabled, you really don't want the formatters to run.
+Maybe you haven't finished writing that one function or expression, and the formatter “fixing” things for you just because you switched to a different window would be very annoying.
+However with autosave, buffers don't *stay* modified for the formatters to act up on when you finally decide to write them. \
+So what is possible in this position, is that all of your buffers are saved when you run `:write-quit-all`, and files *stay* unformatted even though you expect them to be.
+Making `:write-all` actions always write every buffer makes sure you can't (ish) get in a situation where you push unformatted code.
+
+</details>
 
 ## Scratch buffers
 
