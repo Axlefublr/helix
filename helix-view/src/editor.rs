@@ -2459,7 +2459,7 @@ impl Editor {
         &mut self,
         doc_id: DocumentId,
         force: bool,
-        focus_left: bool,
+        focus_right: bool,
     ) -> Result<(), CloseError> {
         let doc = match self.documents.get(&doc_id) {
             Some(doc) => doc,
@@ -2488,14 +2488,20 @@ impl Editor {
                 view.remove_document(&doc_id);
 
                 if view.doc == doc_id {
-                    if focus_left {
-                        if let Some(left_buf_id) = view
+                    if focus_right {
+                        if let Some(right_buf_id) = view
                             .docs_access_history
                             .iter()
-                            .filter(|buf_id| buf_id < &&doc_id)
-                            .max()
+                            .filter(|buf_id| buf_id > &&doc_id)
+                            .min()
+                            .or_else(|| {
+                                view.docs_access_history
+                                    .iter()
+                                    .filter(|buf_id| buf_id != &&doc_id)
+                                    .max()
+                            })
                         {
-                            Some(Action::ReplaceDoc(view.id, *left_buf_id))
+                            Some(Action::ReplaceDoc(view.id, *right_buf_id))
                         } else {
                             Some(Action::Close(view.id))
                         }

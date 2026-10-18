@@ -182,7 +182,7 @@ fn buffer_close_by_ids_impl(
     cx: &mut compositor::Context,
     doc_ids: &[DocumentId],
     force: bool,
-    focus_left: bool,
+    focus_right: bool,
 ) -> anyhow::Result<()> {
     cx.block_try_flush_writes()?;
 
@@ -190,7 +190,7 @@ fn buffer_close_by_ids_impl(
         .iter()
         .filter_map(|&doc_id| {
             if let Err(CloseError::BufferModified(name)) =
-                cx.editor.close_document(doc_id, force, focus_left)
+                cx.editor.close_document(doc_id, force, focus_right)
             {
                 Some((doc_id, name))
             } else {
@@ -261,9 +261,9 @@ fn buffer_close(
         return Ok(());
     }
 
-    let focus_left = args.has_flag("focus-left");
+    let focus_right = args.has_flag("focus-right");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_right)
 }
 
 fn force_buffer_close(
@@ -275,9 +275,9 @@ fn force_buffer_close(
         return Ok(());
     }
 
-    let focus_left = args.has_flag("focus-left");
+    let focus_right = args.has_flag("focus-right");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, true, focus_left)
+    buffer_close_by_ids_impl(cx, &document_ids, true, focus_right)
 }
 
 fn buffer_gather_others_impl(editor: &mut Editor, skip_visible: bool) -> Vec<DocumentId> {
@@ -611,9 +611,9 @@ fn write_buffer_close(
         },
     )?;
 
-    let focus_left = args.has_flag("focus-left");
+    let focus_right = args.has_flag("focus-right");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_right)
 }
 
 fn force_write_buffer_close(
@@ -635,9 +635,9 @@ fn force_write_buffer_close(
         },
     )?;
 
-    let focus_left = args.has_flag("focus-left");
+    let focus_right = args.has_flag("focus-right");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
-    buffer_close_by_ids_impl(cx, &document_ids, false, focus_left)
+    buffer_close_by_ids_impl(cx, &document_ids, false, focus_right)
 }
 
 fn new_file(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyhow::Result<()> {
@@ -3391,10 +3391,10 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         signature: Signature {
             positionals: (0, Some(1)),
             flags: &[WRITE_NO_FORMAT_FLAG,WRITE_NO_CODE_ACTIONS_FLAG, Flag {
-    name: "focus-left",
-    doc: "switch back onto the left buffer, not most recently accessed",
-    ..Flag::DEFAULT
-}],
+                name: "focus-right",
+                doc: "switch back onto the right buffer, not most recently accessed",
+                ..Flag::DEFAULT
+            }],
             ..Signature::DEFAULT
         },
     },
