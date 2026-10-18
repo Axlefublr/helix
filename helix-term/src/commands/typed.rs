@@ -465,12 +465,54 @@ fn write_impl(
     };
 
     if let Some(job) = job {
+        let job = after(job, move |editor| {
+            if let Some(doc) = editor.document_mut(doc_id) {
+                doc.forsure_formatted = true;
+            }
+        });
         cx.jobs.add(job);
     } else {
+        if auto_format {
+            if let Some(doc) = cx.editor.document_mut(doc_id) {
+                doc.forsure_formatted = true;
+            }
+        }
         cx.editor.save(doc_id, path, force)?;
     }
 
     Ok(())
+}
+
+fn after(inner: Job, outer: impl FnOnce(&mut Editor) + Send + 'static) -> Job {
+    let Job { future, wait } = inner;
+    let job = Job::with_callback(async {
+        Ok(match future.await? {
+            Some(Callback::EditorCompositor(closure)) => {
+                Callback::EditorCompositor(Box::new(|editor, compositor| {
+                    closure(editor, compositor);
+                    outer(editor);
+                }))
+            }
+            Some(Callback::Editor(closure)) => Callback::Editor(Box::new(|editor| {
+                closure(editor);
+                outer(editor);
+            })),
+            Some(Callback::Followup(closure)) => Callback::Followup(Box::new(|editor| {
+                if let Some(job) = closure(editor) {
+                    Some(after(job, outer))
+                } else {
+                    outer(editor);
+                    None
+                }
+            })),
+            None => Callback::Editor(Box::new(outer)),
+        })
+    });
+    if wait {
+        job.wait_before_exiting()
+    } else {
+        job
+    }
 }
 
 /// Trim all whitespace preceding line-endings in a document.
@@ -874,6 +916,7 @@ pub struct WriteAllOptions {
     pub write_scratch: bool,
     pub auto_format: bool,
     pub code_actions: bool,
+    pub unmodified: bool,
 }
 
 pub fn write_all_impl(
@@ -973,6 +1016,11 @@ pub fn write_all_impl(
         };
 
         if let Some(job) = job {
+            let job = after(job, move |editor| {
+                if let Some(doc) = editor.document_mut(doc_id) {
+                    doc.forsure_formatted = true;
+                }
+            });
             cx.jobs.add(job);
         } else {
             cx.editor.save::<PathBuf>(doc_id, None, force)?;
@@ -998,6 +1046,7 @@ fn write_all(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> an
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )
 }
@@ -1018,6 +1067,7 @@ fn force_write_all(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )
 }
@@ -1037,6 +1087,7 @@ fn write_all_quit(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     )?;
     quit_all_impl(cx, false)
@@ -1057,6 +1108,7 @@ fn force_write_all_quit(
             write_scratch: true,
             auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
             code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            unmodified: args.has_flag(WRITE_UNMODIFIED_FLAG.name),
         },
     );
     quit_all_impl(cx, true)
@@ -3041,6 +3093,12 @@ const SWITCH_FOCUS_DIRECTIONALLY: Flag = Flag {
     ..Flag::DEFAULT
 };
 
+const WRITE_UNMODIFIED_FLAG: Flag = Flag {
+    name: "unmodified",
+    doc: "write even buffers with no unmodified changes",
+    ..Flag::DEFAULT
+};
+
 pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     TypableCommand {
         name: "exit",
@@ -3332,7 +3390,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3344,7 +3402,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3356,7 +3414,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
@@ -3368,7 +3426,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (0, Some(0)),
-            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG],
+            flags: &[WRITE_NO_FORMAT_FLAG, WRITE_NO_CODE_ACTIONS_FLAG, WRITE_UNMODIFIED_FLAG],
             ..Signature::DEFAULT
         },
     },
