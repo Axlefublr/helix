@@ -1297,10 +1297,6 @@ impl EditorView {
                 cxt.editor.count = NonZeroUsize::new(i);
             }
             // special handling for repeat operator
-
-
-
-
             _ => {
                 // set the count
                 cxt.count = cxt.editor.count;
