@@ -2154,7 +2154,12 @@ impl Editor {
         self._refresh();
     }
 
-    pub fn close_document(&mut self, doc_id: DocumentId, force: bool) -> Result<(), CloseError> {
+    pub fn close_document(
+        &mut self,
+        doc_id: DocumentId,
+        force: bool,
+        focus_direction: bool,
+    ) -> Result<(), CloseError> {
         let doc = match self.documents.get(&doc_id) {
             Some(doc) => doc,
             None => return Err(CloseError::DoesNotExist),
@@ -2178,8 +2183,25 @@ impl Editor {
                 view.remove_document(&doc_id);
 
                 if view.doc == doc_id {
+                    if focus_direction {
+                        if let Some(left_buf_id) = view
+                            .docs_access_history
+                            .iter()
+                            .filter(|buf_id| buf_id < &&doc_id)
+                            .max()
+                            .or_else(|| {
+                                view.docs_access_history
+                                    .iter()
+                                    .filter(|buf_id| buf_id != &&doc_id)
+                                    .min()
+                            })
+                        {
+                            Some(Action::ReplaceDoc(view.id, *left_buf_id))
+                        } else {
+                            Some(Action::Close(view.id))
+                        }
                     // something was previously open in the view, switch to previous doc
-                    if let Some(prev_doc) = view.docs_access_history.pop() {
+                    } else if let Some(prev_doc) = view.docs_access_history.pop() {
                         Some(Action::ReplaceDoc(view.id, prev_doc))
                     } else {
                         // only the document that is being closed was in the view, close it
