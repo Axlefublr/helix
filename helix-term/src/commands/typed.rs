@@ -573,15 +573,18 @@ fn write_buffer_close(
         return Ok(());
     }
 
-    write_impl(
-        cx,
-        args.first(),
-        WriteOptions {
-            force: false,
-            auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
-            code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
-        },
-    )?;
+    let doc = doc!(cx.editor);
+    if doc.is_modified() || !doc.forsure_formatted {
+        write_impl(
+            cx,
+            args.first(),
+            WriteOptions {
+                force: false,
+                auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
+                code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            },
+        )?;
+    }
 
     let focus_direction = args.has_flag("focus-direction");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
@@ -597,15 +600,18 @@ fn force_write_buffer_close(
         return Ok(());
     }
 
-    write_impl(
-        cx,
-        args.first(),
-        WriteOptions {
-            force: true,
-            auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
-            code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
-        },
-    )?;
+    let doc = doc!(cx.editor);
+    if doc.is_modified() || !doc.forsure_formatted {
+        write_impl(
+            cx,
+            args.first(),
+            WriteOptions {
+                force: true,
+                auto_format: !args.has_flag(WRITE_NO_FORMAT_FLAG.name),
+                code_actions: !args.has_flag(WRITE_NO_CODE_ACTIONS_FLAG.name),
+            },
+        )?;
+    }
 
     let focus_direction = args.has_flag("focus-direction");
     let document_ids = buffer_gather_paths_impl(cx.editor, args);
