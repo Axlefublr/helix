@@ -685,33 +685,72 @@ impl EditorView {
             .theme
             .try_get("ui.bufferline")
             .unwrap_or_else(|| editor.theme.get("ui.statusline.inactive"));
+
+        let bufferline_active_modified = editor
+            .theme
+            .try_get("ui.bufferline.active.modified")
+            .unwrap_or_else(|| editor.theme.get("ui.statusline.active"));
+
+        let bufferline_active_unformatted = editor
+            .theme
+            .try_get("ui.bufferline.active.unformatted")
+            .unwrap_or_else(|| editor.theme.get("ui.statusline.active"));
+
+        let bufferline_inactive_modified = editor
+            .theme
+            .try_get("ui.bufferline.modified")
+            .unwrap_or_else(|| editor.theme.get("ui.statusline.inactive"));
+
+        let bufferline_inactive_unformatted = editor
+            .theme
+            .try_get("ui.bufferline.unformatted")
+            .unwrap_or_else(|| editor.theme.get("ui.statusline.inactive"));
+
         let current_doc = view!(editor).doc;
 
+        enum SaveState {
+            Saved,
+            Modified,
+            Unformatted,
+        }
+
         // Build buffer entries: " filename[+] " with is_active flag
-        let entries: Vec<(String, bool)> = editor
+        let entries: Vec<(String, bool, SaveState)> = editor
             .documents()
             .enumerate()
             .map(|(index, doc)| {
                 let filename = Self::make_document_name(doc, editor);
 
-                let modified = if doc.is_modified() { "[+]" } else { "" };
-                let label = format!("{} {filename}{modified}  ", index + 1);
-                (label, doc.id() == current_doc)
+                let save_state = if doc.path().is_none() {
+                    SaveState::Saved
+                } else if doc.is_modified() {
+                    SaveState::Modified
+                } else if !doc.forsure_formatted {
+                    SaveState::Unformatted
+                } else {
+                    SaveState::Saved
+                };
+                let label = format!("{} {filename}  ", index + 1);
+                (label, doc.id() == current_doc, save_state)
             })
             .collect();
 
-        let total_width: u16 = entries.iter().map(|(label, _)| label.len() as u16).sum();
+        let total_width: u16 = entries.iter().map(|(label, _, _)| label.len() as u16).sum();
 
         // No scrolling when all buffers fit
         if total_width <= viewport.width {
             let spans: Vec<Span> = entries
                 .iter()
-                .map(|(label, is_active)| {
-                    if *is_active {
-                        Span::styled(label.clone(), bufferline_active)
-                    } else {
-                        Span::styled(label.clone(), bufferline_inactive)
-                    }
+                .map(|(label, is_active, save_state)| {
+                    let style = match (*is_active, save_state) {
+                        (true, SaveState::Saved) => bufferline_active,
+                        (false, SaveState::Saved) => bufferline_inactive,
+                        (true, SaveState::Modified) => bufferline_active_modified,
+                        (false, SaveState::Modified) => bufferline_inactive_modified,
+                        (true, SaveState::Unformatted) => bufferline_active_unformatted,
+                        (false, SaveState::Unformatted) => bufferline_inactive_unformatted,
+                    };
+                    Span::styled(label.clone(), style)
                 })
                 .collect();
 
@@ -722,7 +761,7 @@ impl EditorView {
         // Find active buffer position for scrolling
         let mut offset_before_active = 0;
 
-        for (label, is_active) in &entries {
+        for (label, is_active, _) in &entries {
             let w = label.len() as u16;
             if *is_active {
                 break;
@@ -739,7 +778,7 @@ impl EditorView {
         let mut spans = Vec::new();
         let mut pos = 0;
 
-        for (label, is_active) in entries {
+        for (label, is_active, save_state) in entries {
             let label_width = label.len() as u16;
 
             // Skip entries completely left of viewport
@@ -756,11 +795,15 @@ impl EditorView {
             let skip_chars = scroll.saturating_sub(pos) as usize;
             let visible_text = label.chars().skip(skip_chars).collect::<String>();
 
-            if is_active {
-                spans.push(Span::styled(visible_text, bufferline_active));
-            } else {
-                spans.push(Span::styled(visible_text, bufferline_inactive));
-            }
+            let style = match (is_active, save_state) {
+                (true, SaveState::Saved) => bufferline_active,
+                (false, SaveState::Saved) => bufferline_inactive,
+                (true, SaveState::Modified) => bufferline_active_modified,
+                (false, SaveState::Modified) => bufferline_inactive_modified,
+                (true, SaveState::Unformatted) => bufferline_active_unformatted,
+                (false, SaveState::Unformatted) => bufferline_inactive_unformatted,
+            };
+            spans.push(Span::styled(visible_text, style));
 
             pos += label_width;
         }
