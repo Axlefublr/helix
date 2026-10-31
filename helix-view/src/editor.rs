@@ -2492,13 +2492,13 @@ impl Editor {
                         if let Some(left_buf_id) = view
                             .docs_access_history
                             .iter()
-                            .filter(|buf_id| buf_id < &&doc_id)
-                            .max()
+                            .filter(|buf_id| buf_id > &&doc_id)
+                            .min()
                             .or_else(|| {
                                 view.docs_access_history
                                     .iter()
-                                    .filter(|buf_id| buf_id != &&doc_id)
-                                    .min()
+                                    .filter(|buf_id| buf_id < &&doc_id)
+                                    .max()
                             })
                         {
                             Some(Action::ReplaceDoc(view.id, *left_buf_id))

@@ -3259,7 +3259,7 @@ const WRITE_NO_CODE_ACTIONS_FLAG: Flag = Flag {
 
 const SWITCH_FOCUS_DIRECTIONALLY: Flag = Flag {
     name: "focus-direction",
-    doc: "switch back onto the left buffer, not most recently accessed",
+    doc: "switch back onto the right buffer, not most recently accessed",
     ..Flag::DEFAULT
 };
 
