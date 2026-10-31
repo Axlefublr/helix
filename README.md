@@ -183,7 +183,7 @@ Commit semantics: `beh(:<command>):` prefix.
 `:char` renders each codepoint as `1f404` instead of `U+1f404`.
 
 `:write-buffer-close`, `:write-buffer-close!`, `:buffer-close`, `:buffer-close!` have a new `--focus-direction` flag.
-With it, instead of activating the most *recently accessed* other buffer after closing the current one, the buffer *directionally on the left* will be focused.
+With it, instead of activating the most *recently accessed* other buffer after closing the current one, the buffer *directionally on the right* will be focused.
 
 The former two commands now only write the buffer if there's a reason to: unsaved changes or the buffer isn't for sure formatted (you'll see below).
 
