@@ -3036,6 +3036,14 @@ fn redraw(cx: &mut compositor::Context, _args: Args, event: PromptEvent) -> anyh
 #[derive(Debug, Clone, Copy)]
 pub struct MoveBufferOptions {
     pub force: bool,
+    pub relativity: MoveBufferRelative,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum MoveBufferRelative {
+    Not,
+    Parent,
+    Stem,
 }
 
 fn move_buffer(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow::Result<()> {
@@ -3044,7 +3052,14 @@ fn move_buffer(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> 
     }
 
     let new_path: PathBuf = args.first().unwrap().into();
-    move_buffer_impl(cx, new_path, MoveBufferOptions { force: false })
+    move_buffer_impl(
+        cx,
+        new_path,
+        MoveBufferOptions {
+            force: false,
+            relativity: MoveBufferRelative::Not,
+        },
+    )
 }
 
 fn force_move_buffer(
@@ -3057,7 +3072,74 @@ fn force_move_buffer(
     }
 
     let new_path: PathBuf = args.first().unwrap().into();
-    move_buffer_impl(cx, new_path, MoveBufferOptions { force: true })
+    move_buffer_impl(
+        cx,
+        new_path,
+        MoveBufferOptions {
+            force: true,
+            relativity: MoveBufferRelative::Not,
+        },
+    )
+}
+
+fn rename_buffer(
+    cx: &mut compositor::Context,
+    args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let new_path: PathBuf = args.first().unwrap().into();
+    move_buffer_impl(
+        cx,
+        new_path,
+        MoveBufferOptions {
+            force: false,
+            relativity: MoveBufferRelative::Parent,
+        },
+    )
+}
+
+fn force_rename_buffer(
+    cx: &mut compositor::Context,
+    args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let new_path: PathBuf = args.first().unwrap().into();
+    move_buffer_impl(
+        cx,
+        new_path,
+        MoveBufferOptions {
+            force: true,
+            relativity: MoveBufferRelative::Parent,
+        },
+    )
+}
+
+fn extension_buffer(
+    cx: &mut compositor::Context,
+    args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    let new_path: PathBuf = args.first().unwrap().into();
+    move_buffer_impl(
+        cx,
+        new_path,
+        MoveBufferOptions {
+            force: false,
+            relativity: MoveBufferRelative::Stem,
+        },
+    )
 }
 
 fn move_buffer_impl(
@@ -3070,6 +3152,30 @@ fn move_buffer_impl(
         .path()
         .map(ToOwned::to_owned)
         .context("Scratch buffer cannot be moved. Use :write instead")?;
+
+    let new_path = {
+        match options.relativity {
+            MoveBufferRelative::Not => new_path,
+            MoveBufferRelative::Parent => old_path
+                .parent()
+                .context("Current buffer should have a parent directory")?
+                .join(new_path),
+            MoveBufferRelative::Stem => old_path
+                .parent()
+                .context("Current buffer should have a parent directory")?
+                .join(
+                    old_path
+                        .file_stem()
+                        .context("Current buffer should have a filename")?,
+                )
+                .with_extension(new_path),
+        }
+    };
+
+    let new_path = old_path
+        .parent()
+        .context("Current buffer should have a parent directory")?
+        .join(new_path);
 
     // if new_path is a directory, append the original file name
     // to move the file into that directory.
@@ -4319,6 +4425,39 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         doc: "Move the current buffer and its corresponding file to a different path",
         fun: move_buffer,
         completer: CommandCompleter::positional(&[completers::filename]),
+        signature: Signature {
+            positionals: (1, Some(1)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "rename",
+        aliases: &["rn"],
+        doc: "Move the current buffer and its corresponding file to a different path, relative to its parent directory",
+        fun: rename_buffer,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (1, Some(1)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "rename!",
+        aliases: &["rn!"],
+        doc: "Move the current buffer and its corresponding file to a different path, relative to its parent directory, creating necessary subdirectories",
+        fun: force_rename_buffer,
+        completer: CommandCompleter::none(),
+        signature: Signature {
+            positionals: (1, Some(1)),
+            ..Signature::DEFAULT
+        },
+    },
+    TypableCommand {
+        name: "extension",
+        aliases: &["et"],
+        doc: "Move the current buffer and its corresponding file into its own path but with the extension changed to this",
+        fun: extension_buffer,
+        completer: CommandCompleter::none(),
         signature: Signature {
             positionals: (1, Some(1)),
             ..Signature::DEFAULT
