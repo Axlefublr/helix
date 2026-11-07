@@ -3288,7 +3288,10 @@ fn local_search_section(cx: &mut Context) {
     let doc = doc!(cx.editor);
     let contents = doc.text().to_string();
 
-    if doc.language_name().is_some_and(|lang| lang == "markdown" || lang == "gee") {
+    if doc
+        .language_name()
+        .is_some_and(|lang| lang == "markdown" || lang == "gee")
+    {
         local_search_markdown_section(cx, contents);
         return;
     }
