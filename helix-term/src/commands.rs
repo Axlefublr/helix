@@ -532,6 +532,8 @@ impl MappableCommand {
         format_selections, "Format selection",
         join_selections, "Join lines inside selection",
         join_selections_space, "Join lines inside selection and select spaces",
+        keep_column, "Keep only this column of selections",
+        remove_column, "Remove only this column of selections",
         keep_selections, "Keep selections matching regex",
         remove_selections, "Remove selections matching regex",
         align_selections, "Align selections in column",
@@ -659,7 +661,6 @@ impl MappableCommand {
         harp_register, "Interact with a register harp",
         harp_command, "Interact with a command harp",
         harp_mark, "Interact with a mark harp",
-        retain_column, "Keep only this column of selections",
     );
 }
 
@@ -1181,45 +1182,124 @@ fn goto_first_nonwhitespace_impl(view: &mut View, doc: &mut Document, movement: 
     doc.set_selection(view.id, selection);
 }
 
-fn retain_column(cx: &mut Context) {
-    ui::prompt(
-        cx,
-        "columns:".into(),
-        None,
-        ui::completers::none,
-        move |cx, input, event| {
-            if event != PromptEvent::Validate || input.is_empty() {
-                return;
+fn keep_column(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let primary_index = selection.primary_index();
+    let text = doc.text().slice(..);
+    let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
+    let last_on_line = last_on_line && index_on_line != 0;
+    let ranges = {
+        let mut hindsight = None;
+        let mut ranges = SmallVec::<[Range; 1]>::new();
+        let mut ranges_on_line = 0;
+        let mut current_line = (0, 0);
+        for range in selection.iter() {
+            let range_line = range.line_range(text);
+            if range_line != current_line {
+                current_line = range_line;
+                ranges_on_line = 0;
+                if last_on_line {
+                    if let Some(range) = hindsight.take() {
+                        ranges.push(range);
+                    }
+                }
             }
-            let Ok(columns) = input.parse::<usize>() else {
-                cx.editor.set_error("not a valid integer");
-                return;
-            };
-            let (view, doc) = current!(cx.editor);
-            let selection = doc.selection(view.id);
-            let primary_index = selection.primary_index();
-            let keep_column = primary_index % columns;
-            let ranges: SmallVec<[Range; 1]> = selection
-                .iter()
-                .enumerate()
-                .filter(|(index, _)| index % columns == keep_column)
-                .map(|(_, range)| range.to_owned())
-                .collect();
-
-            if ranges.is_empty() {
-                cx.editor.set_error("action would destroy all selections");
-                return;
+            ranges_on_line += 1;
+            if last_on_line {
+                hindsight = Some(*range);
+            } else if index_on_line == ranges_on_line - 1 {
+                ranges.push(*range);
             }
+        }
+        if last_on_line {
+            if let Some(range) = hindsight {
+                ranges.push(range);
+            }
+        }
+        ranges
+    };
+    push_jump(view, doc);
+    doc.set_selection(view.id, Selection::new(ranges, 0));
+}
 
-            let primary = selection.primary();
-            let idx = ranges
-                .iter()
-                .position(|range| range.overlaps(&primary))
-                .unwrap_or(ranges.len() - 1);
-            push_jump(view, doc);
-            doc.set_selection(view.id, Selection::new(ranges, idx));
-        },
-    );
+fn which_column_in_line(
+    selection: &Selection,
+    text: RopeSlice,
+    primary_index: usize,
+) -> (usize, bool) {
+    let mut last_on_line = true;
+    let mut index_on_line = 0;
+
+    let mut met_primary = false;
+    let mut ranges_on_line = 0;
+    let mut current_line = (0, 0);
+    for (index, range) in selection.ranges().iter().enumerate() {
+        let range_line = range.line_range(text);
+        if range_line != current_line {
+            if met_primary {
+                break;
+            }
+            current_line = range_line;
+            ranges_on_line = 0;
+        } else if met_primary {
+            last_on_line = false;
+            break;
+        }
+        ranges_on_line += 1;
+        if index == primary_index {
+            met_primary = true;
+            index_on_line = ranges_on_line - 1;
+        }
+    }
+    (index_on_line, last_on_line)
+}
+
+fn remove_column(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let primary_index = selection.primary_index();
+    let text = doc.text().slice(..);
+    let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
+    let last_on_line = last_on_line && index_on_line != 0;
+    let ranges = {
+        let mut hindsight = None;
+        let mut ranges = SmallVec::<[Range; 1]>::new();
+        let mut ranges_on_line = 0;
+        let mut current_line = (0, 0);
+        for range in selection.iter() {
+            let range_line = range.line_range(text);
+            if range_line != current_line {
+                current_line = range_line;
+                ranges_on_line = 0;
+            } else if last_on_line {
+                if let Some(range) = hindsight {
+                    ranges.push(range);
+                }
+            }
+            ranges_on_line += 1;
+            if last_on_line {
+                hindsight = Some(*range);
+            } else if index_on_line != ranges_on_line - 1 {
+                ranges.push(*range);
+            }
+        }
+        if !last_on_line {
+            if let Some(range) = hindsight {
+                ranges.push(range);
+            }
+        }
+        ranges
+    };
+    push_jump(view, doc);
+    let new_index = if index_on_line > ranges.len() - 1 {
+        0
+    } else if last_on_line {
+        index_on_line.saturating_sub(1)
+    } else {
+        index_on_line
+    };
+    doc.set_selection(view.id, Selection::new(ranges, new_index));
 }
 
 fn trim_selections(cx: &mut Context) {
