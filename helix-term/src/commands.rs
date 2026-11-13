@@ -1186,41 +1186,109 @@ fn keep_column(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id);
     let primary_index = selection.primary_index();
+    let last_selected = primary_index == selection.len() - 1;
     let text = doc.text().slice(..);
     let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
-    let last_on_line = last_on_line && index_on_line != 0;
-    let ranges = {
-        let mut hindsight = None;
-        let mut ranges = SmallVec::<[Range; 1]>::new();
-        let mut ranges_on_line = 0;
-        let mut current_line = (0, 0);
-        for range in selection.iter() {
-            let range_line = range.line_range(text);
-            if range_line != current_line {
-                current_line = range_line;
-                ranges_on_line = 0;
-                if last_on_line {
-                    if let Some(range) = hindsight.take() {
-                        ranges.push(range);
-                    }
+    let lined_ranges = get_lined_ranges(selection, text);
+    // primary selection is the overall last one → pick ranges that are the last on their line
+    // if primary was the last one on its line but not the overall → pick that index on every line
+    // if wasn't the last one in either form → pick that index except when it would be the last one on its line
+    // that exception doesn't apply if we're asking for the *first* selection regardless
+    let ranges = if last_selected {
+        lined_ranges
+            .iter()
+            .flat_map(|line| line.last())
+            .copied()
+            .collect()
+    } else if !last_on_line {
+        lined_ranges
+            .iter()
+            .flat_map(|line| {
+                let selections_on_line = line.len();
+                if (index_on_line != selections_on_line - 1) || index_on_line == 0 {
+                    line.get(index_on_line)
+                } else {
+                    None
                 }
-            }
-            ranges_on_line += 1;
-            if last_on_line {
-                hindsight = Some(*range);
-            } else if index_on_line == ranges_on_line - 1 {
-                ranges.push(*range);
-            }
-        }
-        if last_on_line {
-            if let Some(range) = hindsight {
-                ranges.push(range);
-            }
-        }
-        ranges
+            })
+            .copied()
+            .collect()
+    } else {
+        lined_ranges
+            .iter()
+            .flat_map(|line| line.get(index_on_line))
+            .copied()
+            .collect()
     };
     push_jump(view, doc);
     doc.set_selection(view.id, Selection::new(ranges, 0));
+}
+
+fn remove_column(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let primary_index = selection.primary_index();
+    let last_selected = primary_index == selection.len() - 1;
+    let text = doc.text().slice(..);
+    let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
+    let lined_ranges = get_lined_ranges(selection, text);
+    let ranges: SmallVec<[Range; 1]> = if last_selected {
+        lined_ranges
+            .iter()
+            .flat_map(|line| line.iter().take(line.len().saturating_sub(1)))
+            .copied()
+            .collect()
+    } else if !last_on_line {
+        lined_ranges
+            .iter()
+            .flat_map(|line| {
+                let last_index = line.len() - 1;
+                line.iter()
+                    .enumerate()
+                    .filter(move |(index, _)| {
+                        index_on_line != *index || (last_index == *index && index_on_line != 0)
+                    })
+                    .map(|(_, value)| value)
+            })
+            .copied()
+            .collect()
+    } else {
+        lined_ranges
+            .iter()
+            .flat_map(|line| {
+                line.iter()
+                    .enumerate()
+                    .filter(|(index, _)| index_on_line != *index)
+                    .map(|(_, value)| value)
+            })
+            .copied()
+            .collect()
+    };
+
+    push_jump(view, doc);
+    let new_index = if index_on_line > ranges.len() - 1 {
+        0
+    } else if last_on_line {
+        index_on_line.saturating_sub(1)
+    } else {
+        index_on_line
+    };
+    doc.set_selection(view.id, Selection::new(ranges, new_index));
+}
+
+fn get_lined_ranges(selection: &Selection, text: RopeSlice<'_>) -> Vec<Vec<Range>> {
+    let mut lined_ranges = vec![];
+    let mut current_line = None;
+    for range in selection.iter() {
+        let range_line = range.line_range(text);
+        if current_line != Some(range_line) {
+            current_line = Some(range_line);
+            lined_ranges.push(Vec::new());
+        }
+        let last_item = lined_ranges.len() - 1;
+        lined_ranges[last_item].push(*range);
+    }
+    lined_ranges
 }
 
 fn which_column_in_line(
@@ -1253,53 +1321,6 @@ fn which_column_in_line(
         }
     }
     (index_on_line, last_on_line)
-}
-
-fn remove_column(cx: &mut Context) {
-    let (view, doc) = current!(cx.editor);
-    let selection = doc.selection(view.id);
-    let primary_index = selection.primary_index();
-    let text = doc.text().slice(..);
-    let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
-    let last_on_line = last_on_line && index_on_line != 0;
-    let ranges = {
-        let mut hindsight = None;
-        let mut ranges = SmallVec::<[Range; 1]>::new();
-        let mut ranges_on_line = 0;
-        let mut current_line = (0, 0);
-        for range in selection.iter() {
-            let range_line = range.line_range(text);
-            if range_line != current_line {
-                current_line = range_line;
-                ranges_on_line = 0;
-            } else if last_on_line {
-                if let Some(range) = hindsight {
-                    ranges.push(range);
-                }
-            }
-            ranges_on_line += 1;
-            if last_on_line {
-                hindsight = Some(*range);
-            } else if index_on_line != ranges_on_line - 1 {
-                ranges.push(*range);
-            }
-        }
-        if !last_on_line {
-            if let Some(range) = hindsight {
-                ranges.push(range);
-            }
-        }
-        ranges
-    };
-    push_jump(view, doc);
-    let new_index = if index_on_line > ranges.len() - 1 {
-        0
-    } else if last_on_line {
-        index_on_line.saturating_sub(1)
-    } else {
-        index_on_line
-    };
-    doc.set_selection(view.id, Selection::new(ranges, new_index));
 }
 
 fn trim_selections(cx: &mut Context) {
