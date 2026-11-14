@@ -374,6 +374,7 @@ impl MappableCommand {
         split_selection, "Split selections on regex matches",
         split_selection_on_newline, "Split selection on newlines",
         merge_selections, "Merge selections",
+        merge_line_selections, "Merge selections of each line",
         merge_consecutive_selections, "Merge consecutive selections",
         search, "Search for regex pattern",
         rsearch, "Reverse search for regex pattern",
@@ -1053,12 +1054,12 @@ fn keep_column_selections(cx: &mut Context) {
     let last_selected = primary_index == selection.len() - 1;
     let text = doc.text().slice(..);
     let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
-    let lined_ranges = get_lined_ranges(selection, text);
+    let (lined_ranges, line_of_primary) = get_lined_ranges(selection, text, primary_index);
     // primary selection is the overall last one → pick ranges that are the last on their line
     // if primary was the last one on its line but not the overall → pick that index on every line
     // if wasn't the last one in either form → pick that index except when it would be the last one on its line
     // that exception doesn't apply if we're asking for the *first* selection regardless
-    let ranges = if last_selected {
+    let ranges: SmallVec<[Range; 1]> = if last_selected {
         lined_ranges
             .iter()
             .flat_map(|line| line.last())
@@ -1084,8 +1085,15 @@ fn keep_column_selections(cx: &mut Context) {
             .copied()
             .collect()
     };
+    let new_primary = {
+        ranges
+            .iter()
+            .take_while(|range| range.line_range(text) != line_of_primary)
+            .count()
+            .min(ranges.len() - 1)
+    };
     push_jump(view, doc);
-    doc.set_selection(view.id, Selection::new(ranges, 0));
+    doc.set_selection(view.id, Selection::new(ranges, new_primary));
 }
 
 fn remove_column_selections(cx: &mut Context) {
@@ -1095,7 +1103,7 @@ fn remove_column_selections(cx: &mut Context) {
     let last_selected = primary_index == selection.len() - 1;
     let text = doc.text().slice(..);
     let (index_on_line, last_on_line) = which_column_in_line(selection, text, primary_index);
-    let lined_ranges = get_lined_ranges(selection, text);
+    let (lined_ranges, line_of_primary) = get_lined_ranges(selection, text, primary_index);
     let ranges: SmallVec<[Range; 1]> = if last_selected {
         lined_ranges
             .iter()
@@ -1129,30 +1137,52 @@ fn remove_column_selections(cx: &mut Context) {
             .collect()
     };
 
+    let new_primary = {
+        let mut sofar = 0;
+        let mut remaining_selections_on_line: usize = 0;
+        for range in ranges.iter() {
+            if range.line_range(text) != line_of_primary {
+                if remaining_selections_on_line != 0 {
+                    break;
+                }
+                sofar += 1;
+            } else {
+                remaining_selections_on_line += 1;
+                continue;
+            }
+        }
+        if index_on_line >= remaining_selections_on_line.saturating_sub(1) {
+            (sofar + remaining_selections_on_line).saturating_sub(1)
+        } else {
+            sofar + index_on_line
+        }
+    }
+    .min(ranges.len() - 1);
     push_jump(view, doc);
-    let new_index = if index_on_line > ranges.len() - 1 {
-        0
-    } else if last_on_line {
-        index_on_line.saturating_sub(1)
-    } else {
-        index_on_line
-    };
-    doc.set_selection(view.id, Selection::new(ranges, new_index));
+    doc.set_selection(view.id, Selection::new(ranges, new_primary));
 }
 
-fn get_lined_ranges(selection: &Selection, text: RopeSlice<'_>) -> Vec<Vec<Range>> {
+fn get_lined_ranges(
+    selection: &Selection,
+    text: RopeSlice<'_>,
+    primary_index: usize,
+) -> (Vec<Vec<Range>>, (usize, usize)) {
     let mut lined_ranges = vec![];
     let mut current_line = None;
-    for range in selection.iter() {
+    let mut line_of_primary = None;
+    for (index, range) in selection.iter().enumerate() {
         let range_line = range.line_range(text);
         if current_line != Some(range_line) {
             current_line = Some(range_line);
             lined_ranges.push(Vec::new());
         }
+        if index == primary_index {
+            line_of_primary = current_line;
+        }
         let last_item = lined_ranges.len() - 1;
         lined_ranges[last_item].push(*range);
     }
-    lined_ranges
+    (lined_ranges, line_of_primary.unwrap())
 }
 
 fn which_column_in_line(
@@ -2415,6 +2445,39 @@ fn merge_consecutive_selections(cx: &mut Context) {
     let (view, doc) = current!(cx.editor);
     let selection = doc.selection(view.id).clone().merge_consecutive_ranges();
     doc.set_selection(view.id, selection);
+}
+
+fn merge_line_selections(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let primary_index = selection.primary_index();
+    let text = doc.text().slice(..);
+    let chunks: Vec<&[Range]> = selection
+        .ranges()
+        .chunk_by(|first, second| first.line_range(text) == second.line_range(text))
+        .collect();
+    let new_primary = chunks
+        .iter()
+        .scan(0, |acc, chunk| {
+            *acc += chunk.len();
+            Some(*acc)
+        })
+        .position(|endss| primary_index < endss)
+        .unwrap_or(0);
+    let ranges: SmallVec<[Range; 1]> = chunks
+        .iter()
+        .flat_map(|inner| {
+            inner.first().map(|first| {
+                if let Some(second) = inner.last() {
+                    first.merge(*second)
+                } else {
+                    *first
+                }
+            })
+        })
+        .collect();
+    push_jump(view, doc);
+    doc.set_selection(view.id, Selection::new(ranges, new_primary));
 }
 
 #[allow(clippy::too_many_arguments)]
