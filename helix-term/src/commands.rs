@@ -537,6 +537,8 @@ impl MappableCommand {
         remove_column, "Remove only this column of selections",
         keep_selections, "Keep selections matching regex",
         remove_selections, "Remove selections matching regex",
+        keep_line_selections, "Keep selections on this line",
+        remove_line_selections, "Remove selections on this line",
         align_selections, "Align selections in column",
         keep_primary_selection, "Keep primary selection",
         remove_primary_selection, "Remove primary selection",
@@ -1181,6 +1183,39 @@ fn goto_first_nonwhitespace_impl(view: &mut View, doc: &mut Document, movement: 
         }
     });
     doc.set_selection(view.id, selection);
+}
+
+fn keep_line_selections(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let text = doc.text().slice(..);
+    let primary_line = selection.primary().line_range(text);
+    let ranges = selection
+        .ranges()
+        .iter()
+        .filter(|range| range.line_range(text) == primary_line)
+        .copied()
+        .collect();
+    push_jump(view, doc);
+    doc.set_selection(view.id, Selection::new(ranges, 0));
+}
+
+fn remove_line_selections(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let text = doc.text().slice(..);
+    let primary_line = selection.primary().line_range(text);
+    let ranges: SmallVec<_> = selection
+        .ranges()
+        .iter()
+        .filter(|range| range.line_range(text) != primary_line)
+        .copied()
+        .collect();
+    if ranges.is_empty() {
+        return;
+    }
+    push_jump(view, doc);
+    doc.set_selection(view.id, Selection::new(ranges, 0));
 }
 
 fn keep_column(cx: &mut Context) {
