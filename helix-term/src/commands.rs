@@ -520,6 +520,8 @@ impl MappableCommand {
         remove_column_selections, "Remove only this column of selections",
         keep_selections, "Keep selections matching regex",
         remove_selections, "Remove selections matching regex",
+        keep_line_selections, "Keep selections on this line",
+        remove_line_selections, "Remove selections on this line",
         align_selections, "Align selections in column",
         keep_primary_selection, "Keep primary selection",
         remove_primary_selection, "Remove primary selection",
@@ -1045,6 +1047,71 @@ fn goto_first_nonwhitespace_impl(view: &mut View, doc: &mut Document, movement: 
         }
     });
     doc.set_selection(view.id, selection);
+}
+
+fn keep_line_selections(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let text = doc.text().slice(..);
+    let primary_index = selection.primary_index();
+    let chunks: Vec<&[Range]> = selection
+        .ranges()
+        .chunk_by(|first, second| first.line_range(text) == second.line_range(text))
+        .collect();
+    let (primary_line, primary_column) = unflatten_primary_position(primary_index, &chunks);
+    let ranges = chunks.into_iter().nth(primary_line).unwrap().into();
+    push_jump(view, doc);
+    doc.set_selection(view.id, Selection::new(ranges, primary_column));
+}
+
+fn remove_line_selections(cx: &mut Context) {
+    let (view, doc) = current!(cx.editor);
+    let selection = doc.selection(view.id);
+    let text = doc.text().slice(..);
+    let primary_index = selection.primary_index();
+    let chunks: Vec<&[Range]> = selection
+        .ranges()
+        .chunk_by(|first, second| first.line_range(text) == second.line_range(text))
+        .collect();
+    let (primary_line, primary_column) = unflatten_primary_position(primary_index, &chunks);
+    let mut chunks = chunks;
+    chunks.remove(primary_line);
+    let ranges: Vec<Range> = chunks.iter().copied().flatten().copied().collect();
+    let new_primary = if let Some(next_line) = chunks.get(primary_line) {
+        primary_index
+            .saturating_sub(primary_column.saturating_sub(next_line.len().saturating_sub(1)))
+    } else if let Some(previous_line) = chunks.last() {
+        let len = previous_line.len();
+        primary_index.saturating_sub(len + primary_column.saturating_sub(len.saturating_sub(1)))
+    } else {
+        ranges.len().saturating_sub(1)
+    };
+    if ranges.is_empty() {
+        return;
+    }
+    push_jump(view, doc);
+    doc.set_selection(
+        view.id,
+        Selection::new(SmallVec::from_vec(ranges), new_primary),
+    );
+}
+
+fn unflatten_primary_position(primary_index: usize, chunks: &Vec<&[Range]>) -> (usize, usize) {
+    let mut current_line = 0;
+    let mut current_column = 0;
+    let mut flat_index = 0;
+    'outer: for (line_index, chunk) in chunks.iter().enumerate() {
+        for column_index in 0..chunk.len() {
+            if primary_index == flat_index {
+                current_line = line_index;
+                current_column = column_index;
+                break 'outer;
+            } else {
+                flat_index += 1;
+            }
+        }
+    }
+    (current_line, current_column)
 }
 
 fn keep_column_selections(cx: &mut Context) {
