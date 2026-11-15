@@ -2670,52 +2670,32 @@ fn merge_line_selections(cx: &mut Context) {
     let selection = doc.selection(view.id);
     let primary_index = selection.primary_index();
     let text = doc.text().slice(..);
-    let mut new_primary = 0;
-    let ranges = {
-        let mut first_range: Option<Range> = None;
-        let mut last_range = None;
-        let mut current_line = None;
-        let mut lined_ranges = SmallVec::new();
-        for (index, range) in selection.ranges().iter().enumerate() {
-            let range_line = range.line_range(text);
-            if Some(range_line) != current_line {
-                current_line = Some(range_line);
-                if let Some(first_range) = first_range {
-                    if let Some(last_range) = last_range {
-                        if first_range == last_range {
-                            lined_ranges.push(first_range);
-                        } else {
-                            lined_ranges.push(first_range.merge(last_range))
-                        }
-                    } else {
-                        lined_ranges.push(first_range);
-                    }
-                }
-                first_range = None;
-                last_range = None;
-            }
-            if first_range.is_none() {
-                first_range = Some(*range);
-            } else {
-                last_range = Some(*range);
-            }
-            if index == primary_index {
-                new_primary = lined_ranges.len();
-            }
-        }
-        if let Some(first_range) = first_range {
-            if let Some(last_range) = last_range {
-                if first_range == last_range {
-                    lined_ranges.push(first_range);
+    let chunks: Vec<&[Range]> = selection
+        .ranges()
+        .chunk_by(|first, second| first.line_range(text) == second.line_range(text))
+        .collect();
+    let new_primary = chunks
+        .iter()
+        .scan(0, |acc, chunk| {
+            *acc += chunk.len();
+            Some(*acc)
+        })
+        .position(|endss| primary_index < endss)
+        .unwrap_or(0);
+    let ranges: SmallVec<[Range; 1]> = chunks
+        .iter()
+        .filter_map(|inner| {
+            if let Some(first) = inner.first() {
+                if let Some(second) = inner.last() {
+                    Some(first.merge(*second))
                 } else {
-                    lined_ranges.push(first_range.merge(last_range))
+                    Some(*first)
                 }
             } else {
-                lined_ranges.push(first_range);
+                None
             }
-        }
-        lined_ranges
-    };
+        })
+        .collect();
     push_jump(view, doc);
     doc.set_selection(view.id, Selection::new(ranges, new_primary));
 }
