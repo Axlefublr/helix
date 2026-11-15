@@ -433,39 +433,25 @@ I usually realize I want something to be in some register only *after* I've alre
 But now I can more conveniently play into this: <kbd>y</kbd>, “oh right I want this in a register”, *boom*. \
 On the opposite end, I can now grab the contents of some register and then continue to reuse it over and over again, rather than invoking the register picker for every action, which I always found *so* annoying that I end up never using it.
 
-### retain_column
-Is better shown with an example.
-```
-jenny, provider, referred, circuit,
-sought, restaurant, crowd, circuit,
-stopped, symposium, density, circuit,
-flexible, corps, concerned, madrid,
-```
-Say you have this text, and want to hyphenate the words of the second and third column, to get this:
-```
-jenny, provider-referred, circuit,
-sought, restaurant-crowd, circuit,
-stopped, symposium-density, circuit,
-flexible, corps-concerned, madrid,
-```
-We first select all the lines and use `select_character` to select all `,`s. Now we want to trim / remove all the selections that *aren't* the commas after the second words. We want to only keep the second *column* of selections. \
-Once we can do that, we can `dc-` to change the `, ` to a `-` to complete the hyphenation.
+### keep_column
+Out of all selections, keep only the selections in the current (linewise) column.
 
-So, `retain_column` is what you can use for that “keep only the nth column” part. \
-You specify which column to keep with the position of your **primary selection**. So you can `rotate_selections_forward` once to get yourself onto the overall second comma (or the 6th, 10th, 14th). \
-Then you call `retain_column` and it asks you *how many columns there are*. In this case there are 4, so you type `4`, press <kbd>Enter</kbd>, and blammo — you're left selecting only the second column of commas / only the commas after the second words.
+You pick the current column by where your primary selection is, and what “current” *means* goes like this:
+1. Keep the column of the current index on all lines. But if this index turns out to be the *last* column on some line, it won't count there.
+2. If you were on the last selection of the line, the “But” of rule 1 no longer applies.
+3. If you're on the absolute last selection, keep the last (rather than some index) selection of every line.
 
-Incidentally, this action can *also* be used to mean the more general “only keep every nth selection” — I made this action to make columnar selections nicer to work with, but “columns” don't have to be all on the same line to be valid.
+https://github.com/user-attachments/assets/e81af025-3f0c-4511-b17d-fbb9df92293f
 
-Let's instead of doing `dc-` call `retain_column` *again* and now provide `2`.
-```
-jenny, provider, referred, circuit,
-sought, restaurant, crowd, circuit,
-stopped, symposium, density, circuit,
-flexible, corps, concerned, madrid,
-```
-We would end up selecting only the commas after `provider` and `symposium`.
-Even though the “columns” were vertical rather than horizontal in this case, the action worked just as well.
+### remove_column
+Same exact semantics as in `keep_column`, but *remove* the current column (keeping the rest) instead of keeping the current column (removing the rest).
+
+### merge_line_selections
+Like `merge_selections`, but merge the ranges of *each line*, instead of the entire buffer.
+
+<img width="1876" height="1001" alt="image" src="https://github.com/user-attachments/assets/869429bd-cb7e-42f3-a27e-9145b0558f20" />
+
+<img width="1876" height="1001" alt="image" src="https://github.com/user-attachments/assets/52592191-29e0-4693-b0bd-4b5ad26f6a2f" />
 
 ### local_search_fuzzy
 Lets you fuzzy search the contents of the *current* buffer with a picker. \
