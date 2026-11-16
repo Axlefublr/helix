@@ -532,6 +532,8 @@ impl MappableCommand {
         toggle_block_comments, "Block comment/uncomment selections",
         rotate_selections_forward, "Rotate selections forward",
         rotate_selections_backward, "Rotate selections backward",
+        rotate_selections_down, "Rotate selections down by column",
+        rotate_selections_up, "Rotate selections up by column",
         rotate_selection_contents_forward, "Rotate selection contents forward",
         rotate_selection_contents_backward, "Rotate selections contents backward",
         reverse_selection_contents, "Reverse selections contents",
@@ -6570,6 +6572,67 @@ fn rotate_selections_forward(cx: &mut Context) {
 }
 fn rotate_selections_backward(cx: &mut Context) {
     rotate_selections(cx, Direction::Backward)
+}
+
+#[derive(PartialEq)]
+enum VerticalDirection {
+    Down,
+    Up,
+}
+fn rotate_selections_vertical(cx: &mut Context, direction: VerticalDirection) {
+    let (view, doc) = current!(cx.editor);
+    let text = doc.text().slice(..);
+    let mut selection = doc.selection(view.id).clone();
+    let primary_index = selection.primary_index();
+    let selections = selection.len();
+    let chunks: Vec<&[Range]> = selection
+        .ranges()
+        .chunk_by(|first, second| first.line_range(text) == second.line_range(text))
+        .collect();
+    let (primary_line, primary_column) = unflatten_primary_position(primary_index, &chunks);
+
+    let new_primary = if direction == VerticalDirection::Down {
+        let mut the = chunks.iter().cycle();
+        let line_ranges = the.nth(primary_line);
+        let next_line_ranges = the.next();
+        match (line_ranges, next_line_ranges) {
+            (Some(line_ranges), Some(next_line_ranges)) => {
+                (primary_index
+                    + line_ranges.len().saturating_sub(1 + primary_column)
+                    + primary_column.min(next_line_ranges.len().saturating_sub(1))
+                    + 1)
+                    % selections
+            }
+            (_, _) => return,
+        }
+    } else {
+        let mut the = chunks.iter().rev().cycle();
+        let line_ranges = the.nth((chunks.len() - primary_line).saturating_sub(1));
+        let prev_line_ranges = the.next();
+        match (line_ranges, prev_line_ranges) {
+            (Some(_), Some(prev_line_ranges)) => {
+                let offset = primary_index as isize
+                    - (primary_column
+                        + 1
+                        + (prev_line_ranges.len().saturating_sub(1 + primary_column)))
+                        as isize;
+                if offset < 0 {
+                    selections - offset.unsigned_abs()
+                } else {
+                    offset as usize
+                }
+            }
+            (_, _) => return,
+        }
+    };
+    selection.set_primary_index(new_primary);
+    doc.set_selection(view.id, selection);
+}
+fn rotate_selections_down(cx: &mut Context) {
+    rotate_selections_vertical(cx, VerticalDirection::Down)
+}
+fn rotate_selections_up(cx: &mut Context) {
+    rotate_selections_vertical(cx, VerticalDirection::Up)
 }
 
 fn rotate_selections_first(cx: &mut Context) {
