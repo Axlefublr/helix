@@ -5486,6 +5486,7 @@ fn remove_primary_selection(cx: &mut Context) {
     let index = selection.primary_index();
     let selection = selection.clone().remove(index);
 
+    push_jump(view, doc);
     doc.set_selection(view.id, selection);
 }
 
