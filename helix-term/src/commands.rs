@@ -637,6 +637,7 @@ impl MappableCommand {
         dap_switch_stack_frame, "Switch stack frame",
         dap_enable_exceptions, "Enable exception breakpoints",
         dap_disable_exceptions, "Disable exception breakpoints",
+        shell_run_command, "Run a shell command",
         shell_pipe, "Pipe selections through shell command",
         shell_pipe_to, "Pipe selections into shell command ignoring output",
         shell_insert_output, "Insert shell command output before selections",
@@ -8326,6 +8327,44 @@ where
 fn shell_prompt_for_behavior(cx: &mut Context, prompt: Cow<'static, str>, behavior: ShellBehavior) {
     shell_prompt(cx, prompt, move |cx, args| {
         shell(cx, args.join(" ").as_str(), &behavior)
+    })
+}
+
+fn shell_run_command(cx: &mut Context) {
+    shell_prompt(cx, "sh:".into(), move |cx, args| {
+        let cmd = args.join(" ");
+        let config = cx.editor.config();
+        let mut chrs = cmd.chars();
+        let Some(first_char) = chrs.next() else {
+            return;
+        };
+        let (cmd, shell) = if let Some(shell) = config.shellmap.get(&first_char) {
+            let Some((cmd_start, _char)) = cmd.char_indices().nth(1) else {
+                return;
+            };
+            (cmd.get(cmd_start..).unwrap_or_default(), shell.clone())
+        } else {
+            (cmd.as_str(), config.shell.clone())
+        };
+        let args = cmd.to_owned();
+
+        let callback = async move {
+            let output = shell_impl_async(&shell, &args, None).await?;
+            let call: job::Callback = Callback::EditorCompositor(Box::new(
+                move |editor: &mut Editor, compositor: &mut Compositor| {
+                    if !output.trim().is_empty() {
+                        let contents = ui::Text::new(output.trim_end().to_owned());
+                        let popup = Popup::new("shell", contents).position(Some(
+                            helix_core::Position::new(editor.cursor().0.unwrap_or_default().row, 2),
+                        ));
+                        compositor.replace_or_push("shell", popup);
+                    }
+                    editor.set_status("Command run");
+                },
+            ));
+            Ok(call)
+        };
+        cx.jobs.callback(callback);
     })
 }
 
