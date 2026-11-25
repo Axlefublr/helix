@@ -919,7 +919,12 @@ impl Component for Prompt {
                     (self.callback_fn)(cx, &self.line, PromptEvent::Update);
                 }
             }
-            key!(Enter) => {
+            key!(Enter)
+            | shift!(Enter)
+            | KeyEvent {
+                code: KeyCode::F(11),
+                modifiers: helix_view::keyboard::KeyModifiers::NONE,
+            } => {
                 if self.selection.is_some() && self.line.ends_with(std::path::MAIN_SEPARATOR) {
                     self.recalculate_completion(cx.editor);
                 } else {
