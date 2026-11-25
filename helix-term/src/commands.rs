@@ -622,6 +622,7 @@ impl MappableCommand {
         dap_switch_stack_frame, "Switch stack frame",
         dap_enable_exceptions, "Enable exception breakpoints",
         dap_disable_exceptions, "Disable exception breakpoints",
+        shell_run_command, "Run a shell command",
         shell_pipe, "Pipe selections through shell command",
         shell_pipe_to, "Pipe selections into shell command ignoring output",
         shell_insert_output, "Insert shell command output before selections",
@@ -8147,6 +8148,41 @@ where
 fn shell_prompt_for_behavior(cx: &mut Context, prompt: Cow<'static, str>, behavior: ShellBehavior) {
     shell_prompt(cx, prompt, move |cx, args| {
         shell(cx, args.join(" ").as_str(), &behavior)
+    })
+}
+
+fn shell_run_command(cx: &mut Context) {
+    shell_prompt(cx, "sh:".into(), move |cx, args| {
+        let cmd = args.join(" ");
+        let Some((cmd, shell)) = shellmap(&*cx, &cmd) else {
+            return;
+        };
+        let args = cmd;
+
+        let callback = async move {
+            let output = shell_impl_async(&shell, &args, None).await?;
+            let call: job::Callback = Callback::EditorCompositor(Box::new(
+                move |editor: &mut Editor, compositor: &mut Compositor| {
+                    if !output.trim().is_empty() {
+                        let mut output = output;
+                        if output.ends_with('\n') {
+                            output.pop();
+                            if output.ends_with('\r') {
+                                output.pop();
+                            }
+                        }
+                        let contents = ui::Text::new(output.to_string());
+                        let popup = Popup::new("shell", contents).position(Some(
+                            helix_core::Position::new(editor.cursor().0.unwrap_or_default().row, 2),
+                        ));
+                        compositor.replace_or_push("shell", popup);
+                    }
+                    editor.set_status("Command run");
+                },
+            ));
+            Ok(call)
+        };
+        cx.jobs.callback(callback);
     })
 }
 
