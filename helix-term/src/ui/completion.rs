@@ -564,7 +564,13 @@ impl Component for Completion {
                 return;
             }
 
-            Rect::new(0, y, area.width, avail_height.min(15))
+            if let Some((_content_width, content_height)) =
+                markdown_doc.required_size((area.width, avail_height))
+            {
+                Rect::new(0, y, area.width, content_height.min(avail_height))
+            } else {
+                Rect::new(0, y, area.width, avail_height)
+            }
         };
 
         // clear area
