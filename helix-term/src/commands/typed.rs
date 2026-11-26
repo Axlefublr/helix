@@ -2712,6 +2712,19 @@ fn insert_output(
     Ok(())
 }
 
+fn squish_output(
+    cx: &mut compositor::Context,
+    args: Args,
+    event: PromptEvent,
+) -> anyhow::Result<()> {
+    if event != PromptEvent::Validate {
+        return Ok(());
+    }
+
+    shell(cx, &args.join(" "), &ShellBehavior::Squish);
+    Ok(())
+}
+
 fn pipe_to(cx: &mut compositor::Context, args: Args, event: PromptEvent) -> anyhow::Result<()> {
     pipe_impl(cx, args, event, &ShellBehavior::Ignore)
 }
@@ -4053,6 +4066,14 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
         aliases: &[],
         doc: "Run shell command, appending output after each selection.",
         fun: append_output,
+        completer: SHELL_COMPLETER,
+        signature: SHELL_SIGNATURE,
+    },
+    TypableCommand {
+        name: "squish-output",
+        aliases: &[],
+        doc: "Run shell command, inserting output at each cursor.",
+        fun: squish_output,
         completer: SHELL_COMPLETER,
         signature: SHELL_SIGNATURE,
     },
