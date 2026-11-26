@@ -375,7 +375,7 @@ impl Component for Markdown {
             .wrap(Wrap { trim: false })
             .scroll((cx.scroll.unwrap_or_default() as u16, 0));
 
-        let margin = Margin::all(1);
+        let margin = Margin::horizontal(1);
         par.render(area.inner(margin), surface);
     }
 
@@ -387,6 +387,6 @@ impl Component for Markdown {
         let max_text_width = (viewport.0.saturating_sub(padding)).min(120);
         let (width, height) = crate::ui::text::required_size(&contents, max_text_width);
 
-        Some((width + padding, height + padding))
+        Some((width + padding, height))
     }
 }
