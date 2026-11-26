@@ -532,7 +532,7 @@ impl Component for Completion {
 
         let popup_area = self.popup.area(area, cx.editor);
         let doc_width_available = area.width.saturating_sub(popup_area.right());
-        let doc_area = if doc_width_available > 30 {
+        let doc_area = if doc_width_available > 200 {
             let mut doc_width = doc_width_available;
             let mut doc_height = area.height.saturating_sub(popup_area.top());
             let x = popup_area.right();
