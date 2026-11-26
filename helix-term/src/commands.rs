@@ -642,6 +642,7 @@ impl MappableCommand {
         shell_pipe_to, "Pipe selections into shell command ignoring output",
         shell_insert_output, "Insert shell command output before selections",
         shell_append_output, "Append shell command output after selections",
+        shell_squish_output, "Insert shell command output at the cursor positions",
         shell_keep_pipe, "Filter selections with shell predicate",
         suspend, "Suspend and return to shell",
         rename_symbol, "Rename symbol",
@@ -8074,6 +8075,7 @@ enum ShellBehavior {
     Ignore,
     Insert,
     Append,
+    Squish,
 }
 
 fn shell_pipe(cx: &mut Context) {
@@ -8090,6 +8092,10 @@ fn shell_insert_output(cx: &mut Context) {
 
 fn shell_append_output(cx: &mut Context) {
     shell_prompt_for_behavior(cx, "append-output:".into(), ShellBehavior::Append);
+}
+
+fn shell_squish_output(cx: &mut Context) {
+    shell_prompt_for_behavior(cx, "squish-output:".into(), ShellBehavior::Squish);
 }
 
 fn shell_keep_pipe(cx: &mut Context) {
@@ -8212,9 +8218,10 @@ async fn shell_impl_async(
 fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
     let pipe = match behavior {
         ShellBehavior::Replace | ShellBehavior::Ignore => true,
-        ShellBehavior::Insert | ShellBehavior::Append => false,
+        ShellBehavior::Insert | ShellBehavior::Append | ShellBehavior::Squish => false,
     };
 
+    let is_insert_mode = cx.editor.mode() == Mode::Insert;
     let config = cx.editor.config();
     let mut chrs = cmd.chars();
     let Some(first_char) = chrs.next() else {
@@ -8269,6 +8276,10 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             ShellBehavior::Replace => (range.from(), range.to(), range.len()),
             ShellBehavior::Insert => (range.from(), range.from(), 0),
             ShellBehavior::Append => (range.to(), range.to(), 0),
+            ShellBehavior::Squish => {
+                let cursor_position = range.cursor(text);
+                (cursor_position, cursor_position, 0)
+            }
             _ => (range.from(), range.from(), 0),
         };
 
@@ -8278,7 +8289,23 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             .expect("Selection ranges cannot overlap")
             .checked_sub(deleted_len)
             .expect("Selection ranges cannot overlap");
-        let new_range = Range::new(anchor, anchor + output_len).with_direction(range.direction());
+        let actual_head = anchor + output_len;
+        let head = if *behavior == ShellBehavior::Squish && is_insert_mode {
+            let text_len = text.len_chars();
+            if actual_head <= text_len {
+                next_grapheme_boundary(text, actual_head)
+            } else {
+                (actual_head + 1).max(text_len - 1)
+            }
+        } else {
+            actual_head
+        };
+        let new_direction = if *behavior == ShellBehavior::Squish {
+            Direction::Forward
+        } else {
+            range.direction()
+        };
+        let new_range = Range::new(anchor, head).with_direction(new_direction);
         ranges.push(new_range);
         offset = offset
             .checked_add_unsigned(output_len)
@@ -8294,6 +8321,9 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
             .with_selection(Selection::new(ranges, selection.primary_index()));
         doc.apply(&transaction, view.id);
         doc.append_changes_to_history(view);
+        if *behavior == ShellBehavior::Squish && is_insert_mode {
+            doc.restore_cursor = true;
+        }
     }
 
     // after replace cursor may be out of bounds, do this to
