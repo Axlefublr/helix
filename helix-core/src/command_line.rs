@@ -547,6 +547,15 @@ impl<'a> Tokenizer<'a> {
             .count();
         let kind = &self.input[kind_start..self.pos];
 
+        if let Some(content) = variable_shortcut(kind) {
+            return Some(Ok(Token {
+                kind: TokenKind::Expansion(ExpansionKind::Variable),
+                content_start: kind_start,
+                content: Cow::Borrowed(content),
+                is_terminated: false,
+            }));
+        }
+
         let (open, close) = match self.byte() {
             // We support a couple of hard-coded chars only to make sure we can provide more
             // useful errors and avoid weird behavior in case of typos. These should cover
@@ -645,6 +654,22 @@ impl<'a> Tokenizer<'a> {
 
         (Cow::Borrowed(&self.input[start..end]), is_terminated)
     }
+}
+
+fn variable_shortcut(kind: &str) -> Option<&'static str> {
+    Some(match kind {
+        "l" => "cursor_line",
+        "c" => "cursor_column",
+        "n" => "buffer_name",
+        "f" => "full_path",
+        "d" => "working_directory",
+        "g" => "language",
+        "s" => "selection",
+        "r" => "relative_path",
+        "p" => "buffer_parent",
+        "t" => "buffer_stem",
+        _ => return None,
+    })
 }
 
 impl<'a> Iterator for Tokenizer<'a> {
