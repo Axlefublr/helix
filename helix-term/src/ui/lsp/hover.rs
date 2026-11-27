@@ -65,14 +65,14 @@ impl Hover {
 }
 
 const PADDING_HORIZONTAL: u16 = 2;
-const PADDING_TOP: u16 = 1;
-const PADDING_BOTTOM: u16 = 1;
+const PADDING_TOP: u16 = 0;
+const PADDING_BOTTOM: u16 = 0;
 const HEADER_HEIGHT: u16 = 1;
 const SEPARATOR_HEIGHT: u16 = 1;
 
 impl Component for Hover {
     fn render(&mut self, area: Rect, surface: &mut Buffer, cx: &mut Context) {
-        let margin = Margin::all(1);
+        let margin = Margin::horizontal(1);
         let area = area.inner(margin);
 
         let (header, contents) = self.content();
