@@ -342,8 +342,7 @@ impl Markdown {
                     }
                 }
                 Event::Rule => {
-                    lines.push(Spans::from(Span::styled("───", rule_style)));
-                    lines.push(Spans::default());
+                    lines.push(Spans::from(Span::styled("━━━", rule_style)));
                 }
                 // TaskListMarker(bool) true if checked
                 _ => {
