@@ -421,6 +421,10 @@ Prompts you with the name of an html tag, and surrounds your selections with it.
 You have `word`, type in `div`, and get `<div>word</div>`. \
 The history for it is stored in the `<` register.
 
+### shell_run_command
+The action equivalent of `:sh` — you *just* type in the command, rather than having to also type in `sh ` first.
+Shares history with the other `shell_` actions.
+
 ### registers manipulation
 Usually, you retrieve a register for every action that you want to do with it, rather than getting it once and reusing it. \
 `copy_register_to_yank` lets you pick a register to copy the contents of, into the default yank register. \
@@ -534,9 +538,6 @@ desktop
 
 ### echopy
 Command is exactly like `:echo`, but *also* puts the result into your `default-yank-register`. Has alias `:cc`.
-
-### run-shell-command-quiet
-With aliases `?` and `shq` is exactly like `:run-shell-command`, but doesn't show the output of the command.
 
 ## Autopairs
 
