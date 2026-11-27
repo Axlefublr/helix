@@ -8365,10 +8365,14 @@ fn shell_run_command(cx: &mut Context) {
             let call: job::Callback = Callback::EditorCompositor(Box::new(
                 move |editor: &mut Editor, compositor: &mut Compositor| {
                     if !output.trim().is_empty() {
-                        let contents = ui::Markdown::new(
-                            format!("```text\n{}\n```", output.trim_end()),
-                            editor.syn_loader.clone(),
-                        );
+                        let mut output = output;
+                        if output.ends_with('\n') {
+                            output.pop();
+                            if output.ends_with('\r') {
+                                output.pop();
+                            }
+                        }
+                        let contents = ui::Text::new(output.to_string());
                         let popup = Popup::new("shell", contents).position(Some(
                             helix_core::Position::new(editor.cursor().0.unwrap_or_default().row, 2),
                         ));
