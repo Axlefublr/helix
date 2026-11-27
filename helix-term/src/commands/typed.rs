@@ -4474,7 +4474,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     },
     TypableCommand {
         name: "echopy",
-        aliases: &["cc"],
+        aliases: &[",,"],
         doc: "Put string into clipboard",
         fun: echopy,
         completer: CommandCompleter::none(),
