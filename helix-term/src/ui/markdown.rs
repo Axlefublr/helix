@@ -330,7 +330,10 @@ impl Markdown {
                 Event::Code(text) | Event::Html(text) => {
                     spans.push(Span::styled(text, code_style));
                 }
-                Event::SoftBreak | Event::HardBreak => {
+                Event::SoftBreak => {
+                    spans.push(Span::raw(" "));
+                }
+                Event::HardBreak => {
                     push_line(&mut spans, &mut lines);
                     if !list_stack.is_empty() {
                         // TODO: could push indent + 2 or 3 spaces to align with
