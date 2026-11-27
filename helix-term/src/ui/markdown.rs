@@ -287,7 +287,7 @@ impl Markdown {
 
                     // whenever heading, code block or paragraph closes, empty line
                     match tag {
-                        TagEnd::Heading(_) | TagEnd::Paragraph | TagEnd::CodeBlock => {
+                        TagEnd::Paragraph => {
                             lines.push(Spans::default());
                         }
                         _ => (),
