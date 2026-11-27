@@ -332,6 +332,12 @@ Previously, the same hotkeys were used to scroll the popup *and* to scroll the m
 
 </details>
 
+## Completion
+
+### Documentation popup
+
+Doesn't have vertical margin.
+
 ## New options
 
 Commit semantics: `option:` prefix with the name of the option afterwards.
