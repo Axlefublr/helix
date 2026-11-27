@@ -4463,7 +4463,7 @@ pub const TYPABLE_COMMAND_LIST: &[TypableCommand] = &[
     },
     TypableCommand {
         name: "echo",
-        aliases: &[],
+        aliases: &[","],
         doc: "Prints the given arguments to the statusline.",
         fun: echo,
         completer: CommandCompleter::none(),
