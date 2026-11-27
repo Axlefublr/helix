@@ -8372,7 +8372,7 @@ fn shell_run_command(cx: &mut Context) {
                                 output.pop();
                             }
                         }
-                        let contents = ui::Text::new(output.to_string());
+                        let contents = ui::Text::padded(output.to_string());
                         let popup = Popup::new("shell", contents).position(Some(
                             helix_core::Position::new(editor.cursor().0.unwrap_or_default().row, 2),
                         ));

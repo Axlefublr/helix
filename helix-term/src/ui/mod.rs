@@ -165,7 +165,7 @@ pub fn raw_regex_prompt(
                                 let callback = async move {
                                     let call: job::Callback = Callback::EditorCompositor(Box::new(
                                         move |_editor: &mut Editor, compositor: &mut Compositor| {
-                                            let contents = Text::new(format!("{}", err));
+                                            let contents = Text::padded(format!("{}", err));
                                             let size = compositor.size();
                                             let popup = Popup::new("invalid-regex", contents)
                                                 .position(Some(helix_core::Position::new(
