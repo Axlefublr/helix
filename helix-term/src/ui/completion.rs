@@ -558,7 +558,12 @@ impl Component for Completion {
                     avail_height_below,
                 )
             } else {
-                (0, avail_height_above)
+                (
+                    ((cx.editor.config().bufferline == helix_view::editor::BufferLine::Always)
+                        as u16)
+                        + (cx.editor.config().breadcrumb.enable as u16),
+                    avail_height_above,
+                )
             };
             if avail_height <= 1 {
                 return;
