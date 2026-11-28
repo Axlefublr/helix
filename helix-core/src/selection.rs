@@ -134,6 +134,28 @@ impl Range {
         }
     }
 
+    /// `Direction::Forward` when head > anchor.
+    /// `Direction::Backward` otherwise.
+    #[inline]
+    pub fn direction_bias_backward(&self) -> Direction {
+        if self.head > self.anchor {
+            Direction::Forward
+        } else {
+            Direction::Backward
+        }
+    }
+
+    /// `Direction::Forward` when head > anchor by more than 1.
+    /// `Direction::Backward` otherwise.
+    #[inline]
+    pub fn direction_strong_bias_backward(&self) -> Direction {
+        if self.head > self.anchor && (self.head - self.anchor) > 1 {
+            Direction::Forward
+        } else {
+            Direction::Backward
+        }
+    }
+
     /// Flips the direction of the selection
     pub fn flip(&self) -> Self {
         Self {
