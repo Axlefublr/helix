@@ -188,7 +188,7 @@ Offensively, helix went out of its way to prevent you from being able to do so??
 
 `insert_tab` inserts the tab character always, not whatever the indent string is.
 
-`signature_help` *is* actually closed when you press <kbd>Escape</kbd> to exit insert mode.
+`signature_help` popup is closed when you press <kbd>Escape</kbd>.
 
 `save_selection` is silent: doesn't print “Selection saved to jumplist” to the messages line.
 
@@ -339,7 +339,7 @@ Now, <kbd>ctrl+Home</kbd> and <kbd>ctrl+End</kbd> are used instead.
 
 Commit semantics: `popup:` prefix.
 
-Markdown popups¹ and `hover` no longer have vertical padding: only horizontal one. \
+Markdown popups¹, `hover`, `signature_help` no longer have vertical padding: only horizontal one. \
 Plain text popups² *gain* horizontal padding (but still no vertical padding).
 
 ¹ Like the [completion documentation popup](#completion-doc-popup) \
