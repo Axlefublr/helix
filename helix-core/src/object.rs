@@ -20,7 +20,7 @@ pub fn expand_selection(syntax: &Syntax, text: RopeSlice, selection: Selection) 
         let from = text.byte_to_char(node.start_byte() as usize);
         let to = text.byte_to_char(node.end_byte() as usize);
 
-        Range::new(to, from).with_direction(range.direction())
+        Range::new(to, from).with_direction(range.direction_strong_bias_backward())
     })
 }
 
