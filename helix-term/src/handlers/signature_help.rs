@@ -269,7 +269,7 @@ pub fn show_signature_help(
     let mut popup = Popup::new(SignatureHelp::ID, contents)
         .position(old_popup.and_then(|p| p.get_position()))
         .position_bias(Open::Above)
-        .ignore_escape_key(true);
+        .ignore_escape_key(false);
 
     // Don't create a popup if it intersects the auto-complete menu.
     let size = compositor.size();
