@@ -94,7 +94,7 @@ impl Component for SignatureHelp {
     }
 
     fn render(&mut self, area: Rect, surface: &mut Buffer, cx: &mut Context) {
-        let margin = Margin::all(1);
+        let margin = Margin::horizontal(1);
         let area = area.inner(margin);
 
         let signature = self
@@ -206,6 +206,6 @@ impl Component for SignatureHelp {
             0
         };
 
-        Some((width + PADDING + sig_index_width as u16, height + PADDING))
+        Some((width + PADDING + sig_index_width as u16, height))
     }
 }
