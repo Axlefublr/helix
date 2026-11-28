@@ -205,7 +205,7 @@ pub fn syntax_symbol_picker(cx: &mut Context) {
             cx.editor.switch(doc_id, action);
             let view = view_mut!(cx.editor);
             let doc = doc_mut!(cx.editor, &doc_id);
-            doc.set_selection(view.id, Selection::single(tag.start, tag.end));
+            doc.set_selection(view.id, Selection::single(tag.end, tag.start));
             if action.align_view(view, doc.id()) {
                 align_view(doc, view, Align::Center)
             }
@@ -447,7 +447,7 @@ pub fn syntax_workspace_symbol_picker(cx: &mut Context) {
                 cx.editor.set_error("The location you jumped to does not exist anymore because the file has changed.");
                 return;
             }
-            doc.set_selection(view.id, Selection::single(tag.start, tag.end));
+            doc.set_selection(view.id, Selection::single(tag.end, tag.start));
             if action.align_view(view, doc.id()) {
                 align_view(doc, view, Align::Center)
             }
