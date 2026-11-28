@@ -8124,7 +8124,7 @@ fn shell(cx: &mut compositor::Context, cmd: &str, behavior: &ShellBehavior) {
         let new_direction = if *behavior == ShellBehavior::Squish {
             Direction::Forward
         } else {
-            range.direction()
+            range.direction_strong_bias_backward()
         };
         let new_range = Range::new(anchor, head).with_direction(new_direction);
         ranges.push(new_range);
